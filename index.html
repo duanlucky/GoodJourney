@@ -18,329 +18,152 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f4f6f8; padding: 8px; color: #333; -webkit-tap-highlight-color: transparent; }
+    .container { max-width: 980px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    
+    .header { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #007bff; padding-bottom: 12px; }
+    .header h1 { color: #1a365d; font-size: 20px; margin-bottom: 6px; line-height: 1.3; }
+    .header p { color: #4a5568; font-size: 13px; font-weight: 500; }
+    
+    /* Thanh trạng thái đăng nhập */
+    .admin-bar { display: flex; flex-direction: column; gap: 10px; background: #edf2f7; padding: 10px 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center; }
+    .admin-bar-btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; }
+    .badge-role { font-weight: 700; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+    .role-user { background: #e2e8f0; color: #4a5568; }
+    .role-admin { background: #c53030; color: white; }
 
-:root{
-  --navy:#092f4f;
-  --blue:#1677b8;
-  --blue2:#0d5f95;
-  --sky:#eaf6ff;
-  --orange:#ff8a3d;
-  --green:#16a36b;
-  --red:#df5757;
-  --ink:#132238;
-  --muted:#66758a;
-  --line:#e6edf3;
-  --bg:#f3f7fa;
-  --white:#fff;
-  --shadow:0 12px 32px rgba(15,43,68,.08);
-  --softshadow:0 5px 18px rgba(15,43,68,.06);
-  --radius:20px;
-}
+    .card { background: #ffffff; border: 1px solid #e2e8f0; padding: 14px; border-radius: 10px; margin-bottom: 15px; }
+    .card h2 { color: #2b6cb0; font-size: 16px; margin-bottom: 12px; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
+    input[type="text"], input[type="number"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; -webkit-appearance: none; }
+    
+    .summary-box { background: #ebf8ff; border: 1px solid #bee3f8; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: bold; color: #2b6cb0; display: flex; flex-direction: column; gap: 8px; text-align: center; }
+    .summary-item span { display: block; font-size: 18px; color: #2c5282; margin-top: 2px; }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-html{scroll-behavior:smooth}
-body{
-  background:
-    radial-gradient(circle at 0 0,rgba(22,119,184,.10),transparent 26%),
-    radial-gradient(circle at 100% 8%,rgba(255,138,61,.08),transparent 22%),
-    var(--bg);
-  color:var(--ink);
-  padding:10px;
-  -webkit-tap-highlight-color:transparent;
-}
-.container{max-width:1120px;margin:0 auto;padding:0 0 82px}
+    .btn-group { display: flex; flex-direction: column; gap: 8px; }
+    .btn { display: inline-block; width: 100%; text-align: center; background: #3182ce; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .btn:active { opacity: 0.85; }
+    .btn-success { background: #38a169; }
+    .btn-danger { background: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
+    .btn-warning { background: #ed8936; }
+    .btn-dark { background: #4a5568; }
+    
+    #map { height: 380px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e0; margin-top: 12px; z-index: 1; }
+    .leaflet-routing-container { display: none !important; }
+    
+    .custom-div-icon, .leg-badge-icon { background: transparent; border: none; }
 
-.header{
-  position:relative;overflow:hidden;color:#fff;text-align:left;
-  padding:24px 20px 21px;margin-bottom:10px;border-radius:24px;
-  background:linear-gradient(135deg,#062d4b 0%,#0e5f91 58%,#1784c1 100%);
-  box-shadow:0 18px 45px rgba(9,47,79,.22);
-}
-.header:before{
-  content:"HÀNH TRÌNH 2026";
-  display:inline-block;padding:5px 10px;margin-bottom:10px;
-  border:1px solid rgba(255,255,255,.18);border-radius:999px;
-  background:rgba(255,255,255,.11);font-size:10px;font-weight:800;letter-spacing:1.3px;
-}
-.header:after{
-  content:"✈";
-  position:absolute;right:-6px;top:-20px;font-size:110px;
-  opacity:.08;transform:rotate(-12deg);
-}
-.header h1{position:relative;z-index:1;color:#fff;font-size:clamp(25px,5vw,40px);line-height:1.08;letter-spacing:-.6px;margin-bottom:8px}
-.header p{position:relative;z-index:1;color:rgba(255,255,255,.84);font-size:13px;line-height:1.55;max-width:900px}
+    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    th, td { border: 1px solid #e2e8f0; padding: 8px 6px; text-align: left; font-size: 12px; line-height: 1.4; }
+    th { background: #f7fafc; color: #2d3748; font-weight: 700; }
 
-.trip-nav{
-  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;
-  padding:2px 1px 9px;margin-bottom:4px;position:sticky;top:0;z-index:30;
-}
-.trip-nav::-webkit-scrollbar{display:none}
-.trip-nav a{
-  flex:0 0 auto;text-decoration:none;color:#36546c;background:rgba(255,255,255,.94);
-  border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;
-  box-shadow:var(--softshadow);backdrop-filter:blur(8px);
-}
-.trip-nav a:active{transform:scale(.97)}
+    .timeline { border-left: 2px solid #3182ce; padding-left: 12px; margin-left: 5px; }
+    .timeline-item { margin-bottom: 16px; }
+    .timeline-date { font-weight: bold; color: #2b6cb0; font-size: 13px; }
+    .timeline-title { font-size: 14px; font-weight: 600; margin: 3px 0; color: #1a202c; }
+    .timeline-desc { font-size: 12px; color: #4a5568; line-height: 1.5; }
 
-.admin-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:9px 11px;margin-bottom:12px;background:rgba(255,255,255,.95);
-  border:1px solid var(--line);border-radius:15px;box-shadow:var(--softshadow);
-  font-size:12px;text-align:left;
-}
-.admin-bar-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.badge-role{font-weight:800;padding:5px 9px;border-radius:999px}
-.role-user{background:#edf2f6;color:#526174}.role-admin{background:#fff0ed;color:#b42318}
+    /* Admin UI */
+    .admin-only { display: none !important; }
+    body.is-admin .admin-only { display: grid !important; }
+    body.is-admin .admin-flex { display: flex !important; }
+    body.is-admin .admin-col { display: table-cell !important; }
+    body:not(.is-admin) .admin-col { display: none !important; }
 
-.card{
-  background:var(--white);border:1px solid var(--line);padding:17px;
-  border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow);
-}
-.card h2{
-  display:flex;align-items:center;gap:7px;color:var(--ink);font-size:16px;
-  margin-bottom:13px;letter-spacing:-.2px;
-}
-.card h2:after{content:"";height:1px;flex:1;background:var(--line);margin-left:5px}
-.card > p{color:var(--muted)!important;line-height:1.55}
+    /* Khung Chat Online Phong cách Messenger/Zalo */
+    .chat-box { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+    .chat-messages { height: 260px; overflow-y: auto; background: white; border: 1px solid #cbd5e0; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+    
+    .chat-msg { display: flex; flex-direction: column; max-width: 75%; }
+    .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.other { align-self: flex-start; align-items: flex-start; }
+    .chat-msg.system { align-self: center; align-items: center; max-width: 90%; width: 100%; }
 
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:9px}
-input[type=text],input[type=number],input[type=password]{
-  width:100%;padding:11px 12px;border:1px solid #d7e0e8;background:#fbfcfe;
-  color:var(--ink);border-radius:11px;font-size:14px;outline:none
-}
-input:focus{border-color:#70acd5;box-shadow:0 0 0 3px rgba(22,119,184,.10);background:#fff}
+    .chat-msg .msg-info { font-size: 10px; color: #a0aec0; margin-bottom: 2px; }
+    .chat-msg.mine .msg-info { text-align: right; }
+    
+    .chat-msg .bubble { padding: 8px 12px; border-radius: 12px; font-size: 13px; word-break: break-word; line-height: 1.4; }
+    .chat-msg.mine .bubble { background: #007bff; color: white; border-top-right-radius: 2px; }
+    .chat-msg.other .bubble { background: #edf2f7; color: #2d3748; border-top-left-radius: 2px; }
+    .chat-msg.system .bubble { background: #e2e8f0; color: #4a5568; font-style: italic; text-align: center; border-radius: 6px; font-size: 12px; }
 
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;width:auto;min-height:40px;
-  padding:9px 14px;border:0;border-radius:11px;background:var(--blue);color:#fff;
-  font-size:12.5px;font-weight:800;text-decoration:none;cursor:pointer;
-  box-shadow:0 5px 13px rgba(22,119,184,.15);transition:.15s
-}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.04)}.btn:active{transform:none;opacity:.9}
-.btn-group{display:flex;flex-wrap:wrap;gap:8px}
-.btn-success{background:var(--green)}.btn-danger{background:var(--red);padding:7px 10px;font-size:11px}.btn-warning{background:var(--orange)}.btn-dark{background:#344054}
+    @media (min-width: 600px) {
+      body { padding: 15px; }
+      .container { padding: 25px; border-radius: 16px; }
+      .header h1 { font-size: 26px; }
+      .admin-bar { flex-direction: row; justify-content: space-between; text-align: left; }
+      .admin-bar-btns { width: auto; }
+      .summary-box { flex-direction: row; justify-content: space-around; }
+      .btn-group { flex-direction: row; }
+      .btn { width: auto; }
+      .form-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      #map { height: 500px; }
+      table { min-width: 100%; }
+      th, td { padding: 10px; font-size: 13px; }
+      .chat-form-grid { grid-template-columns: 1fr 2fr auto !important; }
+    }
 
-.summary-box{
-  display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:9px;margin-bottom:12px;
-  background:linear-gradient(135deg,#eff9ff,#f8fcff);border:1px solid #d9edf9;border-radius:16px
-}
-.summary-item{
-  background:#fff;border-radius:13px;padding:12px 8px;text-align:center;font-size:11px;color:#5b6c7e;
-}
-.summary-item span{display:block;color:var(--blue2);font-size:22px;font-weight:850;letter-spacing:-.5px;margin-top:2px}
+    @media (max-width: 480px) {
+      .col-coord { display: none; }
+    }
 
-#map{height:470px;width:100%;border-radius:16px;border:1px solid #dce5ed;margin-top:12px;z-index:1;overflow:hidden}
-.leaflet-routing-container{display:none!important}
-.custom-div-icon,.leg-badge-icon{background:transparent;border:none}
+    /* ===========================
+       V6 FINAL - APP TRAVEL UI
+       =========================== */
+    .v6-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 15px;position:sticky;top:6px;z-index:20}
+    .v6-nav button{border:1px solid #dbe5ef;background:#fff;color:#334e68;border-radius:10px;padding:10px 6px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.04)}
+    .v6-nav button.active{background:#1f6feb;color:#fff;border-color:#1f6feb}
+    .v6-hero{background:linear-gradient(135deg,#eaf4ff,#f7fbff);border:1px solid #cfe3f7;border-radius:14px;padding:15px;margin-bottom:15px}
+    .v6-hero-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .v6-hero h2{font-size:20px;color:#163a5f;margin:0 0 5px}
+    .v6-hero p{font-size:12px;color:#52677d;line-height:1.5}
+    .v6-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+    .v6-pill{background:#fff;border:1px solid #d8e6f2;border-radius:10px;padding:9px;text-align:center}
+    .v6-pill b{display:block;font-size:16px;color:#1f4e79}
+    .v6-pill span{font-size:10px;color:#718096}
+    .v6-section{display:none}
+    .v6-section.active{display:block}
+    .v6-card{background:#fff;border:1px solid #e1e8f0;border-radius:12px;padding:14px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.035)}
+    .v6-card h3{font-size:15px;color:#244b6b;margin-bottom:10px}
+    .v6-table{width:100%;border-collapse:collapse}
+    .v6-table th,.v6-table td{border-bottom:1px solid #edf2f7;padding:9px 6px;font-size:12px;text-align:left;vertical-align:top}
+    .v6-table th{background:#f8fafc;color:#52606d}
+    .v6-actions{display:flex;gap:5px;flex-wrap:wrap}
+    .v6-mini{padding:5px 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}
+    .v6-edit{background:#fff3cd;color:#8a5a00}
+    .v6-del{background:#ffe3e3;color:#b42318}
+    .v6-empty{padding:18px;text-align:center;color:#718096;font-size:12px;background:#f8fafc;border-radius:9px}
+    .v6-expense-grid{display:grid;grid-template-columns:1fr;gap:8px}
+    .v6-expense-grid select,.v6-expense-grid input{width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:7px;font-size:13px;background:#fff}
+    .v6-cost-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+    .v6-cost-box{background:#f8fbff;border:1px solid #d9e8f5;border-radius:9px;padding:9px;text-align:center}
+    .v6-cost-box b{display:block;color:#1f4e79;font-size:15px}
+    .v6-cost-box span{font-size:10px;color:#718096}
+    .v6-cat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf2f7;font-size:12px}
+    .v6-cat-row:last-child{border-bottom:0}
+    .v6-bar{height:7px;background:#edf2f7;border-radius:10px;overflow:hidden;margin:4px 0}
+    .v6-bar i{display:block;height:100%;background:#3182ce;border-radius:10px}
+    .v6-admin-note{font-size:11px;color:#718096;background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:10px}
+    .v6-day{border-left:3px solid #3182ce;padding:9px 10px;margin-bottom:9px;background:#f8fbff;border-radius:0 8px 8px 0}
+    .v6-day b{color:#24557b;font-size:13px}
+    .v6-day p{font-size:11px;color:#52677d;line-height:1.5;margin-top:3px}
+    .v6-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}
+    .v6-modal.show{display:flex}
+    .v6-modal-box{width:100%;max-width:520px;background:#fff;border-radius:14px;padding:16px;max-height:90vh;overflow:auto}
+    .v6-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .v6-close{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;cursor:pointer}
+    .v6-admin-badge{font-size:10px;background:#fff4e5;color:#9a6700;border:1px solid #f6d58d;border-radius:20px;padding:4px 7px;font-weight:700}
+    @media(min-width:600px){
+      .v6-nav{grid-template-columns:repeat(6,1fr)}
+      .v6-pills{grid-template-columns:repeat(4,1fr)}
+      .v6-expense-grid{grid-template-columns:repeat(2,1fr)}
+      .v6-cost-summary{grid-template-columns:repeat(4,1fr)}
+    }
 
-.table-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:9px;border-radius:13px;border:1px solid var(--line)}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:500px}
-th,td{border:0;border-bottom:1px solid var(--line);padding:10px 9px;text-align:left;font-size:12px;line-height:1.45}
-th{background:#f7f9fb;color:#475467;font-weight:800;white-space:nowrap}
-tr:last-child td{border-bottom:0}tbody tr:hover td{background:#fbfdff}
-code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
-
-.timeline{border-left:0;padding-left:0;margin-left:0}
-.timeline-item{
-  position:relative;margin-bottom:9px;padding:15px 15px 15px 20px;
-  border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#fff,#fbfcfe);
-  box-shadow:0 3px 13px rgba(15,43,68,.04)
-}
-.timeline-item:before{
-  content:"";position:absolute;left:-7px;top:20px;width:12px;height:12px;border-radius:50%;
-  background:var(--blue);border:3px solid #eaf5fb
-}
-.timeline-date{font-size:11px;font-weight:850;color:var(--blue);letter-spacing:.1px}
-.timeline-title{font-size:16px;font-weight:850;margin:5px 0 6px;color:var(--ink)}
-.timeline-desc{font-size:13px;color:var(--muted);line-height:1.65}
-
-.chat-box{background:#f5f8fb;border:1px solid var(--line);border-radius:15px;padding:9px}
-.chat-messages{
-  height:300px;overflow-y:auto;background:#fff;border:1px solid #e0e7ee;border-radius:12px;
-  padding:13px;margin-bottom:9px;display:flex;flex-direction:column;gap:8px
-}
-.chat-msg{display:flex;flex-direction:column;max-width:78%}.chat-msg.mine{align-self:flex-end;align-items:flex-end}
-.chat-msg.other{align-self:flex-start;align-items:flex-start}.chat-msg.system{align-self:center;align-items:center;max-width:90%;width:100%}
-.chat-msg .msg-info{font-size:10px;color:#98a2b3;margin-bottom:3px}
-.chat-msg .bubble{padding:9px 12px;border-radius:15px;font-size:13px;word-break:break-word;line-height:1.45}
-.chat-msg.mine .bubble{background:var(--blue);color:#fff;border-top-right-radius:4px}
-.chat-msg.other .bubble{background:#eef2f6;color:#344054;border-top-left-radius:4px}
-.chat-msg.system .bubble{background:#eef2f6;color:#667085;font-style:italic;text-align:center;border-radius:8px;font-size:11px}
-
-#photos,#route,#members,#chat,#schedule{scroll-margin-top:55px}
-
-/* V3 dashboard blocks */
-.trip-dashboard{
-  display:grid;grid-template-columns:1.35fr .65fr;gap:10px;margin-bottom:12px
-}
-.trip-now,.trip-countdown{
-  border-radius:18px;padding:16px;border:1px solid var(--line);box-shadow:var(--shadow)
-}
-.trip-now{
-  color:#fff;background:linear-gradient(135deg,#0a4b75,#167fbc);position:relative;overflow:hidden
-}
-.trip-now:after{content:"🚗";position:absolute;right:14px;bottom:-9px;font-size:65px;opacity:.12}
-.trip-kicker{font-size:10px;font-weight:850;letter-spacing:1px;opacity:.75;text-transform:uppercase}
-.trip-now-title{font-size:20px;font-weight:850;margin:5px 0}
-.trip-now-sub{font-size:12px;line-height:1.5;opacity:.82}
-.trip-countdown{background:#fff}
-.trip-countdown .trip-kicker{color:var(--muted)}
-.countdown-number{font-size:28px;font-weight:900;color:var(--navy);margin-top:5px}
-.countdown-sub{font-size:11px;color:var(--muted)}
-
-.day-strip{
-  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding:1px
-}
-.day-strip::-webkit-scrollbar{display:none}
-.day-pill{
-  flex:0 0 auto;min-width:76px;text-align:center;padding:9px 8px;border-radius:13px;
-  background:#fff;border:1px solid var(--line);box-shadow:var(--softshadow)
-}
-.day-pill b{display:block;font-size:12px;color:var(--navy)}.day-pill span{font-size:9px;color:var(--muted)}
-.day-pill.active{background:#eaf6ff;border-color:#b9def4}.day-pill.active b{color:var(--blue)}
-
-.mini-stats{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px
-}
-.mini-stat{
-  background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 8px;text-align:center;box-shadow:var(--softshadow)
-}
-.mini-stat .ico{font-size:17px}.mini-stat strong{display:block;font-size:15px;margin-top:3px;color:var(--navy)}
-.mini-stat span{font-size:9px;color:var(--muted)}
-
-.member-visual{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:10px
-}
-.member-chip{
-  display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);
-  border-radius:13px;background:#fbfcfe
-}
-.member-avatar{
-  width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#d9effd,#eef8ff);color:var(--blue2);font-weight:900
-}
-.member-name{font-size:12px;font-weight:800;color:var(--ink)}.member-role{font-size:10px;color:var(--muted);margin-top:2px}
-
-@media(max-width:699px){
-  body{padding:7px}.container{padding-bottom:76px}
-  .header{padding:22px 17px 19px;border-radius:20px}
-  .header h1{font-size:25px}.header p{font-size:12px}
-  .trip-dashboard{grid-template-columns:1fr 1fr}
-  .trip-now{grid-column:1/-1}
-  .trip-now-title{font-size:18px}
-  .countdown-number{font-size:23px}
-  .admin-bar{flex-direction:column;align-items:stretch;text-align:center}
-  .admin-bar-btns{justify-content:center}.admin-bar-btns .btn{flex:1}
-  .card{padding:14px;border-radius:17px}
-  .btn{width:100%}.btn-group .btn{flex:1 1 100%}
-  .summary-box{grid-template-columns:1fr 1fr}
-  #map{height:390px}
-  .timeline-item{padding:13px 13px 13px 15px}.timeline-item:before{display:none}
-  .chat-form-grid{grid-template-columns:1fr!important}.chat-form-grid .btn{width:100%}
-  .col-coord{display:none!important}
-  .mini-stats{grid-template-columns:repeat(2,1fr)}
-  .member-visual{grid-template-columns:1fr}
-}
-@media(max-width:390px){
-  .trip-dashboard{grid-template-columns:1fr}.trip-now{grid-column:auto}
-  .summary-box{grid-template-columns:1fr}.mini-stats{grid-template-columns:1fr 1fr}
-}
-@media(min-width:700px){
-  body{padding:20px}.card{padding:20px}#map{height:540px}
-  .chat-form-grid{grid-template-columns:1fr 2fr auto!important}
-}
-
-
-.mobile-bottom-nav{
-  display:none;
-}
-@media(max-width:699px){
-  .mobile-bottom-nav{
-    position:fixed;left:8px;right:8px;bottom:8px;z-index:1000;
-    display:grid;grid-template-columns:repeat(4,1fr);gap:3px;
-    padding:7px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
-    border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px rgba(15,43,68,.16)
-  }
-  .mobile-bottom-nav a{
-    text-decoration:none;text-align:center;color:#536579;font-size:16px;padding:3px 2px
-  }
-  .mobile-bottom-nav span{display:block;font-size:9px;font-weight:800;margin-top:2px}
-}
-
-
-/* ========================= V4 TRIP CONTROL CENTER ========================= */
-.v4-section{margin-bottom:12px}
-.v4-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px}
-.v4-panel{
-  background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;
-  box-shadow:var(--softshadow)
-}
-.v4-panel h3{font-size:14px;margin-bottom:10px;color:var(--navy)}
-.v4-route-list{display:flex;flex-direction:column;gap:7px}
-.v4-stop{
-  display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;
-  padding:9px;border:1px solid var(--line);border-radius:12px;background:#fbfdff
-}
-.v4-stop-num{
-  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:#eaf6ff;color:var(--blue2);font-size:11px;font-weight:900
-}
-.v4-stop-name{font-size:12px;font-weight:850}.v4-stop-meta{font-size:10px;color:var(--muted);margin-top:2px}
-.v4-leg{font-size:10px;color:var(--muted);padding-left:43px;margin-top:-2px}
-.v4-expense-form{display:grid;grid-template-columns:1.2fr .7fr .7fr auto;gap:7px;margin-bottom:10px}
-.v4-expenses{display:flex;flex-direction:column;gap:7px;max-height:245px;overflow:auto}
-.v4-expense{
-  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
-  padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe
-}
-.v4-expense-title{font-size:12px;font-weight:800}.v4-expense-meta{font-size:10px;color:var(--muted);margin-top:2px}
-.v4-expense-amount{font-size:13px;font-weight:900;color:var(--navy);white-space:nowrap}
-.v4-total{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:11px 12px;border-radius:13px;background:linear-gradient(135deg,#eef9ff,#f8fcff);
-  border:1px solid #d9edf9;margin-bottom:9px
-}
-.v4-total span{font-size:11px;color:var(--muted)}.v4-total strong{font-size:20px;color:var(--blue2)}
-.v4-day-tabs{display:flex;gap:6px;overflow:auto;scrollbar-width:none;margin-bottom:10px}
-.v4-day-tabs::-webkit-scrollbar{display:none}
-.v4-day-tab{
-  flex:0 0 auto;padding:8px 11px;border:1px solid var(--line);border-radius:999px;
-  background:#fff;color:#526579;font-size:11px;font-weight:850;cursor:pointer
-}
-.v4-day-tab.active{background:#eaf6ff;border-color:#b8ddf3;color:var(--blue2)}
-.v4-day-content{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfcfe}
-.v4-day-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:4px}
-.v4-day-sub{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:9px}
-.v4-checklist{display:flex;flex-direction:column;gap:6px}
-.v4-check{
-  display:flex;align-items:center;gap:8px;padding:8px 9px;background:#fff;border:1px solid var(--line);border-radius:10px;
-  font-size:11px;color:#46586a
-}
-.v4-check input{accent-color:var(--blue)}
-.v4-check.done{text-decoration:line-through;color:#98a2b3;background:#f7f9fb}
-.v4-quick{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:7px
-}
-.v4-quick button{
-  min-height:42px;border:1px solid var(--line);background:#fff;border-radius:12px;
-  font-size:11px;font-weight:800;color:#40556b;cursor:pointer
-}
-.v4-quick button:active{transform:scale(.98)}
-.v4-note{font-size:10px;color:#98a2b3;margin-top:8px;line-height:1.45}
-.v4-delete{border:0;background:transparent;color:#b42318;font-size:12px;cursor:pointer;padding:4px}
-@media(max-width:699px){
-  .v4-grid{grid-template-columns:1fr}
-  .v4-expense-form{grid-template-columns:1fr 1fr}
-  .v4-expense-form .btn{grid-column:1/-1}
-  .v4-quick{grid-template-columns:1fr 1fr 1fr}
-}
-@media(max-width:390px){
-  .v4-expense-form{grid-template-columns:1fr}
-  .v4-expense-form .btn{grid-column:auto}
-  .v4-quick{grid-template-columns:1fr 1fr}
-}
-
-</style>
+  </style>
 </head>
 <body>
 
@@ -350,96 +173,10 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       <p>6 Ngày 5 Đêm: Hà Nội – Thanh Hóa – Đồng Hới – Hội An – Huế – Hà Tĩnh – Hà Nội</p>
     </div>
 
-    <nav class="trip-nav" aria-label="Điều hướng nhanh">
-      <a href="#control-center">🏠 Tổng quan</a><a href="#photos">📸 Ảnh</a>
-      <a href="#route">🗺️ Lộ trình</a>
-      <a href="#members">👥 Thành viên</a>
-      <a href="#chat">💬 Chat</a>
-      <a href="#schedule">📅 Lịch trình</a>
-    </nav>
-
-
-    <section class="trip-dashboard" aria-label="Tổng quan chuyến đi">
-      <div class="trip-now">
-        <div class="trip-kicker">Điểm nhấn hành trình</div>
-        <div class="trip-now-title">Hà Nội → Miền Trung → Hà Nội</div>
-        <div class="trip-now-sub">28/08 — 02/09/2026 · Cùng nhau đi, cùng nhau về.</div>
-      </div>
-      <div class="trip-countdown">
-        <div class="trip-kicker">Ngày khởi hành</div>
-        <div class="countdown-number">28/08</div>
-        <div class="countdown-sub">17:00 · Hateco Apollo</div>
-      </div>
-    </section>
-
-    <section class="mini-stats" aria-label="Tóm tắt chuyến đi">
-      <div class="mini-stat"><div class="ico">📅</div><strong>6N5Đ</strong><span>Thời gian</span></div>
-      <div class="mini-stat"><div class="ico">📍</div><strong>7</strong><span>Điểm hành trình</span></div>
-      <div class="mini-stat"><div class="ico">🚗</div><strong>6</strong><span>Chặng đường</span></div>
-      <div class="mini-stat"><div class="ico">👨‍👩‍👧‍👦</div><strong>3–5</strong><span>Gia đình</span></div>
-    </section>
-
-    <section class="day-strip" aria-label="Các ngày trong hành trình">
-      <div class="day-pill active"><b>D1</b><span>28/08 · Đi</span></div>
-      <div class="day-pill"><b>D2</b><span>29/08 · Hội An</span></div>
-      <div class="day-pill"><b>D3</b><span>30/08 · Huế</span></div>
-      <div class="day-pill"><b>D4</b><span>31/08 · Huế</span></div>
-      <div class="day-pill"><b>D5</b><span>01/09 · Hà Tĩnh</span></div>
-      <div class="day-pill"><b>D6</b><span>02/09 · Về nhà</span></div>
-    </section>
-
-
-    <!-- ================= V4 TRIP CONTROL CENTER ================= -->
-    <section class="v4-section" id="control-center">
-      <div class="v4-grid">
-
-        <div class="v4-panel">
-          <h3>🗺️ Các chặng trong hành trình</h3>
-          <div id="v4-route-list" class="v4-route-list"></div>
-          <div class="v4-note">Danh sách lấy trực tiếp từ các điểm hành trình hiện có của app.</div>
-        </div>
-
-        <div class="v4-panel">
-          <h3>💰 Chi phí chuyến đi</h3>
-          <div class="v4-total">
-            <span>Tổng chi phí đã nhập</span>
-            <strong id="v4-total">0 đ</strong>
-          </div>
-          <div class="v4-expense-form admin-only" style="display:none">
-            <input id="v4-exp-name" type="text" placeholder="Khoản chi: xăng, ăn, vé..." />
-            <input id="v4-exp-amount" type="number" min="0" placeholder="Số tiền" />
-            <input id="v4-exp-who" type="text" placeholder="Người trả" />
-            <button class="btn btn-success" onclick="v4AddExpense()">＋ Thêm</button>
-          </div>
-          <div id="v4-expenses" class="v4-expenses"></div>
-          <div class="v4-note">Dữ liệu chi phí được lưu trên Firebase. Thành viên được xem; chỉ Quản trị viên được thêm/xóa.</div>
-        </div>
-
-      </div>
-
-      <div class="v4-panel" style="margin-top:10px">
-        <h3>📅 Điều hành từng ngày</h3>
-        <div id="v4-day-tabs" class="v4-day-tabs"></div>
-        <div id="v4-day-content" class="v4-day-content"></div>
-      </div>
-
-      <div class="v4-panel" style="margin-top:10px">
-        <h3>⚡ Thao tác nhanh</h3>
-        <div class="v4-quick">
-          <button onclick="document.getElementById('route').scrollIntoView({behavior:'smooth'})">🗺️ Mở bản đồ</button>
-          <button onclick="document.getElementById('schedule').scrollIntoView({behavior:'smooth'})">📅 Xem lịch trình</button>
-          <button onclick="document.getElementById('members').scrollIntoView({behavior:'smooth'})">👥 Đoàn</button>
-          <button onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">💬 Chat</button>
-          <button onclick="document.getElementById('photos').scrollIntoView({behavior:'smooth'})">📸 Kho ảnh</button>
-          <button class="admin-only" onclick="v5ResetV5Data()">♻️ Xóa dữ liệu V5</button>
-        </div>
-      </div>
-    </section>
-
     <!-- Thanh Quyền Hạn -->
     <div class="admin-bar">
       <div>
-        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Xem toàn bộ)</span>
+        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Chỉ Xem)</span>
       </div>
       <div class="admin-bar-btns">
         <button id="btn-login-admin" class="btn btn-warning" onclick="loginAdmin()">🔐 Đăng Nhập Quản Trị</button>
@@ -449,7 +186,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <!-- Kho ảnh Google Drive -->
-    <div class="card" id="photos">
+    <div class="card">
       <h2>📸 Kho Ảnh Chuyến Đi (Drive 100GB)</h2>
       <p style="color: #4a5568; margin-bottom: 12px; font-size: 0.85em;">
         Thành viên trong đoàn bấm nút dưới đây để xem toàn bộ ảnh hoặc tải ảnh mới chụp lên thư mục chung.
@@ -465,7 +202,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <!-- Bản đồ & Lộ trình -->
-    <div class="card" id="route">
+    <div class="card">
       <h2>🗺️ Lộ Trình & Tính Quãng Đường</h2>
       
       <div class="summary-box">
@@ -506,7 +243,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <!-- Quản lý Thành viên -->
-    <div class="card" id="members">
+    <div class="card">
       <h2>👥 Thành Viên Trong Đoàn</h2>
       
       <div class="form-grid admin-only">
@@ -515,9 +252,6 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
         <input type="text" id="member-role" placeholder="Vai trò (VD: Lái chính)">
       </div>
       <button class="btn btn-success admin-only admin-flex" onclick="addMember()" style="margin-bottom: 12px;">➕ Thêm Thành Viên</button>
-
-
-      <div id="member-visual" class="member-visual"></div>
 
       <div class="table-container">
         <table>
@@ -535,7 +269,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <!-- Khung Chat Online -->
-    <div class="card" id="chat">
+    <div class="card">
       <h2>💬 Trò Chuyện Online</h2>
       <div class="chat-box">
         <div class="chat-messages" id="chat-messages"></div>
@@ -548,7 +282,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <!-- Lịch trình chi tiết 6 ngày 5 đêm -->
-    <div class="card" id="schedule">
+    <div class="card">
       <h2>📅 Lịch Trình Chi Tiết 6N5Đ</h2>
       <div class="timeline">
         
@@ -614,6 +348,145 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       </div>
     </div>
 
+
+
+    <!-- ================= V6 FINAL ================= -->
+    <div class="v6-nav">
+      <button class="active" onclick="v6Show('home',this)">🏠 Tổng quan</button>
+      <button onclick="v6Show('route',this)">🗺️ Lộ trình</button>
+      <button onclick="v6Show('schedule',this)">📅 Lịch trình</button>
+      <button onclick="v6Show('members',this)">👥 Thành viên</button>
+      <button onclick="v6Show('cost',this)">💰 Chi phí</button>
+      <button onclick="v6Show('tools',this)">⚙️ Quản trị</button>
+    </div>
+
+    <section id="v6-home" class="v6-section active">
+      <div class="v6-hero">
+        <div class="v6-hero-top">
+          <div>
+            <h2>🌄 Hành trình 2026</h2>
+            <p>28/08 → 02/09/2026 · 6 ngày 5 đêm<br>Hà Nội → Thanh Hóa → Đồng Hới → Hội An → Huế → Hà Tĩnh → Hà Nội</p>
+          </div>
+          <span class="v6-admin-badge" id="v6-role-badge">THÀNH VIÊN</span>
+        </div>
+        <div class="v6-pills">
+          <div class="v6-pill"><b id="v6-total-km">0 km</b><span>Quãng đường</span></div>
+          <div class="v6-pill"><b>6 ngày</b><span>Hành trình</span></div>
+          <div class="v6-pill"><b id="v6-member-count">0</b><span>Thành viên</span></div>
+          <div class="v6-pill"><b id="v6-cost-total">0 đ</b><span>Tổng chi phí</span></div>
+        </div>
+      </div>
+      <div class="v6-card">
+        <h3>🧭 Trạng thái chuyến đi</h3>
+        <div class="v6-day"><b>28/08 · Hà Nội → Thanh Hóa</b><p>Xuất phát 17:00 · nghỉ đêm 1</p></div>
+        <div class="v6-day"><b>29/08 · Thanh Hóa → Đồng Hới → Hội An</b><p>Ngày di chuyển dài · nghỉ đêm 2</p></div>
+        <div class="v6-day"><b>30/08 · Hội An → Huế</b><p>Tham quan Hội An · nghỉ đêm 3</p></div>
+        <div class="v6-day"><b>31/08 · Huế</b><p>Khám phá Cố đô · nghỉ đêm 4</p></div>
+        <div class="v6-day"><b>01/09 · Huế → Hà Tĩnh</b><p>Di chuyển về phía Bắc · nghỉ đêm 5</p></div>
+        <div class="v6-day"><b>02/09 · Hà Tĩnh → Hà Nội</b><p>Chặng cuối · kết thúc hành trình</p></div>
+      </div>
+    </section>
+
+    <section id="v6-route" class="v6-section">
+      <div class="v6-card">
+        <h3>🗺️ Bản đồ & lộ trình</h3>
+        <div id="v6-route-summary" class="v6-admin-note">Lộ trình được đồng bộ từ dữ liệu chuyến đi.</div>
+        <div id="v6-route-copy"></div>
+      </div>
+    </section>
+
+    <section id="v6-schedule" class="v6-section">
+      <div class="v6-card">
+        <h3>📅 Lịch trình 6 ngày 5 đêm</h3>
+        <div class="v6-day"><b>NGÀY 1 · 28/08</b><p>17:00 xuất phát từ Hateco Apollo → Thanh Hóa · nhận phòng.</p></div>
+        <div class="v6-day"><b>NGÀY 2 · 29/08</b><p>Thanh Hóa → Đồng Hới → Hội An · ăn trưa tại Đồng Hới · nhận phòng Hội An.</p></div>
+        <div class="v6-day"><b>NGÀY 3 · 30/08</b><p>Khám phá Hội An → chiều di chuyển sang Huế.</p></div>
+        <div class="v6-day"><b>NGÀY 4 · 31/08</b><p>Khám phá Đại Nội, lăng tẩm, Chùa Thiên Mụ và Huế.</p></div>
+        <div class="v6-day"><b>NGÀY 5 · 01/09</b><p>Huế → Đồng Hới → Vinpearl Hà Tĩnh.</p></div>
+        <div class="v6-day"><b>NGÀY 6 · 02/09</b><p>Hà Tĩnh → Hà Nội · kết thúc hành trình.</p></div>
+      </div>
+    </section>
+
+    <section id="v6-members" class="v6-section">
+      <div class="v6-card">
+        <h3>👥 Thành viên trong đoàn</h3>
+        <div id="v6-members-copy"></div>
+      </div>
+    </section>
+
+    <section id="v6-cost" class="v6-section">
+      <div class="v6-card">
+        <h3>💰 Quản lý chi phí thực tế</h3>
+        <div class="v6-admin-note">
+          ☁️ <b>Dữ liệu được lưu trực tiếp trên Firebase Firestore</b> — không lưu cục bộ trên máy.
+          Khi ứng dụng được đưa lên GitHub Pages, mọi thành viên mở cùng ứng dụng sẽ đọc cùng một cơ sở dữ liệu.
+          Chỉ Quản trị viên đã đăng nhập mới được thêm, sửa hoặc xóa.
+        </div>
+        <div class="v6-cost-summary">
+          <div class="v6-cost-box"><b id="v6-cost-total2">0 đ</b><span>Tổng cộng</span></div>
+          <div class="v6-cost-box"><b id="v6-cost-count">0</b><span>Khoản chi</span></div>
+          <div class="v6-cost-box"><b id="v6-cost-avg">0 đ</b><span>Bình quân/khoản</span></div>
+          <div class="v6-cost-box"><b id="v6-cost-dayavg">0 đ</b><span>Bình quân/ngày</span></div>
+        </div>
+        <div id="v6-cost-cats"></div>
+      </div>
+
+      <div class="v6-card">
+        <h3>📋 Chi phí thực tế <span id="v6-db-status" style="font-size:10px;color:#3182ce;font-weight:600">● Đang kết nối Firebase...</span></h3>
+        <div id="v6-cost-admin-form" class="admin-only">
+          <div class="v6-expense-grid">
+            <input type="date" id="v6-exp-date">
+            <select id="v6-exp-cat">
+              <option>Xăng</option>
+              <option>Lưu trú</option>
+              <option>Ăn uống</option>
+              <option>Vé tham quan</option>
+              <option>Quà lưu niệm</option>
+              <option>Vé đường bộ</option>
+              <option>Gửi xe</option>
+            </select>
+            <input type="text" id="v6-exp-desc" placeholder="Nội dung khoản chi thực tế">
+            <input type="text" id="v6-exp-amount" inputmode="numeric" autocomplete="off" title="Ví dụ: 1.500.000" placeholder="Số tiền (VNĐ)" oninput="v6FormatMoneyInput(this)">
+            <input type="text" id="v6-exp-payer" placeholder="Người trả / gia đình">
+          </div>
+          <button class="btn btn-success" style="margin-top:8px" onclick="v6SaveExpense()">💾 Lưu khoản chi</button>
+        </div>
+        <div class="table-container" style="margin-top:12px">
+          <table class="v6-table">
+            <thead><tr><th>Ngày</th><th>Khoản mục</th><th>Nội dung</th><th>Người trả</th><th>Số tiền</th><th class="admin-col">Thao tác</th></tr></thead>
+            <tbody id="v6-expense-list"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="v6-tools" class="v6-section">
+      <div class="v6-card">
+        <h3>⚙️ Khu vực quản trị</h3>
+        <div class="v6-admin-note">Khi chưa đăng nhập: toàn bộ ứng dụng ở chế độ Thành viên — chỉ xem. Sau khi đăng nhập Quản trị, các nút thêm/sửa/xóa mới được kích hoạt. Nút “Xóa chi phí mẫu” chỉ xóa dữ liệu mẫu; chi phí thực tế phải sửa/xóa ngay tại bảng Quản lý chi phí.</div>
+        <button class="btn btn-warning admin-only admin-flex" onclick="v6SeedCostDemo()">🧪 Tạo dữ liệu mẫu chi phí</button>
+        <button class="btn btn-danger admin-only admin-flex" style="margin-top:8px" onclick="v6ClearDemoExpenses()">🗑️ Xóa chi phí mẫu</button>
+      </div>
+    </section>
+
+    <div id="v6-expense-modal" class="v6-modal">
+      <div class="v6-modal-box">
+        <div class="v6-modal-head"><b>✏️ Sửa khoản chi</b><button class="v6-close" onclick="v6CloseModal()">×</button></div>
+        <input type="hidden" id="v6-edit-id">
+        <div class="v6-expense-grid">
+          <input type="date" id="v6-edit-date">
+          <select id="v6-edit-cat">
+            <option>Xăng</option><option>Lưu trú</option><option>Ăn uống</option><option>Vé tham quan</option>
+            <option>Quà lưu niệm</option><option>Vé đường bộ</option><option>Gửi xe</option>
+          </select>
+          <input type="text" id="v6-edit-desc" placeholder="Nội dung">
+          <input type="text" id="v6-edit-amount" inputmode="numeric" autocomplete="off" title="Ví dụ: 1.500.000" placeholder="Số tiền" oninput="v6FormatMoneyInput(this)">
+          <input type="text" id="v6-edit-payer" placeholder="Người trả / gia đình">
+        </div>
+        <button class="btn btn-success" style="margin-top:10px" onclick="v6UpdateExpense()">Cập nhật</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -662,7 +535,6 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       checkAdminStatus();
       initMap();
       listenFirebaseData();
-      v5Init();
 
       // Điền sẵn tên nếu đã lưu trên trình duyệt
       const savedName = localStorage.getItem('chat_my_name');
@@ -693,10 +565,9 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       } else {
         document.body.classList.remove('is-admin');
         roleDisplay.className = 'badge-role role-user';
-        roleDisplay.innerText = 'Thành Viên (Xem toàn bộ)';
+        roleDisplay.innerText = 'Thành Viên (Chỉ Xem)';
         btnLogin.style.display = 'inline-block';
       }
-      if (typeof v5RefreshPermissionUI === 'function') v5RefreshPermissionUI();
     }
 
     function loginAdmin() {
@@ -857,7 +728,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
           profile: 'car'
         }),
         lineOptions: {
-          styles: [{ color: '#1677b8', weight: 5, opacity: 0.88 }]
+          styles: [{ color: '#007bff', weight: 4, opacity: 0.8 }]
         },
         createMarker: function(i, wp) {
           let p = points[i] || { name: `Điểm ${i+1}`, desc: "" };
@@ -997,6 +868,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     }
 
     function addCustomPoint() {
+      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
       let name = document.getElementById('point-name').value;
       let desc = document.getElementById('point-desc').value;
       let lat = parseFloat(document.getElementById('point-lat').value);
@@ -1020,6 +892,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     }
 
     function deletePoint(index) {
+      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
       db.collection("trip_data").doc("points").get().then((doc) => {
         let points = doc.exists && doc.data().list ? doc.data().list : defaultPoints;
         if (points.length <= 2) return alert("Lộ trình cần ít nhất 2 điểm!");
@@ -1029,33 +902,13 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     }
 
     function resetDefaultPoints() {
+      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
       if (confirm("Bạn có chắc chắn muốn khôi phục lại 7 điểm chuẩn ban đầu?")) {
         db.collection("trip_data").doc("points").set({ list: defaultPoints });
       }
     }
 
-
-    function renderMemberVisual(members) {
-      const box = document.getElementById('member-visual');
-      if (!box) return;
-      box.innerHTML = '';
-      members.forEach(m => {
-        const name = (m.name || 'Thành viên').trim();
-        const initials = name.split(/\s+/).slice(-2).map(x => x.charAt(0)).join('').toUpperCase();
-        box.innerHTML += `
-          <div class="member-chip">
-            <div class="member-avatar">${initials || '👤'}</div>
-            <div>
-              <div class="member-name">${name}</div>
-              <div class="member-role">${m.role || 'Thành viên'}</div>
-            </div>
-          </div>
-        `;
-      });
-    }
-
     function renderMembers(members) {
-      renderMemberVisual(members);
       let tbody = document.getElementById('member-list');
       tbody.innerHTML = '';
       members.forEach((m, index) => {
@@ -1071,6 +924,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     }
 
     function addMember() {
+      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
       let name = document.getElementById('member-name').value;
       let phone = document.getElementById('member-phone').value;
       let role = document.getElementById('member-role').value || "Thành viên";
@@ -1089,6 +943,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     }
 
     function deleteMember(index) {
+      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
       db.collection("trip_data").doc("members").get().then((doc) => {
         let members = doc.exists && doc.data().list ? doc.data().list : [];
         members.splice(index, 1);
@@ -1098,251 +953,285 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
 
 
     /* =========================================================
-       V5 - DỮ LIỆU MỚI LƯU FIRESTORE
-       Quyền: mọi thành viên được XEM; chỉ Admin được THAY ĐỔI.
+       V6 FINAL LOGIC
        ========================================================= */
+    const V6_EXPENSE_COLLECTION = "trip_expenses";
+    let v6Expenses = [];
+    let v6EditingId = null;
 
-    let v5Expenses = [];
-    let v5Checks = {};
-    let v5ActiveDay = 1;
+    const V6_CATS = ["Xăng","Lưu trú","Ăn uống","Vé tham quan","Quà lưu niệm","Vé đường bộ","Gửi xe"];
 
-    const V5_EXPENSE_DOC = "expenses";
-    const V5_CHECK_DOC = "checklist";
-
-    const V5_ROUTE = [
-      {name:'Hà Nội', meta:'Điểm xuất phát', icon:'🏠'},
-      {name:'Thanh Hóa', meta:'Chặng 1 · ~158 km', icon:'📍'},
-      {name:'Đồng Hới', meta:'Chặng 2 · ~325 km', icon:'📍'},
-      {name:'Hội An', meta:'Chặng 3 · ~310 km', icon:'📍'},
-      {name:'Huế', meta:'Chặng 4 · ~125 km', icon:'📍'},
-      {name:'Hà Tĩnh', meta:'Chặng 5 · ~270 km', icon:'📍'},
-      {name:'Hà Nội', meta:'Chặng về · ~340 km', icon:'🏁'}
-    ];
-
-    const V5_DAYS = [
-      {id:1,date:'28/08',title:'Ngày 1 · Hà Nội → Thanh Hóa',sub:'17:00 xuất phát · di chuyển và nhận phòng',items:['Kiểm tra hành lý và giấy tờ','Tập trung đủ thành viên','Đổ xăng / kiểm tra xe','Nhận phòng Thanh Hóa']},
-      {id:2,date:'29/08',title:'Ngày 2 · Thanh Hóa → Đồng Hới → Hội An',sub:'Ngày di chuyển dài · ưu tiên nghỉ giữa chặng',items:['Ăn sáng','Kiểm tra xe trước khi đi','Nghỉ giữa chặng','Check-in Hội An']},
-      {id:3,date:'30/08',title:'Ngày 3 · Hội An',sub:'Ngày tham quan và vui chơi',items:['Ăn sáng','Tham quan Hội An','Thời gian tự do','Tập hợp buổi tối']},
-      {id:4,date:'31/08',title:'Ngày 4 · Hội An → Huế',sub:'Di chuyển ngắn · dành thời gian khám phá Huế',items:['Check-out','Di chuyển tới Huế','Nhận phòng','Ăn tối / tham quan']},
-      {id:5,date:'01/09',title:'Ngày 5 · Huế → Hà Tĩnh',sub:'Di chuyển về phía Bắc',items:['Ăn sáng','Check-out','Nghỉ giữa chặng','Nhận phòng Hà Tĩnh']},
-      {id:6,date:'02/09',title:'Ngày 6 · Hà Tĩnh → Hà Nội',sub:'Chặng cuối · kết thúc hành trình',items:['Ăn sáng','Kiểm tra hành lý','Khởi hành về Hà Nội','Kết thúc chuyến đi']}
-    ];
-
-    function v5IsAdmin(){
+    function v6IsAdmin(){
       return sessionStorage.getItem('is_admin') === 'true';
     }
 
-    function v5RequireAdmin(){
-      if(!v5IsAdmin()){
-        alert("Chức năng này chỉ dành cho Quản trị viên.");
+    function v6RequireAdmin(){
+      if(!v6IsAdmin()){
+        alert("Bạn đang ở chế độ Thành viên. Vui lòng đăng nhập Quản trị để thực hiện thao tác này.");
         return false;
       }
       return true;
     }
 
-    function v5Money(n){
-      return new Intl.NumberFormat('vi-VN').format(Number(n)||0) + ' đ';
+    function v6Money(n){
+      return new Intl.NumberFormat('vi-VN', {
+        maximumFractionDigits: 0
+      }).format(Number(n)||0) + ' đ';
     }
 
-    function v5Esc(v){
+    // Hiển thị số tiền theo chuẩn Việt Nam: 50000 -> 50.000
+    // Dữ liệu lưu Firestore vẫn là NUMBER nguyên, không lưu chuỗi "50.000".
+    function v6ParseMoney(value){
+      if (typeof value === 'number') return Math.round(value);
+      const digits = String(value ?? '').replace(/\D/g, '');
+      return digits ? Number(digits) : 0;
+    }
+
+    function v6FormatMoneyInput(input){
+      const n = v6ParseMoney(input.value);
+      input.value = n ? new Intl.NumberFormat('vi-VN', {
+        maximumFractionDigits: 0
+      }).format(n) : '';
+    }
+
+    function v6Esc(v){
       return String(v ?? '').replace(/[&<>"']/g, c => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
       }[c]));
     }
 
-    // ===== FIRESTORE LISTENERS =====
-    // Các document mới:
-    // trip_data/expenses
-    // trip_data/checklist
-    // Không dùng localStorage cho dữ liệu nghiệp vụ V5.
-    function v5ListenData(){
-      db.collection("trip_data").doc(V5_EXPENSE_DOC).onSnapshot((doc)=>{
-        v5Expenses = (doc.exists && Array.isArray(doc.data().list))
-          ? doc.data().list : [];
-        v5RenderExpenses();
-      }, err => console.error("Lỗi đọc expenses:", err));
-
-      db.collection("trip_data").doc(V5_CHECK_DOC).onSnapshot((doc)=>{
-        v5Checks = (doc.exists && doc.data().checks)
-          ? doc.data().checks : {};
-        v5RenderDays(v5ActiveDay);
-      }, err => console.error("Lỗi đọc checklist:", err));
+    function v6Show(name, btn){
+      document.querySelectorAll('.v6-section').forEach(x=>x.classList.remove('active'));
+      document.getElementById('v6-'+name).classList.add('active');
+      document.querySelectorAll('.v6-nav button').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      if(name==='route') v6RenderRouteCopy();
+      if(name==='members') v6RenderMembersCopy();
     }
 
-    // ===== CHI PHÍ =====
-    function v5RenderExpenses(){
-      const box = document.getElementById('v4-expenses');
-      const total = document.getElementById('v4-total');
-      if(!box || !total) return;
+    function v6SyncRoleUI(){
+      const admin = v6IsAdmin();
+      document.getElementById('v6-role-badge').textContent = admin ? 'QUẢN TRỊ VIÊN' : 'THÀNH VIÊN · CHỈ XEM';
+      v6RenderExpenses();
+      // CSS already controls .admin-only; this refresh handles dynamic table actions.
+    }
 
-      const sum = v5Expenses.reduce((a,x)=>a + Number(x.amount || 0), 0);
-      total.textContent = v5Money(sum);
+    function v6ListenExpenses(){
+      db.collection(V6_EXPENSE_COLLECTION)
+        .orderBy('date','asc')
+        .onSnapshot(snap=>{
+          v6Expenses = [];
+          snap.forEach(doc=>v6Expenses.push({id:doc.id,...doc.data()}));
+          const status=document.getElementById('v6-db-status');
+          if(status){status.textContent='● Firebase · Đã đồng bộ';status.style.color='#2f855a';}
+          v6RenderExpenses();
+        }, err=>{
+          // If an index/order issue occurs, fall back to the collection without orderBy.
+          console.error(err);
+          const status=document.getElementById('v6-db-status');
+          if(status){status.textContent='● Firebase · Lỗi kết nối';status.style.color='#c53030';}
+          db.collection(V6_EXPENSE_COLLECTION).onSnapshot(snap=>{
+            const status=document.getElementById('v6-db-status');
+            if(status){status.textContent='● Firebase · Đã đồng bộ';status.style.color='#2f855a';}
+            v6Expenses=[];
+            snap.forEach(doc=>v6Expenses.push({id:doc.id,...doc.data()}));
+            v6Expenses.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+            v6RenderExpenses();
+          });
+        });
+    }
 
-      if(!v5Expenses.length){
-        box.innerHTML = '<div class="v4-note">Chưa có khoản chi nào.</div>';
+    function v6RenderExpenses(){
+      const tbody=document.getElementById('v6-expense-list');
+      if(!tbody) return;
+
+      const total=v6Expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+      document.getElementById('v6-cost-total').textContent=v6Money(total);
+      document.getElementById('v6-cost-total2').textContent=v6Money(total);
+      document.getElementById('v6-cost-count').textContent=v6Expenses.length;
+      document.getElementById('v6-cost-avg').textContent=v6Money(v6Expenses.length?total/v6Expenses.length:0);
+      document.getElementById('v6-cost-dayavg').textContent=v6Money(total/6);
+
+      const byCat={};
+      V6_CATS.forEach(c=>byCat[c]=0);
+      v6Expenses.forEach(x=>{ if(byCat[x.category]!==undefined) byCat[x.category]+=Number(x.amount||0); });
+
+      const max=Math.max(...Object.values(byCat),1);
+      document.getElementById('v6-cost-cats').innerHTML=V6_CATS.map(c=>`
+        <div class="v6-cat-row">
+          <div style="min-width:105px"><b>${v6Esc(c)}</b><div class="v6-bar"><i style="width:${byCat[c]/max*100}%"></i></div></div>
+          <b>${v6Money(byCat[c])}</b>
+        </div>`).join('');
+
+      if(!v6Expenses.length){
+        tbody.innerHTML='<tr><td colspan="6"><div class="v6-empty">Chưa có khoản chi thực tế nào.</div></td></tr>';
         return;
       }
 
-      box.innerHTML = v5Expenses.slice().reverse().map((x, reverseIndex)=>{
-        const index = v5Expenses.length - 1 - reverseIndex;
-        return `
-          <div class="v4-expense">
-            <div>
-              <div class="v4-expense-title">${v5Esc(x.name)}</div>
-              <div class="v4-expense-meta">${v5Esc(x.who || '—')} · ${v5Esc(x.time || '')}</div>
-            </div>
-            <div>
-              <div class="v4-expense-amount">${v5Money(x.amount)}</div>
-              ${v5IsAdmin()
-                ? `<button class="v4-delete" onclick="v5DeleteExpense(${index})">Xóa</button>`
-                : ''}
-            </div>
-          </div>`;
-      }).join('');
+      tbody.innerHTML=v6Expenses.map(x=>`
+        <tr>
+          <td>${v6Esc(x.date||'')}</td>
+          <td><b>${v6Esc(x.category||'')}</b></td>
+          <td>${v6Esc(x.description||'')}</td>
+          <td>${v6Esc(x.payer||'')}</td>
+          <td><b>${v6Money(x.amount)}</b></td>
+          <td class="admin-col">
+            ${v6IsAdmin()?`<div class="v6-actions">
+              <button class="v6-mini v6-edit" onclick="v6OpenEdit('${x.id}')">Sửa</button>
+              <button class="v6-mini v6-del" onclick="v6DeleteExpense('${x.id}')">Xóa</button>
+            </div>`:''}
+          </td>
+        </tr>`).join('');
     }
 
-    function v5AddExpense(){
-      if(!v5RequireAdmin()) return;
+    function v6SaveExpense(){
+      if(!v6RequireAdmin()) return;
+      const date=document.getElementById('v6-exp-date').value;
+      const category=document.getElementById('v6-exp-cat').value;
+      const description=document.getElementById('v6-exp-desc').value.trim();
+      const amount=v6ParseMoney(document.getElementById('v6-exp-amount').value);
+      const payer=document.getElementById('v6-exp-payer').value.trim();
 
-      const name = document.getElementById('v4-exp-name').value.trim();
-      const amount = Number(document.getElementById('v4-exp-amount').value);
-      const who = document.getElementById('v4-exp-who').value.trim();
-
-      if(!name || !amount || amount < 0){
-        alert("Hãy nhập tên khoản chi và số tiền.");
+      if(!date||!category||!description||!amount||amount<=0||!payer){
+        alert("Vui lòng nhập đầy đủ ngày, khoản mục, nội dung, số tiền và người trả.");
         return;
       }
 
-      const next = v5Expenses.slice();
-      next.push({
-        name:name,
-        amount:amount,
-        who:who,
-        time:new Date().toLocaleString('vi-VN'),
-        createdAt:Date.now()
+      db.collection(V6_EXPENSE_COLLECTION).add({
+        date, category, description, amount, payer,
+        isDemo: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(()=>{
+        document.getElementById('v6-exp-desc').value='';
+        document.getElementById('v6-exp-amount').value='';
+        document.getElementById('v6-exp-payer').value='';
+        alert("Đã lưu khoản chi vào Firebase Firestore.");
+      }).catch(e=>alert("Không thể lưu khoản chi: "+e.message));
+    }
+
+    function v6OpenEdit(id){
+      if(!v6RequireAdmin()) return;
+      const x=v6Expenses.find(a=>a.id===id);
+      if(!x) return;
+      v6EditingId=id;
+      document.getElementById('v6-edit-id').value=id;
+      document.getElementById('v6-edit-date').value=x.date||'';
+      document.getElementById('v6-edit-cat').value=x.category||V6_CATS[0];
+      document.getElementById('v6-edit-desc').value=x.description||'';
+      document.getElementById('v6-edit-amount').value=x.amount||'';
+      document.getElementById('v6-edit-payer').value=x.payer||'';
+      document.getElementById('v6-expense-modal').classList.add('show');
+    }
+
+    function v6CloseModal(){
+      document.getElementById('v6-expense-modal').classList.remove('show');
+      v6EditingId=null;
+    }
+
+    function v6UpdateExpense(){
+      if(!v6RequireAdmin()||!v6EditingId) return;
+      const data={
+        date:document.getElementById('v6-edit-date').value,
+        category:document.getElementById('v6-edit-cat').value,
+        description:document.getElementById('v6-edit-desc').value.trim(),
+        amount:v6ParseMoney(document.getElementById('v6-edit-amount').value),
+        payer:document.getElementById('v6-edit-payer').value.trim(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if(!data.date||!data.description||!data.amount||!data.payer){
+        alert("Vui lòng nhập đầy đủ thông tin.");
+        return;
+      }
+      db.collection(V6_EXPENSE_COLLECTION).doc(v6EditingId).update(data)
+        .then(v6CloseModal)
+        .catch(e=>alert("Không thể cập nhật: "+e.message));
+    }
+
+    function v6DeleteExpense(id){
+      if(!v6RequireAdmin()) return;
+      if(!confirm("Xóa khoản chi này khỏi database?")) return;
+      db.collection(V6_EXPENSE_COLLECTION).doc(id).delete()
+        .catch(e=>alert("Không thể xóa: "+e.message));
+    }
+
+    function v6ClearDemoExpenses(){
+      if(!v6RequireAdmin()) return;
+      const demoExpenses = v6Expenses.filter(x => x.isDemo === true);
+      if(!demoExpenses.length){
+        alert("Không có chi phí mẫu nào để xóa.");
+        return;
+      }
+      if(!confirm("Xóa các khoản chi MẪU do quản trị tạo? Chi phí thực tế sẽ không bị ảnh hưởng.")) return;
+
+      Promise.all(
+        demoExpenses.map(x =>
+          db.collection(V6_EXPENSE_COLLECTION).doc(x.id).delete()
+        )
+      )
+      .then(()=>alert("Đã xóa chi phí mẫu. Các khoản chi thực tế vẫn được giữ nguyên."))
+      .catch(e=>alert("Có lỗi khi xóa chi phí mẫu: "+e.message));
+    }
+
+    function v6SeedCostDemo(){
+      if(!v6RequireAdmin()) return;
+      const demo=[
+        ['2026-08-28','Xăng','Đổ xăng xe 01',1200000,'Duẩn'],
+        ['2026-08-28','Lưu trú','Khách sạn Thanh Hóa',1600000,'Giang'],
+        ['2026-08-29','Ăn uống','Ăn trưa Đồng Hới',950000,'Duẩn'],
+        ['2026-08-29','Vé đường bộ','Phí cao tốc',350000,'Duẩn'],
+        ['2026-08-30','Vé tham quan','Vé tham quan Hội An',700000,'Giang'],
+        ['2026-08-30','Gửi xe','Gửi xe Hội An',120000,'Duẩn']
+      ];
+      const batch=db.batch();
+      demo.forEach(d=>{
+        const ref=db.collection(V6_EXPENSE_COLLECTION).doc();
+        batch.set(ref,{date:d[0],category:d[1],description:d[2],amount:d[3],payer:d[4],isDemo:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       });
-
-      db.collection("trip_data").doc(V5_EXPENSE_DOC)
-        .set({list:next})
-        .then(()=>{
-          document.getElementById('v4-exp-name').value='';
-          document.getElementById('v4-exp-amount').value='';
-          document.getElementById('v4-exp-who').value='';
-        })
-        .catch(err=>alert("Không thể lưu chi phí vào Firebase: " + err.message));
+      batch.commit().then(()=>alert("Đã tạo dữ liệu mẫu.")).catch(e=>alert(e.message));
     }
 
-    function v5DeleteExpense(index){
-      if(!v5RequireAdmin()) return;
-      if(!confirm("Xóa khoản chi này?")) return;
-
-      const next = v5Expenses.slice();
-      next.splice(index,1);
-
-      db.collection("trip_data").doc(V5_EXPENSE_DOC)
-        .set({list:next})
-        .catch(err=>alert("Không thể xóa khoản chi: " + err.message));
+    function v6RenderRouteCopy(){
+      const source=document.getElementById('route-points-list');
+      const target=document.getElementById('v6-route-copy');
+      if(!source||!target) return;
+      target.innerHTML='<div class="v6-admin-note">Bản đồ chi tiết vẫn nằm ở khu vực Lộ trình gốc phía trên. Danh sách bên dưới là bản xem nhanh.</div>'+source.closest('.table-container').outerHTML;
+      const copy=target.querySelector('tbody');
+      if(copy) copy.id='v6-route-copy-tbody';
     }
 
-    // ===== CHECKLIST =====
-    function v5RenderDays(active){
-      v5ActiveDay = active || 1;
-
-      const tabs = document.getElementById('v4-day-tabs');
-      const content = document.getElementById('v4-day-content');
-      if(!tabs || !content) return;
-
-      tabs.innerHTML = V5_DAYS.map(d =>
-        `<button class="v4-day-tab ${d.id===v5ActiveDay?'active':''}"
-          onclick="v5RenderDays(${d.id})">D${d.id} · ${d.date}</button>`
-      ).join('');
-
-      const day = V5_DAYS.find(d=>d.id===v5ActiveDay) || V5_DAYS[0];
-
-      content.innerHTML = `
-        <div class="v4-day-title">${day.title}</div>
-        <div class="v4-day-sub">${day.sub}</div>
-        <div class="v4-checklist">
-          ${day.items.map((item,i)=>{
-            const key = `${day.id}-${i}`;
-            const checked = !!v5Checks[key];
-            return `
-              <label class="v4-check ${checked?'done':''}">
-                <input type="checkbox"
-                  ${checked?'checked':''}
-                  ${v5IsAdmin()?'':'disabled'}
-                  onchange="v5ToggleCheck('${key}',this.checked)">
-                ${v5Esc(item)}
-              </label>`;
-          }).join('')}
-        </div>
-        <div class="v4-note">
-          ${v5IsAdmin()
-            ? 'Quản trị viên có thể cập nhật trạng thái checklist. Thay đổi được đồng bộ cho cả đoàn.'
-            : 'Chế độ thành viên: được xem toàn bộ checklist, không được thay đổi.'}
-        </div>`;
+    function v6RenderMembersCopy(){
+      const source=document.getElementById('member-list');
+      const target=document.getElementById('v6-members-copy');
+      if(!source||!target) return;
+      const rows=[...source.querySelectorAll('tr')];
+      target.innerHTML=rows.length
+        ? `<div class="table-container"><table class="v6-table"><thead><tr><th>Họ tên</th><th>SĐT</th><th>Vai trò</th></tr></thead><tbody>${rows.map(r=>{
+            const c=r.querySelectorAll('td');
+            return `<tr><td>${c[0]?.innerHTML||''}</td><td>${c[1]?.innerHTML||''}</td><td>${c[2]?.innerHTML||''}</td></tr>`;
+          }).join('')}</tbody></table></div>`
+        : '<div class="v6-empty">Chưa có thành viên.</div>';
+      document.getElementById('v6-member-count').textContent=rows.length;
     }
 
-    function v5ToggleCheck(key, value){
-      if(!v5RequireAdmin()) return;
+    // Patch the existing role checker so V6 updates instantly.
+    const v6OriginalCheckAdminStatus = checkAdminStatus;
+    checkAdminStatus = function(){
+      v6OriginalCheckAdminStatus();
+      v6SyncRoleUI();
+    };
 
-      const next = Object.assign({}, v5Checks);
-      next[key] = !!value;
+    document.addEventListener('DOMContentLoaded',function(){
+      v6ListenExpenses();
+      v6SyncRoleUI();
 
-      db.collection("trip_data").doc(V5_CHECK_DOC)
-        .set({checks:next})
-        .catch(err=>alert("Không thể lưu checklist vào Firebase: " + err.message));
-    }
+      const originalListen = listenFirebaseData;
+      // Existing listener remains authoritative for original modules.
+      setTimeout(()=>{v6RenderMembersCopy();v6RenderRouteCopy();},1200);
 
-    // ===== ROUTE SUMMARY =====
-    function v5RenderRoute(){
-      const box = document.getElementById('v4-route-list');
-      if(!box) return;
-
-      box.innerHTML = V5_ROUTE.map((r,i)=>{
-        let out = `
-          <div class="v4-stop">
-            <div class="v4-stop-num">${i+1}</div>
-            <div>
-              <div class="v4-stop-name">${r.icon} ${r.name}</div>
-              <div class="v4-stop-meta">${r.meta}</div>
-            </div>
-          </div>`;
-        if(i < V5_ROUTE.length-1) out += `<div class="v4-leg">↓ Chặng ${i+1}</div>`;
-        return out;
-      }).join('');
-    }
-
-    function v5RefreshPermissionUI(){
-      // Role changes immediately affect V5 write controls.
-      v5RenderExpenses();
-      v5RenderDays(v5ActiveDay);
-    }
-
-
-    function v5ResetV5Data(){
-      if(!v5RequireAdmin()) return;
-      if(!confirm("Xóa toàn bộ chi phí và checklist V5 trên Firebase?")) return;
-      Promise.all([
-        db.collection("trip_data").doc(V5_EXPENSE_DOC).set({list:[]}),
-        db.collection("trip_data").doc(V5_CHECK_DOC).set({checks:{}})
-      ]).catch(err=>alert("Không thể xóa dữ liệu V5: " + err.message));
-    }
-
-    function v5Init(){
-      v5RenderRoute();
-      v5ListenData();
-      v5RefreshPermissionUI();
-    }
+      const costDate=document.getElementById('v6-exp-date');
+      if(costDate) costDate.value='2026-08-28';
+    });
 
   </script>
-
-    <nav class="mobile-bottom-nav" aria-label="Điều hướng di động">
-      <a href="#control-center">🏠<span>Tổng quan</span></a>
-      <a href="#route">🗺️<span>Lộ trình</span></a>
-      <a href="#control-center">💰<span>Chi phí</span></a>
-      <a href="#chat">💬<span>Chat</span></a>
-    </nav>
-
 </body>
 </html>
