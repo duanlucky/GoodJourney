@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hành Trình Du Lịch Khứ Hồi 2026 (28/08 - 02/09/2026)</title>
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet Routing Machine CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+  <!-- Firebase App & Firestore CDN (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+
+:root{
+  --navy:#092f4f;
+  --blue:#1677b8;
+  --blue2:#0d5f95;
+  --sky:#eaf6ff;
+  --orange:#ff8a3d;
+  --green:#16a36b;
+  --red:#df5757;
+  --ink:#132238;
+  --muted:#66758a;
+  --line:#e6edf3;
+  --bg:#f3f7fa;
+  --white:#fff;
+  --shadow:0 12px 32px rgba(15,43,68,.08);
+  --softshadow:0 5px 18px rgba(15,43,68,.06);
+  --radius:20px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 0 0,rgba(22,119,184,.10),transparent 26%),
+    radial-gradient(circle at 100% 8%,rgba(255,138,61,.08),transparent 22%),
+    var(--bg);
+  color:var(--ink);
+  padding:10px;
+  -webkit-tap-highlight-color:transparent;
+}
+.container{max-width:1120px;margin:0 auto;padding:0 0 82px}
+
+.header{
+  position:relative;overflow:hidden;color:#fff;text-align:left;
+  padding:24px 20px 21px;margin-bottom:10px;border-radius:24px;
+  background:linear-gradient(135deg,#062d4b 0%,#0e5f91 58%,#1784c1 100%);
+  box-shadow:0 18px 45px rgba(9,47,79,.22);
+}
+.header:before{
+  content:"HÀNH TRÌNH 2026";
+  display:inline-block;padding:5px 10px;margin-bottom:10px;
+  border:1px solid rgba(255,255,255,.18);border-radius:999px;
+  background:rgba(255,255,255,.11);font-size:10px;font-weight:800;letter-spacing:1.3px;
+}
+.header:after{
+  content:"✈";
+  position:absolute;right:-6px;top:-20px;font-size:110px;
+  opacity:.08;transform:rotate(-12deg);
+}
+.header h1{position:relative;z-index:1;color:#fff;font-size:clamp(25px,5vw,40px);line-height:1.08;letter-spacing:-.6px;margin-bottom:8px}
+.header p{position:relative;z-index:1;color:rgba(255,255,255,.84);font-size:13px;line-height:1.55;max-width:900px}
+
+.trip-nav{
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;
+  padding:2px 1px 9px;margin-bottom:4px;position:sticky;top:0;z-index:30;
+}
+.trip-nav::-webkit-scrollbar{display:none}
+.trip-nav a{
+  flex:0 0 auto;text-decoration:none;color:#36546c;background:rgba(255,255,255,.94);
+  border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;
+  box-shadow:var(--softshadow);backdrop-filter:blur(8px);
+}
+.trip-nav a:active{transform:scale(.97)}
+
+.admin-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 11px;margin-bottom:12px;background:rgba(255,255,255,.95);
+  border:1px solid var(--line);border-radius:15px;box-shadow:var(--softshadow);
+  font-size:12px;text-align:left;
+}
+.admin-bar-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.badge-role{font-weight:800;padding:5px 9px;border-radius:999px}
+.role-user{background:#edf2f6;color:#526174}.role-admin{background:#fff0ed;color:#b42318}
+
+.card{
+  background:var(--white);border:1px solid var(--line);padding:17px;
+  border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow);
+}
+.card h2{
+  display:flex;align-items:center;gap:7px;color:var(--ink);font-size:16px;
+  margin-bottom:13px;letter-spacing:-.2px;
+}
+.card h2:after{content:"";height:1px;flex:1;background:var(--line);margin-left:5px}
+.card > p{color:var(--muted)!important;line-height:1.55}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:9px}
+input[type=text],input[type=number],input[type=password]{
+  width:100%;padding:11px 12px;border:1px solid #d7e0e8;background:#fbfcfe;
+  color:var(--ink);border-radius:11px;font-size:14px;outline:none
+}
+input:focus{border-color:#70acd5;box-shadow:0 0 0 3px rgba(22,119,184,.10);background:#fff}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;width:auto;min-height:40px;
+  padding:9px 14px;border:0;border-radius:11px;background:var(--blue);color:#fff;
+  font-size:12.5px;font-weight:800;text-decoration:none;cursor:pointer;
+  box-shadow:0 5px 13px rgba(22,119,184,.15);transition:.15s
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.04)}.btn:active{transform:none;opacity:.9}
+.btn-group{display:flex;flex-wrap:wrap;gap:8px}
+.btn-success{background:var(--green)}.btn-danger{background:var(--red);padding:7px 10px;font-size:11px}.btn-warning{background:var(--orange)}.btn-dark{background:#344054}
+
+.summary-box{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:9px;margin-bottom:12px;
+  background:linear-gradient(135deg,#eff9ff,#f8fcff);border:1px solid #d9edf9;border-radius:16px
+}
+.summary-item{
+  background:#fff;border-radius:13px;padding:12px 8px;text-align:center;font-size:11px;color:#5b6c7e;
+}
+.summary-item span{display:block;color:var(--blue2);font-size:22px;font-weight:850;letter-spacing:-.5px;margin-top:2px}
+
+#map{height:470px;width:100%;border-radius:16px;border:1px solid #dce5ed;margin-top:12px;z-index:1;overflow:hidden}
+.leaflet-routing-container{display:none!important}
+.custom-div-icon,.leg-badge-icon{background:transparent;border:none}
+
+.table-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:9px;border-radius:13px;border:1px solid var(--line)}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:500px}
+th,td{border:0;border-bottom:1px solid var(--line);padding:10px 9px;text-align:left;font-size:12px;line-height:1.45}
+th{background:#f7f9fb;color:#475467;font-weight:800;white-space:nowrap}
+tr:last-child td{border-bottom:0}tbody tr:hover td{background:#fbfdff}
+code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
+
+.timeline{border-left:0;padding-left:0;margin-left:0}
+.timeline-item{
+  position:relative;margin-bottom:9px;padding:15px 15px 15px 20px;
+  border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#fff,#fbfcfe);
+  box-shadow:0 3px 13px rgba(15,43,68,.04)
+}
+.timeline-item:before{
+  content:"";position:absolute;left:-7px;top:20px;width:12px;height:12px;border-radius:50%;
+  background:var(--blue);border:3px solid #eaf5fb
+}
+.timeline-date{font-size:11px;font-weight:850;color:var(--blue);letter-spacing:.1px}
+.timeline-title{font-size:16px;font-weight:850;margin:5px 0 6px;color:var(--ink)}
+.timeline-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+.chat-box{background:#f5f8fb;border:1px solid var(--line);border-radius:15px;padding:9px}
+.chat-messages{
+  height:300px;overflow-y:auto;background:#fff;border:1px solid #e0e7ee;border-radius:12px;
+  padding:13px;margin-bottom:9px;display:flex;flex-direction:column;gap:8px
+}
+.chat-msg{display:flex;flex-direction:column;max-width:78%}.chat-msg.mine{align-self:flex-end;align-items:flex-end}
+.chat-msg.other{align-self:flex-start;align-items:flex-start}.chat-msg.system{align-self:center;align-items:center;max-width:90%;width:100%}
+.chat-msg .msg-info{font-size:10px;color:#98a2b3;margin-bottom:3px}
+.chat-msg .bubble{padding:9px 12px;border-radius:15px;font-size:13px;word-break:break-word;line-height:1.45}
+.chat-msg.mine .bubble{background:var(--blue);color:#fff;border-top-right-radius:4px}
+.chat-msg.other .bubble{background:#eef2f6;color:#344054;border-top-left-radius:4px}
+.chat-msg.system .bubble{background:#eef2f6;color:#667085;font-style:italic;text-align:center;border-radius:8px;font-size:11px}
+
+#photos,#route,#members,#chat,#schedule{scroll-margin-top:55px}
+
+/* V3 dashboard blocks */
+.trip-dashboard{
+  display:grid;grid-template-columns:1.35fr .65fr;gap:10px;margin-bottom:12px
+}
+.trip-now,.trip-countdown{
+  border-radius:18px;padding:16px;border:1px solid var(--line);box-shadow:var(--shadow)
+}
+.trip-now{
+  color:#fff;background:linear-gradient(135deg,#0a4b75,#167fbc);position:relative;overflow:hidden
+}
+.trip-now:after{content:"🚗";position:absolute;right:14px;bottom:-9px;font-size:65px;opacity:.12}
+.trip-kicker{font-size:10px;font-weight:850;letter-spacing:1px;opacity:.75;text-transform:uppercase}
+.trip-now-title{font-size:20px;font-weight:850;margin:5px 0}
+.trip-now-sub{font-size:12px;line-height:1.5;opacity:.82}
+.trip-countdown{background:#fff}
+.trip-countdown .trip-kicker{color:var(--muted)}
+.countdown-number{font-size:28px;font-weight:900;color:var(--navy);margin-top:5px}
+.countdown-sub{font-size:11px;color:var(--muted)}
+
+.day-strip{
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding:1px
+}
+.day-strip::-webkit-scrollbar{display:none}
+.day-pill{
+  flex:0 0 auto;min-width:76px;text-align:center;padding:9px 8px;border-radius:13px;
+  background:#fff;border:1px solid var(--line);box-shadow:var(--softshadow)
+}
+.day-pill b{display:block;font-size:12px;color:var(--navy)}.day-pill span{font-size:9px;color:var(--muted)}
+.day-pill.active{background:#eaf6ff;border-color:#b9def4}.day-pill.active b{color:var(--blue)}
+
+.mini-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px
+}
+.mini-stat{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 8px;text-align:center;box-shadow:var(--softshadow)
+}
+.mini-stat .ico{font-size:17px}.mini-stat strong{display:block;font-size:15px;margin-top:3px;color:var(--navy)}
+.mini-stat span{font-size:9px;color:var(--muted)}
+
+.member-visual{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:10px
+}
+.member-chip{
+  display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);
+  border-radius:13px;background:#fbfcfe
+}
+.member-avatar{
+  width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#d9effd,#eef8ff);color:var(--blue2);font-weight:900
+}
+.member-name{font-size:12px;font-weight:800;color:var(--ink)}.member-role{font-size:10px;color:var(--muted);margin-top:2px}
+
+@media(max-width:699px){
+  body{padding:7px}.container{padding-bottom:76px}
+  .header{padding:22px 17px 19px;border-radius:20px}
+  .header h1{font-size:25px}.header p{font-size:12px}
+  .trip-dashboard{grid-template-columns:1fr 1fr}
+  .trip-now{grid-column:1/-1}
+  .trip-now-title{font-size:18px}
+  .countdown-number{font-size:23px}
+  .admin-bar{flex-direction:column;align-items:stretch;text-align:center}
+  .admin-bar-btns{justify-content:center}.admin-bar-btns .btn{flex:1}
+  .card{padding:14px;border-radius:17px}
+  .btn{width:100%}.btn-group .btn{flex:1 1 100%}
+  .summary-box{grid-template-columns:1fr 1fr}
+  #map{height:390px}
+  .timeline-item{padding:13px 13px 13px 15px}.timeline-item:before{display:none}
+  .chat-form-grid{grid-template-columns:1fr!important}.chat-form-grid .btn{width:100%}
+  .col-coord{display:none!important}
+  .mini-stats{grid-template-columns:repeat(2,1fr)}
+  .member-visual{grid-template-columns:1fr}
+}
+@media(max-width:390px){
+  .trip-dashboard{grid-template-columns:1fr}.trip-now{grid-column:auto}
+  .summary-box{grid-template-columns:1fr}.mini-stats{grid-template-columns:1fr 1fr}
+}
+@media(min-width:700px){
+  body{padding:20px}.card{padding:20px}#map{height:540px}
+  .chat-form-grid{grid-template-columns:1fr 2fr auto!important}
+}
+
+
+.mobile-bottom-nav{
+  display:none;
+}
+@media(max-width:699px){
+  .mobile-bottom-nav{
+    position:fixed;left:8px;right:8px;bottom:8px;z-index:1000;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:3px;
+    padding:7px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+    border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px rgba(15,43,68,.16)
+  }
+  .mobile-bottom-nav a{
+    text-decoration:none;text-align:center;color:#536579;font-size:16px;padding:3px 2px
+  }
+  .mobile-bottom-nav span{display:block;font-size:9px;font-weight:800;margin-top:2px}
+}
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>HÀNH TRÌNH DU LỊCH KHỨ HỒI 2026</h1>
+      <p>6 Ngày 5 Đêm: Hà Nội – Thanh Hóa – Đồng Hới – Hội An – Huế – Hà Tĩnh – Hà Nội</p>
+    </div>
+
+    <nav class="trip-nav" aria-label="Điều hướng nhanh">
+      <a href="#photos">📸 Ảnh</a>
+      <a href="#route">🗺️ Lộ trình</a>
+      <a href="#members">👥 Thành viên</a>
+      <a href="#chat">💬 Chat</a>
+      <a href="#schedule">📅 Lịch trình</a>
+    </nav>
+
+
+    <section class="trip-dashboard" aria-label="Tổng quan chuyến đi">
+      <div class="trip-now">
+        <div class="trip-kicker">Điểm nhấn hành trình</div>
+        <div class="trip-now-title">Hà Nội → Miền Trung → Hà Nội</div>
+        <div class="trip-now-sub">28/08 — 02/09/2026 · Cùng nhau đi, cùng nhau về.</div>
+      </div>
+      <div class="trip-countdown">
+        <div class="trip-kicker">Ngày khởi hành</div>
+        <div class="countdown-number">28/08</div>
+        <div class="countdown-sub">17:00 · Hateco Apollo</div>
+      </div>
+    </section>
+
+    <section class="mini-stats" aria-label="Tóm tắt chuyến đi">
+      <div class="mini-stat"><div class="ico">📅</div><strong>6N5Đ</strong><span>Thời gian</span></div>
+      <div class="mini-stat"><div class="ico">📍</div><strong>7</strong><span>Điểm hành trình</span></div>
+      <div class="mini-stat"><div class="ico">🚗</div><strong>6</strong><span>Chặng đường</span></div>
+      <div class="mini-stat"><div class="ico">👨‍👩‍👧‍👦</div><strong>3–5</strong><span>Gia đình</span></div>
+    </section>
+
+    <section class="day-strip" aria-label="Các ngày trong hành trình">
+      <div class="day-pill active"><b>D1</b><span>28/08 · Đi</span></div>
+      <div class="day-pill"><b>D2</b><span>29/08 · Hội An</span></div>
+      <div class="day-pill"><b>D3</b><span>30/08 · Huế</span></div>
+      <div class="day-pill"><b>D4</b><span>31/08 · Huế</span></div>
+      <div class="day-pill"><b>D5</b><span>01/09 · Hà Tĩnh</span></div>
+      <div class="day-pill"><b>D6</b><span>02/09 · Về nhà</span></div>
+    </section>
+
+    <!-- Thanh Quyền Hạn -->
+    <div class="admin-bar">
+      <div>
+        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Chỉ Xem)</span>
+      </div>
+      <div class="admin-bar-btns">
+        <button id="btn-login-admin" class="btn btn-warning" onclick="loginAdmin()">🔐 Đăng Nhập Quản Trị</button>
+        <button id="btn-change-pwd" class="btn btn-dark admin-only admin-flex" onclick="changeAdminPassword()">🔑 Đổi Mật Khẩu</button>
+        <button id="btn-logout-admin" class="btn btn-danger admin-only admin-flex" onclick="logoutAdmin()">Thoát Quản Trị</button>
+      </div>
+    </div>
+
+    <!-- Kho ảnh Google Drive -->
+    <div class="card" id="photos">
+      <h2>📸 Kho Ảnh Chuyến Đi (Drive 100GB)</h2>
+      <p style="color: #4a5568; margin-bottom: 12px; font-size: 0.85em;">
+        Thành viên trong đoàn bấm nút dưới đây để xem toàn bộ ảnh hoặc tải ảnh mới chụp lên thư mục chung.
+      </p>
+      <div class="btn-group">
+        <a href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn">
+          📤 Tải Ảnh Lên Kho
+        </a>
+        <a href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn btn-success">
+          🖼️ Xem Kho Ảnh Đoàn
+        </a>
+      </div>
+    </div>
+
+    <!-- Bản đồ & Lộ trình -->
+    <div class="card" id="route">
+      <h2>🗺️ Lộ Trình & Tính Quãng Đường</h2>
+      
+      <div class="summary-box">
+        <div class="summary-item">Tổng Quãng Đường: <span id="total-distance">0 km</span></div>
+        <div class="summary-item">Thời Gian Lái Ước Tính: <span id="total-time">0 giờ</span></div>
+      </div>
+
+      <div class="form-grid admin-only">
+        <input type="text" id="point-name" placeholder="Tên điểm đến mới">
+        <input type="text" id="point-desc" placeholder="Mô tả / Ghi chú">
+        <input type="number" step="any" id="point-lat" placeholder="Vĩ độ (Lat)">
+        <input type="number" step="any" id="point-lng" placeholder="Kinh độ (Lng)">
+      </div>
+      <div class="btn-group admin-only admin-flex" style="margin-bottom: 12px;">
+        <button class="btn" onclick="addCustomPoint()">➕ Thêm Điểm Vào Lộ Trình</button>
+        <button class="btn btn-warning" onclick="resetDefaultPoints()">🔄 Khôi Phục 7 Điểm Chuẩn</button>
+      </div>
+
+      <h3 style="font-size: 14px; margin-top: 10px;">📍 Danh Sách Các Điểm Dừng:</h3>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 35px;">STT</th>
+              <th>Tên Điểm</th>
+              <th class="col-coord">Tọa Độ</th>
+              <th>Mô Tả</th>
+              <th>Chặng Tiếp Theo</th>
+              <th class="admin-col">Xóa</th>
+            </tr>
+          </thead>
+          <tbody id="route-points-list"></tbody>
+        </table>
+      </div>
+
+      <div id="map"></div>
+    </div>
+
+    <!-- Quản lý Thành viên -->
+    <div class="card" id="members">
+      <h2>👥 Thành Viên Trong Đoàn</h2>
+      
+      <div class="form-grid admin-only">
+        <input type="text" id="member-name" placeholder="Họ và tên">
+        <input type="text" id="member-phone" placeholder="Số điện thoại">
+        <input type="text" id="member-role" placeholder="Vai trò (VD: Lái chính)">
+      </div>
+      <button class="btn btn-success admin-only admin-flex" onclick="addMember()" style="margin-bottom: 12px;">➕ Thêm Thành Viên</button>
+
+
+      <div id="member-visual" class="member-visual"></div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Họ Tên</th>
+              <th>SĐT</th>
+              <th>Vai Trò</th>
+              <th class="admin-col">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="member-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Khung Chat Online -->
+    <div class="card" id="chat">
+      <h2>💬 Trò Chuyện Online</h2>
+      <div class="chat-box">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="form-grid chat-form-grid" style="gap: 6px;">
+          <input type="text" id="chat-user" placeholder="HỌ VÀ TÊN (IN HOA)" style="text-transform: uppercase;">
+          <input type="text" id="chat-text" placeholder="Nhập tin nhắn..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+          <button class="btn btn-success" onclick="sendChatMessage()">Gửi 📤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lịch trình chi tiết 6 ngày 5 đêm -->
+    <div class="card" id="schedule">
+      <h2>📅 Lịch Trình Chi Tiết 6N5Đ</h2>
+      <div class="timeline">
+        
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 1: THỨ 6 - 28/08/2026</div>
+          <div class="timeline-title">Hà Nội ➔ Thanh Hóa</div>
+          <div class="timeline-desc">
+            • <b>17:00:</b> Xuất phát từ Hateco Apollo.<br>
+            • <b>22:00:</b> Đến TP Thanh Hóa, nhận phòng nghỉ đêm (Đêm 1).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 2: THỨ 7 - 29/08/2026</div>
+          <div class="timeline-title">Thanh Hóa ➔ Đồng Hới ➔ Hội An</div>
+          <div class="timeline-desc">
+            • <b>05:00 - 07:00:</b> Xuất phát đi Đồng Hới.<br>
+            • <b>Trưa:</b> Ăn trưa tại Đồng Hới.<br>
+            • <b>Chiều:</b> Tiếp tục di chuyển vào Hội An.<br>
+            • <b>Tối:</b> Đến Hội An, nhận phòng và nghỉ đêm (Đêm 2).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 3: CHỦ NHẬT - 30/08/2026</div>
+          <div class="timeline-title">Hội An ➔ Di Chuyển Sang Huế</div>
+          <div class="timeline-desc">
+            • <b>Sáng & Trưa:</b> Khám phá Phố cổ Hội An & Rừng dừa Bảy Mẫu.<br>
+            • <b>16:00 - 17:00:</b> Khởi hành sang TP Huế.<br>
+            • <b>Tối:</b> Ăn tối, thưởng thức ẩm thực Cố đô, nghỉ đêm tại Huế (Đêm 3).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 4: THỨ 2 - 31/08/2026</div>
+          <div class="timeline-title">Khám Phá Cố Đô Huế</div>
+          <div class="timeline-desc">
+            • <b>Cả ngày:</b> Tham quan Đại Nội, các Lăng tẩm, Chùa Thiên Mụ...<br>
+            • <b>Tối:</b> Tự do dạo phố, ngắm sông Hương và nghỉ đêm tại Huế (Đêm 4).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 5: THỨ 3 - 01/09/2026</div>
+          <div class="timeline-title">Huế ➔ Đồng Hới ➔ Vinpearl Hà Tĩnh</div>
+          <div class="timeline-desc">
+            • <b>08:00:</b> Khởi hành từ Huế về hướng Hà Tĩnh.<br>
+            • <b>Trưa:</b> Dừng ăn trưa tại Đồng Hới.<br>
+            • <b>Chiều tối:</b> Đến Vinpearl Hà Tĩnh, nhận phòng nghỉ đêm (Đêm 5).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">NGÀY 6: THỨ 4 - 02/09/2026</div>
+          <div class="timeline-title">Hà Tĩnh ➔ Hateco Apollo (Về Đích)</div>
+          <div class="timeline-desc">
+            • <b>Sáng:</b> Dạo chơi, tắm biển Hà Tĩnh, ăn sáng.<br>
+            • <b>08:00 - 09:00:</b> Khởi hành về Hà Nội.<br>
+            • <b>Chiều:</b> Về tới Hateco Apollo. Kết thúc chuyến đi an toàn!
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // CẤU HÌNH FIREBASE (Dự án: AppDuLich)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVuCRzrkhCGqQCZuXYcnHovAu0dgy0Fao",
+      authDomain: "appdulich-d2203.firebaseapp.com",
+      projectId: "appdulich-d2203",
+      storageBucket: "appdulich-d2203.firebasestorage.app",
+      messagingSenderId: "618555116660",
+      appId: "1:618555116660:web:881d55194389af106a5521",
+      measurementId: "G-6PJ7PGX2GZ"
+    };
+
+    // Khởi tạo Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let map = null;
+    let routingControl = null;
+    let legBadgeMarkers = [];
+    let fallbackPolyline = null;
+
+    const defaultPoints = [
+      { name: "1. Hateco Apollo (Xuân Phương)", lat: 21.0477, lng: 105.7344, desc: "Xuất phát: 17:00 ngày 28/08/2026" },
+      { name: "2. TP Thanh Hoá", lat: 19.8079, lng: 105.7770, desc: "Nghỉ đêm 1 (22:00 ngày 28/08)" },
+      { name: "3. TP Đồng Hới", lat: 17.4661, lng: 106.6192, desc: "Dừng ăn trưa ngày 29/08 & 01/09" },
+      { name: "4. Phố cổ Hội An", lat: 15.8806, lng: 108.3307, desc: "Khám phá Hội An & Nghỉ đêm 2" },
+      { name: "5. Thành phố Huế", lat: 16.4759, lng: 107.5891, desc: "Khám phá Huế & Nghỉ đêm 3, Đêm 4" },
+      { name: "6. Vinpearl Hà Tĩnh", lat: 18.5054, lng: 105.8871, desc: "Nghỉ đêm 5 (Ngày 01/09)" },
+      { name: "7. Hateco Apollo (Về đích)", lat: 21.0477, lng: 105.7344, desc: "Kết thúc hành trình (Ngày 02/09)" }
+    ];
+
+    const presetLegs = [
+      { km: 158.0, timeMin: 135 },
+      { km: 325.0, timeMin: 285 },
+      { km: 310.0, timeMin: 330 },
+      { km: 125.0, timeMin: 150 },
+      { km: 270.0, timeMin: 270 },
+      { km: 340.0, timeMin: 315 }
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAdminStatus();
+      initMap();
+      listenFirebaseData();
+
+      // Điền sẵn tên nếu đã lưu trên trình duyệt
+      const savedName = localStorage.getItem('chat_my_name');
+      if (savedName) {
+        document.getElementById('chat-user').value = savedName;
+      }
+
+      document.getElementById('chat-user').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+        localStorage.setItem('chat_my_name', this.value.trim());
+      });
+    });
+
+    function getAdminPassword() {
+      return localStorage.getItem('admin_pwd') || 'admin123';
+    }
+
+    function checkAdminStatus() {
+      const isAdmin = sessionStorage.getItem('is_admin') === 'true';
+      const roleDisplay = document.getElementById('role-display');
+      const btnLogin = document.getElementById('btn-login-admin');
+
+      if (isAdmin) {
+        document.body.classList.add('is-admin');
+        roleDisplay.className = 'badge-role role-admin';
+        roleDisplay.innerText = 'Quản Trị Viên';
+        btnLogin.style.display = 'none';
+      } else {
+        document.body.classList.remove('is-admin');
+        roleDisplay.className = 'badge-role role-user';
+        roleDisplay.innerText = 'Thành Viên (Xem)';
+        btnLogin.style.display = 'inline-block';
+      }
+    }
+
+    function loginAdmin() {
+      const pwd = prompt("Nhập mật khẩu quản trị:");
+      if (pwd === getAdminPassword()) {
+        sessionStorage.setItem('is_admin', 'true');
+        checkAdminStatus();
+        alert("Đăng nhập quản trị thành công!");
+      } else if (pwd !== null) {
+        alert("Mật khẩu không chính xác!");
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('is_admin');
+      checkAdminStatus();
+    }
+
+    function changeAdminPassword() {
+      const oldPwd = prompt("Nhập mật khẩu cũ:");
+      if (oldPwd === getAdminPassword()) {
+        const newPwd = prompt("Nhập mật khẩu mới:");
+        if (newPwd && newPwd.trim() !== '') {
+          localStorage.setItem('admin_pwd', newPwd.trim());
+          alert("Cập nhật mật khẩu thành công!");
+        }
+      } else if (oldPwd !== null) {
+        alert("Mật khẩu cũ không khớp!");
+      }
+    }
+
+    // ==========================================
+    // ĐỒNG BỘ DỮ LIỆU THỜI GIAN THỰC TỪ FIRESTORE
+    // ==========================================
+    function listenFirebaseData() {
+      db.collection("trip_data").doc("points").onSnapshot((doc) => {
+        let points = defaultPoints;
+        if (doc.exists && doc.data().list) {
+          points = doc.data().list;
+        } else {
+          db.collection("trip_data").doc("points").set({ list: defaultPoints });
+        }
+        renderPointsTable(points, null);
+        renderRoadRouting(points);
+      });
+
+      db.collection("trip_data").doc("members").onSnapshot((doc) => {
+        let members = [{ name: "Nguyễn Tiến Duẩn", phone: "098x xxx xxx", role: "Trưởng đoàn / Lái chính" }];
+        if (doc.exists && doc.data().list) {
+          members = doc.data().list;
+        } else {
+          db.collection("trip_data").doc("members").set({ list: members });
+        }
+        renderMembers(members);
+      });
+
+      db.collection("trip_data").doc("chat").onSnapshot((doc) => {
+        let messages = [{ user: "HỆ THỐNG", text: "Chào mừng cả đoàn đến với kênh trao đổi chuyến đi 2026!", time: "10:00" }];
+        if (doc.exists && doc.data().list) {
+          messages = doc.data().list;
+        } else {
+          db.collection("trip_data").doc("chat").set({ list: messages });
+        }
+        renderChatMessages(messages);
+      });
+    }
+
+    function renderChatMessages(messages) {
+      const chatBox = document.getElementById('chat-messages');
+      const myName = (localStorage.getItem('chat_my_name') || '').trim().toUpperCase();
+      chatBox.innerHTML = '';
+
+      messages.forEach(msg => {
+        let msgUserUpper = (msg.user || '').trim().toUpperCase();
+        let msgType = 'other';
+
+        if (msgUserUpper === 'HỆ THỐNG') {
+          msgType = 'system';
+        } else if (myName && msgUserUpper === myName) {
+          msgType = 'mine';
+        }
+
+        chatBox.innerHTML += `
+          <div class="chat-msg ${msgType}">
+            <div class="msg-info"><b>${msg.user}</b> • ${msg.time}</div>
+            <div class="bubble">${msg.text}</div>
+          </div>
+        `;
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      let userInput = document.getElementById('chat-user').value.trim().toUpperCase();
+      let textInput = document.getElementById('chat-text').value.trim();
+
+      if (!userInput) return alert("Vui lòng nhập Họ tên!");
+      if (!textInput) return alert("Vui lòng nhập nội dung nhắn!");
+
+      localStorage.setItem('chat_my_name', userInput);
+
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      db.collection("trip_data").doc("chat").get().then((doc) => {
+        let messages = doc.exists && doc.data().list ? doc.data().list : [];
+        messages.push({ user: userInput, text: textInput, time: timeStr });
+        db.collection("trip_data").doc("chat").set({ list: messages }).then(() => {
+          document.getElementById('chat-text').value = '';
+        });
+      });
+    }
+
+    function calcDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c * 1.25;
+    }
+
+    function initMap() {
+      try {
+        if (!map) {
+          map = L.map('map').setView([18.5, 106.0], 6);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+          }).addTo(map);
+        }
+      } catch (err) {
+        console.error("Lỗi khởi tạo bản đồ:", err);
+      }
+    }
+
+    function clearLegBadges() {
+      legBadgeMarkers.forEach(m => map.removeLayer(m));
+      legBadgeMarkers = [];
+      if (fallbackPolyline) {
+        map.removeLayer(fallbackPolyline);
+        fallbackPolyline = null;
+      }
+    }
+
+    function renderRoadRouting(points) {
+      if (routingControl) {
+        map.removeControl(routingControl);
+      }
+
+      let waypoints = points.map(p => L.latLng(p.lat, p.lng));
+
+      routingControl = L.Routing.control({
+        waypoints: waypoints,
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1',
+          profile: 'car'
+        }),
+        lineOptions: {
+          styles: [{ color: '#1677b8', weight: 5, opacity: 0.88 }]
+        },
+        createMarker: function(i, wp) {
+          let p = points[i] || { name: `Điểm ${i+1}`, desc: "" };
+          let customIcon;
+
+          let isSameLocation = (points.length > 1 && points[0].lat === points[points.length-1].lat && points[0].lng === points[points.length-1].lng);
+          let transformStyle = "";
+          if (isSameLocation) {
+            if (i === 0) {
+              transformStyle = "transform: translateX(-16px);";
+            } else if (i === points.length - 1) {
+              transformStyle = "transform: translateX(16px);";
+            }
+          }
+
+          if (i === 0) {
+            customIcon = L.divIcon({
+              className: 'custom-div-icon',
+              html: `<div style="background-color:#28a745;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);${transformStyle}" title="Xuất phát">${i + 1}</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            });
+          } else if (i === points.length - 1) {
+            customIcon = L.divIcon({
+              className: 'custom-div-icon',
+              html: `<div style="background-color:#6f42c1;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);${transformStyle}" title="Về đích">${i + 1}</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            });
+          } else {
+            customIcon = L.divIcon({
+              className: 'custom-div-icon',
+              html: `<div style="background-color:#007bff;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${i + 1}</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            });
+          }
+
+          return L.marker(wp.latLng, { icon: customIcon }).bindPopup(`<b>${p.name}</b><br>${p.desc}`);
+        },
+        addWaypoints: false,
+        routeWhileDragging: false
+      }).addTo(map);
+
+      routingControl.on('routesfound', function(e) {
+        let route = e.routes[0];
+        renderPointsTable(points, route);
+      });
+
+      routingControl.on('routingerror', function() {
+        if (!fallbackPolyline) {
+          let latLngs = points.map(p => [p.lat, p.lng]);
+          fallbackPolyline = L.polyline(latLngs, { color: '#007bff', weight: 3, dashArray: '5, 8' }).addTo(map);
+        }
+      });
+    }
+
+    function renderPointsTable(points, route) {
+      clearLegBadges();
+      let tbody = document.getElementById('route-points-list');
+      tbody.innerHTML = '';
+
+      let totalKmSum = 0;
+      let totalMinSum = 0;
+      let isDefaultList = points.length === defaultPoints.length;
+
+      points.forEach((p, index) => {
+        let legInfo = "-";
+
+        if (index < points.length - 1) {
+          let legKm = 0;
+          let legMin = 0;
+          let midLat = (p.lat + points[index+1].lat) / 2;
+          let midLng = (p.lng + points[index+1].lng) / 2;
+
+          if (route && route.legs && route.legs[index]) {
+            let leg = route.legs[index];
+            legKm = (leg.summary.totalDistance / 1000);
+            legMin = Math.round(leg.summary.totalTime / 60);
+
+            if (leg.coordinates && leg.coordinates.length > 0) {
+              let midCoord = leg.coordinates[Math.floor(leg.coordinates.length / 2)];
+              midLat = midCoord.lat;
+              midLng = midCoord.lng;
+            }
+          } 
+          else if (isDefaultList && presetLegs[index]) {
+            legKm = presetLegs[index].km;
+            legMin = presetLegs[index].timeMin;
+          } 
+          else {
+            legKm = calcDistanceKm(p.lat, p.lng, points[index+1].lat, points[index+1].lng);
+            legMin = Math.round((legKm / 60) * 60);
+          }
+
+          totalKmSum += legKm;
+          totalMinSum += legMin;
+
+          let legH = Math.floor(legMin / 60);
+          let legM = legMin % 60;
+          let timeStr = legH > 0 ? `${legH}g${legM}p` : `${legM}p`;
+
+          legInfo = `<span style="color:#2b6cb0; font-weight:600;">➔ Điểm ${index+2}: ${legKm.toFixed(1)} km (~${timeStr})</span>`;
+
+          let badge = L.marker([midLat, midLng], {
+            icon: L.divIcon({
+              className: 'leg-badge-icon',
+              html: `<div style="background:#1a365d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;white-space:nowrap;border:1px solid white;">➔ ${legKm.toFixed(1)} km</div>`,
+              iconAnchor: [25, 8]
+            })
+          }).addTo(map);
+
+          legBadgeMarkers.push(badge);
+
+        } else if (index === points.length - 1) {
+          legInfo = `<span style="color:#6f42c1; font-weight:600;">🏁 Về đích</span>`;
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td><b>${index + 1}</b></td>
+            <td><b>${p.name}</b></td>
+            <td class="col-coord"><code>${p.lat}, ${p.lng}</code></td>
+            <td>${p.desc || '-'}</td>
+            <td>${legInfo}</td>
+            <td class="admin-col">
+              <button class="btn btn-danger" onclick="deletePoint(${index})">Xóa</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      let sumH = Math.floor(totalMinSum / 60);
+      let sumM = totalMinSum % 60;
+      document.getElementById('total-distance').innerText = `${totalKmSum.toFixed(1)} km`;
+      document.getElementById('total-time').innerText = `${sumH} giờ ${sumM} phút`;
+    }
+
+    function addCustomPoint() {
+      let name = document.getElementById('point-name').value;
+      let desc = document.getElementById('point-desc').value;
+      let lat = parseFloat(document.getElementById('point-lat').value);
+      let lng = parseFloat(document.getElementById('point-lng').value);
+
+      if (!name || isNaN(lat) || isNaN(lng)) {
+        return alert("Vui lòng nhập Tên điểm, Vĩ độ và Kinh độ!");
+      }
+
+      db.collection("trip_data").doc("points").get().then((doc) => {
+        let points = doc.exists && doc.data().list ? doc.data().list : defaultPoints;
+        points.splice(points.length - 1, 0, { name, lat, lng, desc });
+        
+        db.collection("trip_data").doc("points").set({ list: points }).then(() => {
+          document.getElementById('point-name').value = '';
+          document.getElementById('point-desc').value = '';
+          document.getElementById('point-lat').value = '';
+          document.getElementById('point-lng').value = '';
+        });
+      });
+    }
+
+    function deletePoint(index) {
+      db.collection("trip_data").doc("points").get().then((doc) => {
+        let points = doc.exists && doc.data().list ? doc.data().list : defaultPoints;
+        if (points.length <= 2) return alert("Lộ trình cần ít nhất 2 điểm!");
+        points.splice(index, 1);
+        db.collection("trip_data").doc("points").set({ list: points });
+      });
+    }
+
+    function resetDefaultPoints() {
+      if (confirm("Bạn có chắc chắn muốn khôi phục lại 7 điểm chuẩn ban đầu?")) {
+        db.collection("trip_data").doc("points").set({ list: defaultPoints });
+      }
+    }
+
+
+    function renderMemberVisual(members) {
+      const box = document.getElementById('member-visual');
+      if (!box) return;
+      box.innerHTML = '';
+      members.forEach(m => {
+        const name = (m.name || 'Thành viên').trim();
+        const initials = name.split(/\s+/).slice(-2).map(x => x.charAt(0)).join('').toUpperCase();
+        box.innerHTML += `
+          <div class="member-chip">
+            <div class="member-avatar">${initials || '👤'}</div>
+            <div>
+              <div class="member-name">${name}</div>
+              <div class="member-role">${m.role || 'Thành viên'}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderMembers(members) {
+      renderMemberVisual(members);
+      let tbody = document.getElementById('member-list');
+      tbody.innerHTML = '';
+      members.forEach((m, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td><b>${m.name}</b></td>
+            <td>${m.phone}</td>
+            <td>${m.role}</td>
+            <td class="admin-col"><button class="btn btn-danger" onclick="deleteMember(${index})">Xóa</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function addMember() {
+      let name = document.getElementById('member-name').value;
+      let phone = document.getElementById('member-phone').value;
+      let role = document.getElementById('member-role').value || "Thành viên";
+
+      if (!name) return alert("Vui lòng nhập họ tên!");
+
+      db.collection("trip_data").doc("members").get().then((doc) => {
+        let members = doc.exists && doc.data().list ? doc.data().list : [];
+        members.push({ name, phone, role });
+        db.collection("trip_data").doc("members").set({ list: members }).then(() => {
+          document.getElementById('member-name').value = '';
+          document.getElementById('member-phone').value = '';
+          document.getElementById('member-role').value = '';
+        });
+      });
+    }
+
+    function deleteMember(index) {
+      db.collection("trip_data").doc("members").get().then((doc) => {
+        let members = doc.exists && doc.data().list ? doc.data().list : [];
+        members.splice(index, 1);
+        db.collection("trip_data").doc("members").set({ list: members });
+      });
+    }
+  </script>
+
+    <nav class="mobile-bottom-nav" aria-label="Điều hướng di động">
+      <a href="#route">🗺️<span>Lộ trình</span></a>
+      <a href="#schedule">📅<span>Lịch trình</span></a>
+      <a href="#chat">💬<span>Chat</span></a>
+      <a href="#photos">📸<span>Ảnh</span></a>
+    </nav>
+
+</body>
+</html>
