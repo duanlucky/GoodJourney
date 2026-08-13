@@ -267,6 +267,79 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
   .mobile-bottom-nav span{display:block;font-size:9px;font-weight:800;margin-top:2px}
 }
 
+
+/* ========================= V4 TRIP CONTROL CENTER ========================= */
+.v4-section{margin-bottom:12px}
+.v4-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px}
+.v4-panel{
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;
+  box-shadow:var(--softshadow)
+}
+.v4-panel h3{font-size:14px;margin-bottom:10px;color:var(--navy)}
+.v4-route-list{display:flex;flex-direction:column;gap:7px}
+.v4-stop{
+  display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;
+  padding:9px;border:1px solid var(--line);border-radius:12px;background:#fbfdff
+}
+.v4-stop-num{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:#eaf6ff;color:var(--blue2);font-size:11px;font-weight:900
+}
+.v4-stop-name{font-size:12px;font-weight:850}.v4-stop-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.v4-leg{font-size:10px;color:var(--muted);padding-left:43px;margin-top:-2px}
+.v4-expense-form{display:grid;grid-template-columns:1.2fr .7fr .7fr auto;gap:7px;margin-bottom:10px}
+.v4-expenses{display:flex;flex-direction:column;gap:7px;max-height:245px;overflow:auto}
+.v4-expense{
+  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+  padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe
+}
+.v4-expense-title{font-size:12px;font-weight:800}.v4-expense-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.v4-expense-amount{font-size:13px;font-weight:900;color:var(--navy);white-space:nowrap}
+.v4-total{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 12px;border-radius:13px;background:linear-gradient(135deg,#eef9ff,#f8fcff);
+  border:1px solid #d9edf9;margin-bottom:9px
+}
+.v4-total span{font-size:11px;color:var(--muted)}.v4-total strong{font-size:20px;color:var(--blue2)}
+.v4-day-tabs{display:flex;gap:6px;overflow:auto;scrollbar-width:none;margin-bottom:10px}
+.v4-day-tabs::-webkit-scrollbar{display:none}
+.v4-day-tab{
+  flex:0 0 auto;padding:8px 11px;border:1px solid var(--line);border-radius:999px;
+  background:#fff;color:#526579;font-size:11px;font-weight:850;cursor:pointer
+}
+.v4-day-tab.active{background:#eaf6ff;border-color:#b8ddf3;color:var(--blue2)}
+.v4-day-content{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfcfe}
+.v4-day-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:4px}
+.v4-day-sub{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:9px}
+.v4-checklist{display:flex;flex-direction:column;gap:6px}
+.v4-check{
+  display:flex;align-items:center;gap:8px;padding:8px 9px;background:#fff;border:1px solid var(--line);border-radius:10px;
+  font-size:11px;color:#46586a
+}
+.v4-check input{accent-color:var(--blue)}
+.v4-check.done{text-decoration:line-through;color:#98a2b3;background:#f7f9fb}
+.v4-quick{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px
+}
+.v4-quick button{
+  min-height:42px;border:1px solid var(--line);background:#fff;border-radius:12px;
+  font-size:11px;font-weight:800;color:#40556b;cursor:pointer
+}
+.v4-quick button:active{transform:scale(.98)}
+.v4-note{font-size:10px;color:#98a2b3;margin-top:8px;line-height:1.45}
+.v4-delete{border:0;background:transparent;color:#b42318;font-size:12px;cursor:pointer;padding:4px}
+@media(max-width:699px){
+  .v4-grid{grid-template-columns:1fr}
+  .v4-expense-form{grid-template-columns:1fr 1fr}
+  .v4-expense-form .btn{grid-column:1/-1}
+  .v4-quick{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:390px){
+  .v4-expense-form{grid-template-columns:1fr}
+  .v4-expense-form .btn{grid-column:auto}
+  .v4-quick{grid-template-columns:1fr 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -278,7 +351,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
     </div>
 
     <nav class="trip-nav" aria-label="Điều hướng nhanh">
-      <a href="#photos">📸 Ảnh</a>
+      <a href="#control-center">🏠 Tổng quan</a><a href="#photos">📸 Ảnh</a>
       <a href="#route">🗺️ Lộ trình</a>
       <a href="#members">👥 Thành viên</a>
       <a href="#chat">💬 Chat</a>
@@ -315,10 +388,58 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       <div class="day-pill"><b>D6</b><span>02/09 · Về nhà</span></div>
     </section>
 
+
+    <!-- ================= V4 TRIP CONTROL CENTER ================= -->
+    <section class="v4-section" id="control-center">
+      <div class="v4-grid">
+
+        <div class="v4-panel">
+          <h3>🗺️ Các chặng trong hành trình</h3>
+          <div id="v4-route-list" class="v4-route-list"></div>
+          <div class="v4-note">Danh sách lấy trực tiếp từ các điểm hành trình hiện có của app.</div>
+        </div>
+
+        <div class="v4-panel">
+          <h3>💰 Chi phí chuyến đi</h3>
+          <div class="v4-total">
+            <span>Tổng chi phí đã nhập</span>
+            <strong id="v4-total">0 đ</strong>
+          </div>
+          <div class="v4-expense-form admin-only" style="display:none">
+            <input id="v4-exp-name" type="text" placeholder="Khoản chi: xăng, ăn, vé..." />
+            <input id="v4-exp-amount" type="number" min="0" placeholder="Số tiền" />
+            <input id="v4-exp-who" type="text" placeholder="Người trả" />
+            <button class="btn btn-success" onclick="v4AddExpense()">＋ Thêm</button>
+          </div>
+          <div id="v4-expenses" class="v4-expenses"></div>
+          <div class="v4-note">Dữ liệu chi phí được lưu trên Firebase. Thành viên được xem; chỉ Quản trị viên được thêm/xóa.</div>
+        </div>
+
+      </div>
+
+      <div class="v4-panel" style="margin-top:10px">
+        <h3>📅 Điều hành từng ngày</h3>
+        <div id="v4-day-tabs" class="v4-day-tabs"></div>
+        <div id="v4-day-content" class="v4-day-content"></div>
+      </div>
+
+      <div class="v4-panel" style="margin-top:10px">
+        <h3>⚡ Thao tác nhanh</h3>
+        <div class="v4-quick">
+          <button onclick="document.getElementById('route').scrollIntoView({behavior:'smooth'})">🗺️ Mở bản đồ</button>
+          <button onclick="document.getElementById('schedule').scrollIntoView({behavior:'smooth'})">📅 Xem lịch trình</button>
+          <button onclick="document.getElementById('members').scrollIntoView({behavior:'smooth'})">👥 Đoàn</button>
+          <button onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">💬 Chat</button>
+          <button onclick="document.getElementById('photos').scrollIntoView({behavior:'smooth'})">📸 Kho ảnh</button>
+          <button class="admin-only" onclick="v5ResetV5Data()">♻️ Xóa dữ liệu V5</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Thanh Quyền Hạn -->
     <div class="admin-bar">
       <div>
-        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Chỉ Xem)</span>
+        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Xem toàn bộ)</span>
       </div>
       <div class="admin-bar-btns">
         <button id="btn-login-admin" class="btn btn-warning" onclick="loginAdmin()">🔐 Đăng Nhập Quản Trị</button>
@@ -541,6 +662,7 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       checkAdminStatus();
       initMap();
       listenFirebaseData();
+      v5Init();
 
       // Điền sẵn tên nếu đã lưu trên trình duyệt
       const savedName = localStorage.getItem('chat_my_name');
@@ -571,9 +693,10 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
       } else {
         document.body.classList.remove('is-admin');
         roleDisplay.className = 'badge-role role-user';
-        roleDisplay.innerText = 'Thành Viên (Xem)';
+        roleDisplay.innerText = 'Thành Viên (Xem toàn bộ)';
         btnLogin.style.display = 'inline-block';
       }
+      if (typeof v5RefreshPermissionUI === 'function') v5RefreshPermissionUI();
     }
 
     function loginAdmin() {
@@ -972,13 +1095,253 @@ code{background:#f2f4f7;padding:3px 5px;border-radius:6px;font-size:10px}
         db.collection("trip_data").doc("members").set({ list: members });
       });
     }
+
+
+    /* =========================================================
+       V5 - DỮ LIỆU MỚI LƯU FIRESTORE
+       Quyền: mọi thành viên được XEM; chỉ Admin được THAY ĐỔI.
+       ========================================================= */
+
+    let v5Expenses = [];
+    let v5Checks = {};
+    let v5ActiveDay = 1;
+
+    const V5_EXPENSE_DOC = "expenses";
+    const V5_CHECK_DOC = "checklist";
+
+    const V5_ROUTE = [
+      {name:'Hà Nội', meta:'Điểm xuất phát', icon:'🏠'},
+      {name:'Thanh Hóa', meta:'Chặng 1 · ~158 km', icon:'📍'},
+      {name:'Đồng Hới', meta:'Chặng 2 · ~325 km', icon:'📍'},
+      {name:'Hội An', meta:'Chặng 3 · ~310 km', icon:'📍'},
+      {name:'Huế', meta:'Chặng 4 · ~125 km', icon:'📍'},
+      {name:'Hà Tĩnh', meta:'Chặng 5 · ~270 km', icon:'📍'},
+      {name:'Hà Nội', meta:'Chặng về · ~340 km', icon:'🏁'}
+    ];
+
+    const V5_DAYS = [
+      {id:1,date:'28/08',title:'Ngày 1 · Hà Nội → Thanh Hóa',sub:'17:00 xuất phát · di chuyển và nhận phòng',items:['Kiểm tra hành lý và giấy tờ','Tập trung đủ thành viên','Đổ xăng / kiểm tra xe','Nhận phòng Thanh Hóa']},
+      {id:2,date:'29/08',title:'Ngày 2 · Thanh Hóa → Đồng Hới → Hội An',sub:'Ngày di chuyển dài · ưu tiên nghỉ giữa chặng',items:['Ăn sáng','Kiểm tra xe trước khi đi','Nghỉ giữa chặng','Check-in Hội An']},
+      {id:3,date:'30/08',title:'Ngày 3 · Hội An',sub:'Ngày tham quan và vui chơi',items:['Ăn sáng','Tham quan Hội An','Thời gian tự do','Tập hợp buổi tối']},
+      {id:4,date:'31/08',title:'Ngày 4 · Hội An → Huế',sub:'Di chuyển ngắn · dành thời gian khám phá Huế',items:['Check-out','Di chuyển tới Huế','Nhận phòng','Ăn tối / tham quan']},
+      {id:5,date:'01/09',title:'Ngày 5 · Huế → Hà Tĩnh',sub:'Di chuyển về phía Bắc',items:['Ăn sáng','Check-out','Nghỉ giữa chặng','Nhận phòng Hà Tĩnh']},
+      {id:6,date:'02/09',title:'Ngày 6 · Hà Tĩnh → Hà Nội',sub:'Chặng cuối · kết thúc hành trình',items:['Ăn sáng','Kiểm tra hành lý','Khởi hành về Hà Nội','Kết thúc chuyến đi']}
+    ];
+
+    function v5IsAdmin(){
+      return sessionStorage.getItem('is_admin') === 'true';
+    }
+
+    function v5RequireAdmin(){
+      if(!v5IsAdmin()){
+        alert("Chức năng này chỉ dành cho Quản trị viên.");
+        return false;
+      }
+      return true;
+    }
+
+    function v5Money(n){
+      return new Intl.NumberFormat('vi-VN').format(Number(n)||0) + ' đ';
+    }
+
+    function v5Esc(v){
+      return String(v ?? '').replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[c]));
+    }
+
+    // ===== FIRESTORE LISTENERS =====
+    // Các document mới:
+    // trip_data/expenses
+    // trip_data/checklist
+    // Không dùng localStorage cho dữ liệu nghiệp vụ V5.
+    function v5ListenData(){
+      db.collection("trip_data").doc(V5_EXPENSE_DOC).onSnapshot((doc)=>{
+        v5Expenses = (doc.exists && Array.isArray(doc.data().list))
+          ? doc.data().list : [];
+        v5RenderExpenses();
+      }, err => console.error("Lỗi đọc expenses:", err));
+
+      db.collection("trip_data").doc(V5_CHECK_DOC).onSnapshot((doc)=>{
+        v5Checks = (doc.exists && doc.data().checks)
+          ? doc.data().checks : {};
+        v5RenderDays(v5ActiveDay);
+      }, err => console.error("Lỗi đọc checklist:", err));
+    }
+
+    // ===== CHI PHÍ =====
+    function v5RenderExpenses(){
+      const box = document.getElementById('v4-expenses');
+      const total = document.getElementById('v4-total');
+      if(!box || !total) return;
+
+      const sum = v5Expenses.reduce((a,x)=>a + Number(x.amount || 0), 0);
+      total.textContent = v5Money(sum);
+
+      if(!v5Expenses.length){
+        box.innerHTML = '<div class="v4-note">Chưa có khoản chi nào.</div>';
+        return;
+      }
+
+      box.innerHTML = v5Expenses.slice().reverse().map((x, reverseIndex)=>{
+        const index = v5Expenses.length - 1 - reverseIndex;
+        return `
+          <div class="v4-expense">
+            <div>
+              <div class="v4-expense-title">${v5Esc(x.name)}</div>
+              <div class="v4-expense-meta">${v5Esc(x.who || '—')} · ${v5Esc(x.time || '')}</div>
+            </div>
+            <div>
+              <div class="v4-expense-amount">${v5Money(x.amount)}</div>
+              ${v5IsAdmin()
+                ? `<button class="v4-delete" onclick="v5DeleteExpense(${index})">Xóa</button>`
+                : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function v5AddExpense(){
+      if(!v5RequireAdmin()) return;
+
+      const name = document.getElementById('v4-exp-name').value.trim();
+      const amount = Number(document.getElementById('v4-exp-amount').value);
+      const who = document.getElementById('v4-exp-who').value.trim();
+
+      if(!name || !amount || amount < 0){
+        alert("Hãy nhập tên khoản chi và số tiền.");
+        return;
+      }
+
+      const next = v5Expenses.slice();
+      next.push({
+        name:name,
+        amount:amount,
+        who:who,
+        time:new Date().toLocaleString('vi-VN'),
+        createdAt:Date.now()
+      });
+
+      db.collection("trip_data").doc(V5_EXPENSE_DOC)
+        .set({list:next})
+        .then(()=>{
+          document.getElementById('v4-exp-name').value='';
+          document.getElementById('v4-exp-amount').value='';
+          document.getElementById('v4-exp-who').value='';
+        })
+        .catch(err=>alert("Không thể lưu chi phí vào Firebase: " + err.message));
+    }
+
+    function v5DeleteExpense(index){
+      if(!v5RequireAdmin()) return;
+      if(!confirm("Xóa khoản chi này?")) return;
+
+      const next = v5Expenses.slice();
+      next.splice(index,1);
+
+      db.collection("trip_data").doc(V5_EXPENSE_DOC)
+        .set({list:next})
+        .catch(err=>alert("Không thể xóa khoản chi: " + err.message));
+    }
+
+    // ===== CHECKLIST =====
+    function v5RenderDays(active){
+      v5ActiveDay = active || 1;
+
+      const tabs = document.getElementById('v4-day-tabs');
+      const content = document.getElementById('v4-day-content');
+      if(!tabs || !content) return;
+
+      tabs.innerHTML = V5_DAYS.map(d =>
+        `<button class="v4-day-tab ${d.id===v5ActiveDay?'active':''}"
+          onclick="v5RenderDays(${d.id})">D${d.id} · ${d.date}</button>`
+      ).join('');
+
+      const day = V5_DAYS.find(d=>d.id===v5ActiveDay) || V5_DAYS[0];
+
+      content.innerHTML = `
+        <div class="v4-day-title">${day.title}</div>
+        <div class="v4-day-sub">${day.sub}</div>
+        <div class="v4-checklist">
+          ${day.items.map((item,i)=>{
+            const key = `${day.id}-${i}`;
+            const checked = !!v5Checks[key];
+            return `
+              <label class="v4-check ${checked?'done':''}">
+                <input type="checkbox"
+                  ${checked?'checked':''}
+                  ${v5IsAdmin()?'':'disabled'}
+                  onchange="v5ToggleCheck('${key}',this.checked)">
+                ${v5Esc(item)}
+              </label>`;
+          }).join('')}
+        </div>
+        <div class="v4-note">
+          ${v5IsAdmin()
+            ? 'Quản trị viên có thể cập nhật trạng thái checklist. Thay đổi được đồng bộ cho cả đoàn.'
+            : 'Chế độ thành viên: được xem toàn bộ checklist, không được thay đổi.'}
+        </div>`;
+    }
+
+    function v5ToggleCheck(key, value){
+      if(!v5RequireAdmin()) return;
+
+      const next = Object.assign({}, v5Checks);
+      next[key] = !!value;
+
+      db.collection("trip_data").doc(V5_CHECK_DOC)
+        .set({checks:next})
+        .catch(err=>alert("Không thể lưu checklist vào Firebase: " + err.message));
+    }
+
+    // ===== ROUTE SUMMARY =====
+    function v5RenderRoute(){
+      const box = document.getElementById('v4-route-list');
+      if(!box) return;
+
+      box.innerHTML = V5_ROUTE.map((r,i)=>{
+        let out = `
+          <div class="v4-stop">
+            <div class="v4-stop-num">${i+1}</div>
+            <div>
+              <div class="v4-stop-name">${r.icon} ${r.name}</div>
+              <div class="v4-stop-meta">${r.meta}</div>
+            </div>
+          </div>`;
+        if(i < V5_ROUTE.length-1) out += `<div class="v4-leg">↓ Chặng ${i+1}</div>`;
+        return out;
+      }).join('');
+    }
+
+    function v5RefreshPermissionUI(){
+      // Role changes immediately affect V5 write controls.
+      v5RenderExpenses();
+      v5RenderDays(v5ActiveDay);
+    }
+
+
+    function v5ResetV5Data(){
+      if(!v5RequireAdmin()) return;
+      if(!confirm("Xóa toàn bộ chi phí và checklist V5 trên Firebase?")) return;
+      Promise.all([
+        db.collection("trip_data").doc(V5_EXPENSE_DOC).set({list:[]}),
+        db.collection("trip_data").doc(V5_CHECK_DOC).set({checks:{}})
+      ]).catch(err=>alert("Không thể xóa dữ liệu V5: " + err.message));
+    }
+
+    function v5Init(){
+      v5RenderRoute();
+      v5ListenData();
+      v5RefreshPermissionUI();
+    }
+
   </script>
 
     <nav class="mobile-bottom-nav" aria-label="Điều hướng di động">
+      <a href="#control-center">🏠<span>Tổng quan</span></a>
       <a href="#route">🗺️<span>Lộ trình</span></a>
-      <a href="#schedule">📅<span>Lịch trình</span></a>
+      <a href="#control-center">💰<span>Chi phí</span></a>
       <a href="#chat">💬<span>Chat</span></a>
-      <a href="#photos">📸<span>Ảnh</span></a>
     </nav>
 
 </body>
