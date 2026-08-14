@@ -282,20 +282,28 @@ let routingLibPromise=null;
 let mapTileFallbackUsed=false;
 function addFastMapTiles(){
   if(!map)return;
-  const carto=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
-    attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19,
-    updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true
-  });
-  carto.on('tileerror',()=>{
-    if(mapTileFallbackUsed)return;
-    mapTileFallbackUsed=true;
-    try{map.removeLayer(carto)}catch(e){}
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap',maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true
-    }).addTo(map);
-  });
-  carto.addTo(map);
+  let stage=0,layer=null;
+  const sources=[
+    {url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',opts:{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true}},
+    {url:'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png',opts:{attribution:'© OpenStreetMap contributors',subdomains:'a b c'.split(' '),maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true}},
+    {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',opts:{attribution:'© OpenStreetMap contributors',maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true}}
+  ];
+  const next=()=>{
+    if(stage>=sources.length)return;
+    if(layer){try{map.removeLayer(layer)}catch(e){}}
+    const src=sources[stage++];
+    layer=L.tileLayer(src.url,src.opts);
+    let errors=0;
+    layer.on('tileerror',()=>{
+      errors++;
+      // Chỉ chuyển nguồn sau khi có nhiều tile lỗi; tránh một tile lỗi đơn lẻ làm đổi nền.
+      if(errors>=3)next();
+    });
+    layer.addTo(map);
+  };
+  next();
 }
+
 function mapBoundsFromPoints(list){
   const valid=(list||[]).filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
   if(!valid.length)return null;
@@ -357,15 +365,16 @@ function renderRoadRouting(){
   if(routingControl){try{map.removeControl(routingControl)}catch(e){}routingControl=null}
   if(points.length<2){renderPointsTable(points,null);setSmartMapViewport(points);return}
   // Hiển thị tuyến thẳng + điểm ngay lập tức, không chờ máy chủ định tuyến.
-  fallbackPolyline=L.polyline(points.map(p=>[Number(p.lat),Number(p.lng)]),{color:'#3182ce',weight:3,opacity:.55,dashArray:'6,8'}).addTo(map);
-  renderPointsTable(points,null);
+  fallbackPolyline=L.polyline(points.map(p=>[Number(p.lat),Number(p.lng)]),{color:'#3182ce',weight:4,opacity:.72,dashArray:'6,8'}).addTo(map);
   const group=L.featureGroup(points.map((p,i)=>{
     const bg=i===0?'#28a745':i===points.length-1?'#6f42c1':'#007bff';
     const icon=L.divIcon({className:'custom-div-icon',html:`<div style="background:${bg};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)" title="${i===0?'Xuất phát':i===points.length-1?'Về đích':'Điểm '+(i+1)}">${i+1}</div>`,iconSize:[32,32],iconAnchor:[16,16]});
     return L.marker([Number(p.lat),Number(p.lng)],{icon}).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.desc||'')}<br><small>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</small>`);
   })).addTo(map);
+  renderPointsTable(points,null);
   // Fit nhanh theo điểm, sau đó định tuyến đường bộ chạy nền.
   setSmartMapViewport(points);
+  map.invalidateSize(true);
   loadRoutingMachine().then(()=>{
     if(token!==routeRenderToken||!window.L?.Routing)return;
     try{
@@ -429,7 +438,7 @@ async function deleteExpense(id){if(!v7RequireAdmin()||!confirm('Xóa khoản ch
 function renderHomeMapPreview(){const el=document.getElementById('home-map-preview');if(!el)return;if(!points||points.length<2){el.innerHTML='<div class="home-map-empty">Chưa đủ dữ liệu điểm dừng để hiển thị tuyến.</div>';return}const W=900,H=285,pad=55;const lngs=points.map(p=>Number(p.lng)),lats=points.map(p=>Number(p.lat));const minX=Math.min(...lngs),maxX=Math.max(...lngs),minY=Math.min(...lats),maxY=Math.max(...lats);const sx=v=>pad+(v-minX)/Math.max(maxX-minX,.0001)*(W-pad*2);const sy=v=>H-pad-(v-minY)/Math.max(maxY-minY,.0001)*(H-pad*2);const pts=points.map((p,i)=>({x:sx(Number(p.lng)),y:sy(Number(p.lat)),n:i+1,name:esc(p.name||'')}));const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');const circles=pts.map(p=>`<g><circle cx="${p.x}" cy="${p.y}" r="12" fill="#fff"/><circle cx="${p.x}" cy="${p.y}" r="8" fill="#147eea"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">${p.n}</text></g>`).join('');const labels=pts.filter((p,i)=>i===0||i===pts.length-1||i%2===0).map(p=>`<text x="${Math.min(p.x+16,W-170)}" y="${Math.max(p.y-13,18)}" font-size="11" font-weight="700" fill="#24557b">${p.name}</text>`).join('');el.innerHTML=`<svg class="home-map-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Bản đồ hành trình"><path d="${path}" fill="none" stroke="rgba(255,255,255,.96)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#1684e8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5"/>${circles}${labels}</svg>`;}
 function renderHome(){const t=currentTrip();if(!t)return;document.getElementById('v7-days').textContent=`${durationDays(t.startDate,t.endDate)}`;document.getElementById('v7-member-count').textContent=members.length;const pc=document.getElementById('dashboard-point-count');if(pc)pc.textContent=points.length;const rp=document.getElementById('dashboard-route-points');if(rp)rp.textContent=`${points.length} điểm dừng`;const box=document.getElementById('home-summary');const d=durationDays(t.startDate,t.endDate);const items=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()+1-1).padStart(2,'0')}`;const s=schedule.find(x=>x.date===date)||{};items.push(`<div class="v7-day"><b>NGÀY ${i+1} · ${dateLabel(date,false)}</b><p>${esc(s.title||'Chưa khai báo lịch trình')}</p><p>${esc(s.description||'')}</p></div>`)}box.innerHTML=items.join('')||'<div class="v7-empty">Chưa có dữ liệu.</div>';renderHomeMapPreview();}
 function renderRouteCopy(){const target=document.getElementById('v7-route-copy');if(!target)return;target.innerHTML=points.length?`<div class="v7-admin-note">${points.length} điểm · ${esc(routeNames().join(' → '))}</div><div class="table-container"><table><thead><tr><th>STT</th><th>Điểm</th><th>Tọa độ</th><th>Mô tả</th></tr></thead><tbody>${points.map((p,i)=>`<tr><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</td><td>${esc(p.desc||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="v7-empty">Chưa có điểm.</div>'}
-function v7Show(name,btn){document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));const sec=document.getElementById('v7-'+name);if(sec)sec.classList.add('active');document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.body.classList.toggle('dashboard-nonhome',name!=='home');if(name==='route')renderRouteCopy();if(name==='schedule')renderSchedule();if(name==='members')renderMembers();if(name==='cost')renderExpenses();}
+function v7Show(name,btn){document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));const sec=document.getElementById('v7-'+name);if(sec)sec.classList.add('active');document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.body.classList.toggle('dashboard-nonhome',name!=='home');if(name==='route'){renderRouteCopy();requestAnimationFrame(()=>{try{if(!map)initMap();if(map){map.invalidateSize(true);setTimeout(()=>{try{map.invalidateSize(true);setSmartMapViewport(points);renderRoadRouting();}catch(e){}},120)}}catch(e){console.warn('Route map refresh:',e)}});}if(name==='schedule')renderSchedule();if(name==='members')renderMembers();if(name==='cost')renderExpenses();}
 
 async function openTripManager(){if(!v7RequireAdmin())return;renderTripManager();document.getElementById('trip-manager-modal').classList.add('show')}
 function closeTripManager(){document.getElementById('trip-manager-modal').classList.remove('show')}
@@ -530,9 +539,10 @@ document.addEventListener('DOMContentLoaded',async()=>{populateCats();const save
     if(!user) startAnonymousSession();
   });
   loadTrips();setTimeout(systemCheck,1500);
-  const startMap=()=>{if(!map)initMap()};
-  if('requestIdleCallback' in window) requestIdleCallback(startMap,{timeout:900}); else setTimeout(startMap,350);
-  window.addEventListener('resize',()=>{if(map)requestAnimationFrame(()=>map.invalidateSize(false))},{passive:true});
+  // Không khởi tạo bản đồ khi tab Lộ trình đang ẩn. Leaflet lấy kích thước 0px
+  // nếu khởi tạo trong section display:none, dẫn tới chỉ tải một phần tile và nền xám.
+  // Bản đồ sẽ được khởi tạo ngay khi người dùng mở tab Lộ trình.
+  window.addEventListener('resize',()=>{if(map)requestAnimationFrame(()=>{try{map.invalidateSize(true);setSmartMapViewport(points)}catch(e){}})},{passive:true});
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
 </script>
