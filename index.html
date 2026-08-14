@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AppDuLich – Quản lý hành trình</title>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://{s}.basemaps.cartocdn.com" crossorigin>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 body{background:#f4f6f8;padding:8px;color:#333;-webkit-tap-highlight-color:transparent}
@@ -25,13 +26,13 @@ body{padding-top:141px}
 .form-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}.form-grid label,.field label{display:block;font-size:11px;font-weight:700;color:#52606d;margin-bottom:4px}.form-grid input,.form-grid textarea,.form-grid select,.field input,.field textarea,.field select,input[type=text],input[type=number],input[type=password],input[type=email],input[type=date],textarea,select{width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:7px;font-size:13px;background:#fff;-webkit-appearance:none}textarea{min-height:82px;resize:vertical}
 .summary-box{background:#ebf8ff;border:1px solid #bee3f8;padding:12px;border-radius:8px;margin-bottom:12px;font-weight:bold;color:#2b6cb0;display:flex;flex-direction:column;gap:8px;text-align:center}.summary-item span{display:block;font-size:18px;color:#2c5282;margin-top:2px}
 .btn-group{display:flex;flex-direction:column;gap:8px}.btn{display:inline-block;width:100%;text-align:center;background:#3182ce;color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;text-decoration:none;transition:.2s}.btn:hover{filter:brightness(.96)}.btn:active{opacity:.85}.btn-success{background:#38a169}.btn-danger{background:#e53e3e;color:#fff;border:none;padding:7px 10px;font-size:12px;border-radius:4px;cursor:pointer}.btn-warning{background:#ed8936}.btn-dark{background:#4a5568}.btn-purple{background:#6f42c1}.btn-light{background:#edf2f7;color:#2d3748}.btn-small{width:auto;padding:6px 9px;font-size:11px}
-#map{height:380px;width:100%;border-radius:8px;border:1px solid #cbd5e0;margin-top:12px;z-index:1}.leaflet-routing-container{display:none!important}.custom-div-icon,.leg-badge-icon{background:transparent;border:none}
+#map{height:440px;width:100%;border-radius:8px;border:1px solid #cbd5e0;margin-top:12px;z-index:1;background:#e8f1f5;contain:layout paint;isolation:isolate}.leaflet-routing-container{display:none!important}.custom-div-icon,.leg-badge-icon{background:transparent;border:none}
 .table-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;border-radius:8px;border:1px solid #e2e8f0}table{width:100%;border-collapse:collapse;min-width:520px}th,td{border:1px solid #e2e8f0;padding:8px 6px;text-align:left;font-size:12px;line-height:1.4;vertical-align:top}th{background:#f7fafc;color:#2d3748;font-weight:700}
 .timeline{border-left:2px solid #3182ce;padding-left:12px;margin-left:5px}.timeline-item{margin-bottom:16px}.timeline-date{font-weight:bold;color:#2b6cb0;font-size:13px}.timeline-title{font-size:14px;font-weight:600;margin:3px 0;color:#1a202c}.timeline-desc{font-size:12px;color:#4a5568;line-height:1.5;white-space:pre-line}
 .admin-only{display:none!important}body.is-admin .admin-only{display:grid!important}body.is-admin .admin-flex{display:flex!important}body.is-admin .admin-col{display:table-cell!important}body:not(.is-admin) .admin-col{display:none!important}
 .chat-box{background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.chat-messages{height:260px;overflow-y:auto;background:#fff;border:1px solid #cbd5e0;border-radius:6px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}.chat-msg{display:flex;flex-direction:column;max-width:75%}.chat-msg.mine{align-self:flex-end;align-items:flex-end}.chat-msg.other{align-self:flex-start;align-items:flex-start}.chat-msg.system{align-self:center;align-items:center;max-width:90%;width:100%}.chat-msg .msg-info{font-size:10px;color:#a0aec0;margin-bottom:2px}.chat-msg.mine .msg-info{text-align:right}.chat-msg .bubble{padding:8px 12px;border-radius:12px;font-size:13px;word-break:break-word;line-height:1.4}.chat-msg.mine .bubble{background:#007bff;color:#fff;border-top-right-radius:2px}.chat-msg.other .bubble{background:#edf2f7;color:#2d3748;border-top-left-radius:2px}.chat-msg.system .bubble{background:#e2e8f0;color:#4a5568;font-style:italic;text-align:center;border-radius:6px;font-size:12px}
 .v7-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 15px;position:sticky;top:133px;z-index:20}.v7-nav button{border:1px solid #dbe5ef;background:#fff;color:#334e68;border-radius:10px;padding:10px 6px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.04)}.v7-nav button.active{background:#1f6feb;color:#fff;border-color:#1f6feb}.v7-section{display:none}.v7-section.active{display:block}.v7-hero{background:linear-gradient(135deg,#eaf4ff,#f7fbff);border:1px solid #cfe3f7;border-radius:14px;padding:15px;margin-bottom:15px}.v7-hero-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.v7-hero h2{font-size:20px;color:#163a5f;margin:0 0 5px}.v7-hero p{font-size:12px;color:#52677d;line-height:1.5}.v7-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.v7-pill{background:#fff;border:1px solid #d8e6f2;border-radius:10px;padding:9px;text-align:center}.v7-pill b{display:block;font-size:16px;color:#1f4e79}.v7-pill span{font-size:10px;color:#718096}.v7-admin-note{font-size:11px;color:#718096;background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:10px;line-height:1.5}.v7-day{border-left:3px solid #3182ce;padding:9px 10px;margin-bottom:9px;background:#f8fbff;border-radius:0 8px 8px 0}.v7-day b{color:#24557b;font-size:13px}.v7-day p{font-size:11px;color:#52677d;line-height:1.5;margin-top:3px;white-space:pre-line}.v7-cost-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}.v7-cost-box{background:#f8fbff;border:1px solid #d9e8f5;border-radius:9px;padding:9px;text-align:center}.v7-cost-box b{display:block;color:#1f4e79;font-size:15px}.v7-cost-box span{font-size:10px;color:#718096}.v7-cat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf2f7;font-size:12px}.v7-cat-row:last-child{border-bottom:0}.v7-bar{height:7px;background:#edf2f7;border-radius:10px;overflow:hidden;margin:4px 0}.v7-bar i{display:block;height:100%;background:#3182ce;border-radius:10px}.v7-actions{display:flex;gap:5px;flex-wrap:wrap}.v7-mini{padding:5px 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}.v7-edit{background:#fff3cd;color:#8a5a00}.v7-del{background:#ffe3e3;color:#b42318}.v7-empty{padding:18px;text-align:center;color:#718096;font-size:12px;background:#f8fafc;border-radius:9px}.v7-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}.v7-modal.show{display:flex}.v7-modal-box{width:100%;max-width:650px;background:#fff;border-radius:14px;padding:16px;max-height:92vh;overflow:auto}.v7-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.v7-close{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;cursor:pointer}.v7-trip-list{display:grid;gap:9px}.v7-trip-item{border:1px solid #dbe5ef;border-radius:10px;padding:10px;background:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.v7-trip-item.active{border-color:#3182ce;background:#f3f9ff}.v7-trip-info{min-width:0}.v7-trip-info b{display:block;color:#1f4e79;font-size:13px}.v7-trip-info span{display:block;color:#718096;font-size:10px;margin-top:3px;line-height:1.4}.v7-trip-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#38a169;margin-right:5px}.danger-note{background:#fff5f5;border:1px solid #fed7d7;color:#c53030;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.success-note{background:#f0fff4;border:1px solid #c6f6d5;color:#276749;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.muted{color:#718096;font-size:11px}.two-col{display:grid;grid-template-columns:1fr;gap:10px}.field{margin-bottom:9px}.switch-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#52606d}.switch-row input{width:auto}.sticky-select{display:flex;gap:8px;align-items:center;margin-bottom:12px}.sticky-select select{flex:1}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px}
-@media(min-width:600px){body{padding:15px;padding-top:141px}.container{padding:25px;border-radius:16px}.header h1{font-size:26px}.admin-bar{flex-direction:row;justify-content:space-between;text-align:left}.admin-bar-btns{width:auto}.summary-box{flex-direction:row;justify-content:space-around}.btn-group{flex-direction:row}.btn{width:auto}.form-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}#map{height:500px}table{min-width:100%}th,td{padding:10px;font-size:13px}.chat-form-grid{grid-template-columns:1fr 2fr auto!important}.v7-nav{grid-template-columns:repeat(7,1fr)}.v7-pills{grid-template-columns:repeat(4,1fr)}.v7-cost-summary{grid-template-columns:repeat(4,1fr)}.two-col{grid-template-columns:1fr 1fr}}
+@media(min-width:600px){body{padding:15px;padding-top:141px}.container{padding:25px;border-radius:16px}.header h1{font-size:26px}.admin-bar{flex-direction:row;justify-content:space-between;text-align:left}.admin-bar-btns{width:auto}.summary-box{flex-direction:row;justify-content:space-around}.btn-group{flex-direction:row}.btn{width:auto}.form-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}#map{height:560px}table{min-width:100%}th,td{padding:10px;font-size:13px}.chat-form-grid{grid-template-columns:1fr 2fr auto!important}.v7-nav{grid-template-columns:repeat(7,1fr)}.v7-pills{grid-template-columns:repeat(4,1fr)}.v7-cost-summary{grid-template-columns:repeat(4,1fr)}.two-col{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.app-logo-bar{height:102px;padding:5px 8px}.app-logo-bar img{height:88px;max-width:92vw}.v7-nav{top:109px}body{padding-top:116px}.col-coord{display:none}.v7-trip-item{align-items:flex-start;flex-direction:column}.v7-trip-actions{width:100%;justify-content:flex-start}}
 
 /* ===== GOOD JOURNEY DASHBOARD ===== */
@@ -86,6 +87,9 @@ body{padding-top:120px!important}
 
 /* The old standalone logo bar is intentionally disabled; the only logo is in .top-brand. */
 .app-logo-bar{display:none!important}
+
+
+@media(max-width:599px){#map{height:380px!important;border-radius:12px}.leaflet-control-zoom a{width:40px!important;height:40px!important;line-height:40px!important;font-size:20px!important}}
 
 </style>
 </head>
@@ -274,10 +278,116 @@ function routeSubtitle(){const t=currentTrip();if(!t)return 'Đang tải dữ li
 function clearListeners(){unsubscribers.forEach(fn=>{try{fn&&fn()}catch(e){}});unsubscribers=[];}
 function setStatus(text,color='#3182ce'){const el=document.getElementById('db-status');if(el){el.textContent='● '+text;el.style.color=color;}}
 
-function initMap(){try{if(!map){map=L.map('map').setView([18.5,106],6);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);}}catch(e){console.error(e)}}
+let routingLibPromise=null;
+let mapTileFallbackUsed=false;
+function addFastMapTiles(){
+  if(!map)return;
+  const carto=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19,
+    updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true
+  });
+  carto.on('tileerror',()=>{
+    if(mapTileFallbackUsed)return;
+    mapTileFallbackUsed=true;
+    try{map.removeLayer(carto)}catch(e){}
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      attribution:'© OpenStreetMap',maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,crossOrigin:true
+    }).addTo(map);
+  });
+  carto.addTo(map);
+}
+function mapBoundsFromPoints(list){
+  const valid=(list||[]).filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
+  if(!valid.length)return null;
+  const lats=valid.map(p=>Number(p.lat)),lngs=valid.map(p=>Number(p.lng));
+  return {minLat:Math.min(...lats),maxLat:Math.max(...lats),minLng:Math.min(...lngs),maxLng:Math.max(...lngs)};
+}
+function setSmartMapViewport(list){
+  if(!map)return;
+  const b=mapBoundsFromPoints(list);
+  if(!b){
+    // Chưa có điểm: chỉ mở ở phạm vi Việt Nam, không mở toàn thế giới.
+    map.setView([16.0,107.5],6,{animate:false});
+    map.setMaxBounds([[7.5,101.5],[23.8,116.5]]);
+    return;
+  }
+  const valid=list.filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
+  // Một điểm: phóng rất gần để người dùng nhìn rõ vị trí.
+  if(valid.length===1){
+    map.setMaxBounds([[b.minLat-2.0,b.minLng-2.0],[b.maxLat+2.0,b.maxLng+2.0]]);
+    map.setView([b.minLat,b.minLng],12,{animate:false});
+    return;
+  }
+  const latSpan=Math.max(b.maxLat-b.minLat,0.08),lngSpan=Math.max(b.maxLng-b.minLng,0.08);
+  const padLat=Math.min(Math.max(latSpan*0.22,0.18),4.0),padLng=Math.min(Math.max(lngSpan*0.22,0.18),4.0);
+  const south=b.minLat-padLat,north=b.maxLat+padLat,west=b.minLng-padLng,east=b.maxLng+padLng;
+  map.setMaxBounds([[south,west],[north,east]]);
+  // Fit đúng vùng có dữ liệu; không dùng maxZoom 7 vì sẽ làm tuyến Việt Nam bị nhỏ xíu.
+  const bounds=L.latLngBounds([[b.minLat,b.minLng],[b.maxLat,b.maxLng]]);
+  const maxZoom=valid.length<=4?11:10;
+  try{map.fitBounds(bounds,{padding:[28,28],animate:false,maxZoom:maxZoom});}catch(e){}
+}
+function initMap(){
+  try{
+    if(map)return;
+    const el=document.getElementById('map');
+    if(!el||!window.L)return;
+    map=L.map(el,{preferCanvas:true,zoomControl:true,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false,worldCopyJump:false,maxBoundsViscosity:.85,minZoom:5,maxZoom:18}).setView([16.0,107.5],6);
+    addFastMapTiles();
+    setSmartMapViewport(points);
+    requestAnimationFrame(()=>setTimeout(()=>{try{map.invalidateSize(false);setSmartMapViewport(points)}catch(e){}},80));
+  }catch(e){console.error('Map init:',e)}
+}
+function loadRoutingMachine(){
+  if(window.L?.Routing)return Promise.resolve();
+  if(routingLibPromise)return routingLibPromise;
+  routingLibPromise=new Promise((resolve,reject)=>{
+    const css=document.createElement('link');css.rel='stylesheet';css.href='https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css';document.head.appendChild(css);
+    const sc=document.createElement('script');sc.src='https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js';sc.async=true;
+    sc.onload=()=>resolve();sc.onerror=reject;document.head.appendChild(sc);
+  }).catch(e=>{console.warn('Không tải được Routing Machine:',e);return Promise.reject(e)});
+  return routingLibPromise;
+}
 function clearMapExtras(){legBadgeMarkers.forEach(x=>{try{map.removeLayer(x)}catch(e){}});legBadgeMarkers=[];if(fallbackPolyline){try{map.removeLayer(fallbackPolyline)}catch(e){}fallbackPolyline=null;}}
 function haversineKm(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lng-a.lng)*Math.PI/180;const q=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))*1.25;}
-function renderRoadRouting(){if(!map)return;const token=++routeRenderToken;clearMapExtras();if(routingControl){try{map.removeControl(routingControl)}catch(e){}routingControl=null}if(points.length<2){renderPointsTable(points,null);if(points.length)map.setView([points[0].lat,points[0].lng],12);return}const waypoints=points.map(p=>L.latLng(Number(p.lat),Number(p.lng)));const same=points.length>1&&points[0].lat===points.at(-1).lat&&points[0].lng===points.at(-1).lng;routingControl=L.Routing.control({waypoints,router:L.Routing.osrmv1({serviceUrl:'https://router.project-osrm.org/route/v1',profile:'car'}),lineOptions:{styles:[{color:'#007bff',weight:4,opacity:.8}]},createMarker:function(i,wp){const p=points[i]||{};let shift='';if(same&&i===0)shift='transform:translateX(-16px);';if(same&&i===points.length-1)shift='transform:translateX(16px);';const bg=i===0?'#28a745':i===points.length-1?'#6f42c1':'#007bff';const icon=L.divIcon({className:'custom-div-icon',html:`<div style="background:${bg};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);${shift}" title="${i===0?'Xuất phát':i===points.length-1?'Về đích':'Điểm '+(i+1)}">${i+1}</div>`,iconSize:[32,32],iconAnchor:[16,16]});return L.marker(wp.latLng,{icon}).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.desc||'')}<br><small>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</small>`);},addWaypoints:false,routeWhileDragging:false}).addTo(map);routingControl.on('routesfound',e=>{if(token!==routeRenderToken)return;renderPointsTable(points,e.routes[0]);}).on('routingerror',e=>{console.warn('OSRM routing error',e);if(token!==routeRenderToken)return;fallbackPolyline=L.polyline(points.map(p=>[p.lat,p.lng]),{color:'#007bff',weight:3,dashArray:'5,8'}).addTo(map);renderPointsTable(points,null);});}
+function renderRoadRouting(){
+  if(!map||!window.L)return;
+  const token=++routeRenderToken;
+  clearMapExtras();
+  if(routingControl){try{map.removeControl(routingControl)}catch(e){}routingControl=null}
+  if(points.length<2){renderPointsTable(points,null);setSmartMapViewport(points);return}
+  // Hiển thị tuyến thẳng + điểm ngay lập tức, không chờ máy chủ định tuyến.
+  fallbackPolyline=L.polyline(points.map(p=>[Number(p.lat),Number(p.lng)]),{color:'#3182ce',weight:3,opacity:.55,dashArray:'6,8'}).addTo(map);
+  renderPointsTable(points,null);
+  const group=L.featureGroup(points.map((p,i)=>{
+    const bg=i===0?'#28a745':i===points.length-1?'#6f42c1':'#007bff';
+    const icon=L.divIcon({className:'custom-div-icon',html:`<div style="background:${bg};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)" title="${i===0?'Xuất phát':i===points.length-1?'Về đích':'Điểm '+(i+1)}">${i+1}</div>`,iconSize:[32,32],iconAnchor:[16,16]});
+    return L.marker([Number(p.lat),Number(p.lng)],{icon}).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.desc||'')}<br><small>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</small>`);
+  })).addTo(map);
+  // Fit nhanh theo điểm, sau đó định tuyến đường bộ chạy nền.
+  setSmartMapViewport(points);
+  loadRoutingMachine().then(()=>{
+    if(token!==routeRenderToken||!window.L?.Routing)return;
+    try{
+      if(fallbackPolyline){try{map.removeLayer(fallbackPolyline)}catch(e){}fallbackPolyline=null}
+      routingControl=L.Routing.control({
+        waypoints:points.map(p=>L.latLng(Number(p.lat),Number(p.lng))),
+        router:L.Routing.osrmv1({serviceUrl:'https://router.project-osrm.org/route/v1',profile:'car'}),
+        lineOptions:{styles:[{color:'#007bff',weight:4,opacity:.82}]},
+        createMarker:function(i,wp){return null},addWaypoints:false,routeWhileDragging:false,show:false
+      }).addTo(map);
+      routingControl.on('routesfound',e=>{
+        if(token!==routeRenderToken)return;
+        renderPointsTable(points,e.routes[0]);
+      }).on('routingerror',e=>{
+        console.warn('OSRM routing error',e);
+        if(token!==routeRenderToken)return;
+        // Giữ tuyến thẳng đã hiển thị; không chờ thêm.
+        renderPointsTable(points,null);
+      });
+    }catch(e){console.warn('Routing init:',e)}
+  }).catch(()=>{});
+}
 function renderPointsTable(list,route){const tbody=document.getElementById('route-points-list');if(!tbody)return;clearMapExtras();let totalKm=0,totalMin=0;tbody.innerHTML='';list.forEach((p,i)=>{let legHtml='';if(i<list.length-1){let km=0,min=0,midLat=(Number(p.lat)+Number(list[i+1].lat))/2,midLng=(Number(p.lng)+Number(list[i+1].lng))/2;if(route&&route.legs&&route.legs[i]){const leg=route.legs[i];km=leg.summary.totalDistance/1000;min=Math.round(leg.summary.totalTime/60);if(leg.coordinates?.length){const c=leg.coordinates[Math.floor(leg.coordinates.length/2)];midLat=c.lat;midLng=c.lng;}}else{km=haversineKm(p,list[i+1]);min=Math.round(km/55*60);}totalKm+=km;totalMin+=min;const h=Math.floor(min/60),m=min%60,ts=h?`${h}g${m}p`:`${m}p`;legHtml=`<span style="color:#2b6cb0;font-weight:600">➔ Điểm ${i+2}: ${km.toFixed(1)} km (~${ts})</span>`;if(map){const badge=L.marker([midLat,midLng],{icon:L.divIcon({className:'leg-badge-icon',html:`<div style="background:#1a365d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;white-space:nowrap;border:1px solid white">➔ ${km.toFixed(1)} km</div>`,iconAnchor:[25,8]})}).addTo(map);legBadgeMarkers.push(badge)}}else{legHtml='<span style="color:#6f42c1;font-weight:600">🏁 Về đích</span>'}tbody.innerHTML+=`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td class="col-coord"><code>${esc(Number(p.lat).toFixed(6))}, ${esc(Number(p.lng).toFixed(6))}</code></td><td>${esc(p.desc||'-')}</td><td>${legHtml}</td><td class="admin-col"><button class="btn btn-danger" onclick="deletePoint('${esc(p.id||'')}')">Xóa</button></td></tr>`});const h=Math.floor(totalMin/60),m=totalMin%60;document.getElementById('total-distance').textContent=`${totalKm.toFixed(1)} km`;document.getElementById('total-time').textContent=`${h} giờ ${m} phút`;document.getElementById('v7-total-km').textContent=`${totalKm.toFixed(1)} km`;renderHome();renderRouteCopy();}
 
 function loadTrips(){if(tripUnsubscribe)try{tripUnsubscribe()}catch(e){};tripUnsubscribe=db.collection('trips').orderBy('startDate','desc').onSnapshot(snap=>{trips=snap.docs.map(d=>({id:d.id,...d.data()}));if(!trips.length){clearListeners();points=[];members=[];schedule=[];messages=[];expenses=[];renderTripSelector();if(v7IsAdmin())setStatus('Chưa có chuyến – hãy tạo chuyến đầu tiên','#ed8936');return}if(!currentTripId||!trips.some(t=>t.id===currentTripId)){currentTripId=trips[0].id;localStorage.setItem('appdulich_current_trip',currentTripId)}renderTripSelector();loadCurrentTripData();},err=>{console.error(err);setStatus('Lỗi đọc danh sách chuyến đi','#c53030')});return tripUnsubscribe;}
@@ -408,7 +518,7 @@ function systemCheck(){const box=document.getElementById('system-status');const 
 let anonymousLoginInProgress=false;
 function startAnonymousSession(){if(anonymousLoginInProgress||auth.currentUser)return;anonymousLoginInProgress=true;auth.signInAnonymously().catch(e=>console.error('Anonymous Auth:',e)).finally(()=>{anonymousLoginInProgress=false})}
 
-document.addEventListener('DOMContentLoaded',async()=>{initMap();populateCats();const saved=localStorage.getItem('chat_my_name');if(saved)document.getElementById('chat-user').value=saved;document.getElementById('chat-user').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();localStorage.setItem('chat_my_name',e.target.value.trim())});document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
+document.addEventListener('DOMContentLoaded',async()=>{populateCats();const saved=localStorage.getItem('chat_my_name');if(saved)document.getElementById('chat-user').value=saved;document.getElementById('chat-user').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();localStorage.setItem('chat_my_name',e.target.value.trim())});document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
   try{
     // Giữ phiên đăng nhập Admin qua refresh/trình duyệt đóng-mở.
     // Quan trọng: không đăng nhập Anonymous trước khi Firebase khôi phục phiên hiện tại.
@@ -419,7 +529,10 @@ document.addEventListener('DOMContentLoaded',async()=>{initMap();populateCats();
     // Chỉ dùng Anonymous khi Firebase xác nhận thật sự không có phiên đăng nhập.
     if(!user) startAnonymousSession();
   });
-  loadTrips();setTimeout(systemCheck,1500)
+  loadTrips();setTimeout(systemCheck,1500);
+  const startMap=()=>{if(!map)initMap()};
+  if('requestIdleCallback' in window) requestIdleCallback(startMap,{timeout:900}); else setTimeout(startMap,350);
+  window.addEventListener('resize',()=>{if(map)requestAnimationFrame(()=>map.invalidateSize(false))},{passive:true});
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
 </script>
