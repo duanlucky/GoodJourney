@@ -217,7 +217,66 @@ function resetTripForm(){['trip-edit-id','trip-name','trip-drive-url','trip-desc
 function editTrip(id){const t=trips.find(x=>x.id===id);if(!t)return;document.getElementById('trip-edit-id').value=id;document.getElementById('trip-name').value=t.name||'';document.getElementById('trip-drive-url').value=t.driveUrl||'';document.getElementById('trip-description').value=t.description||'';document.getElementById('trip-start-date').value=t.startDate||'';document.getElementById('trip-end-date').value=t.endDate||'';document.getElementById('trip-copy-legacy').checked=false;}
 async function saveTrip(){if(!v7RequireAdmin())return;const id=document.getElementById('trip-edit-id').value,name=document.getElementById('trip-name').value.trim(),description=document.getElementById('trip-description').value.trim(),startDate=document.getElementById('trip-start-date').value,endDate=document.getElementById('trip-end-date').value,driveUrl=document.getElementById('trip-drive-url').value.trim();if(!name||!startDate||!endDate)return alert('Vui lòng nhập Tên chuyến, Ngày đi và Ngày về.');if(endDate<startDate)return alert('Ngày về không được trước ngày đi.');const data={name,description,startDate,endDate,driveUrl,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};let newId=id;if(id){await db.collection('trips').doc(id).update(data)}else{const copyLegacy=document.getElementById('trip-copy-legacy').checked;const ref=await db.collection('trips').add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});newId=ref.id;currentTripId=newId;localStorage.setItem('appdulich_current_trip',newId);if(copyLegacy)await importLegacyIntoTrip(newId,data);else await seedSchedule(newId,data)}closeTripManager();alert(id?'Đã cập nhật chuyến đi.':'Đã tạo chuyến đi mới.');}
 async function seedSchedule(tripId,t){const pts=[];const snap=await db.collection('trips').doc(tripId).collection('points').orderBy('order','asc').get();snap.forEach(d=>pts.push(d.data()));const arr=defaultScheduleForTrip(t,pts);const batch=db.batch();arr.forEach(x=>batch.set(db.collection('trips').doc(tripId).collection('schedule').doc(),{...x,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit()}
-async function deleteTrip(id){if(!v7RequireAdmin())return;const t=trips.find(x=>x.id===id);if(!t)return;if(trips.length<=1)return alert('Không thể xóa chuyến cuối cùng. Hãy tạo chuyến khác trước.');if(!confirm(`Xóa chuyến "${t.name}" và toàn bộ dữ liệu con?\nThao tác này không thể hoàn tác.`))return;const names=['points','members','schedule','chat','expenses'];for(const name of names){const snap=await db.collection('trips').doc(id).collection(name).get();let batch=db.batch(),count=0;for(const d of snap.docs){batch.delete(d.ref);count++;if(count===450){await batch.commit();batch=db.batch();count=0}}if(count)await batch.commit()}await db.collection('trips').doc(id).delete();if(currentTripId===id){const other=trips.find(x=>x.id!==id);currentTripId=other?.id||null;if(currentTripId)localStorage.setItem('appdulich_current_trip',currentTripId)}}
+async function deleteTrip(id){
+  if(!v7RequireAdmin()) return;
+  const t=trips.find(x=>x.id===id);
+  if(!t) return alert('Không tìm thấy chuyến đi cần xóa.');
+  if(trips.length<=1) return alert('Không thể xóa chuyến cuối cùng. Hãy tạo chuyến khác trước.');
+  if(!confirm(`Xóa chuyến "${t.name}" và toàn bộ dữ liệu con?\n\nThao tác này không thể hoàn tác.`)) return;
+
+  const btns=[...document.querySelectorAll('#trip-manager-list button')];
+  btns.forEach(b=>{ if(b.textContent.trim()==='Xóa') { b.disabled=true; b.style.opacity='.6'; } });
+  setStatus('Đang xóa chuyến đi...','#dd6b20');
+
+  try{
+    const tripRef=db.collection('trips').doc(id);
+    const names=['points','members','schedule','chat','expenses'];
+
+    // Xóa toàn bộ documents trong các subcollection trước khi xóa document cha.
+    // Mỗi batch tối đa 450 document để chừa khoảng an toàn cho giới hạn 500 writes/batch.
+    for(const name of names){
+      const snap=await tripRef.collection(name).get();
+      let batch=db.batch();
+      let count=0;
+      for(const d of snap.docs){
+        batch.delete(d.ref);
+        count++;
+        if(count>=450){
+          await batch.commit();
+          batch=db.batch();
+          count=0;
+        }
+      }
+      if(count>0) await batch.commit();
+    }
+
+    await tripRef.delete();
+
+    // Chuyển ngay sang một chuyến khác để UI không giữ chuyến vừa xóa.
+    if(currentTripId===id){
+      const other=trips.find(x=>x.id!==id);
+      currentTripId=other?.id||null;
+      if(currentTripId) localStorage.setItem('appdulich_current_trip',currentTripId);
+      else localStorage.removeItem('appdulich_current_trip');
+      if(currentTripId) loadCurrentTripData();
+    }
+
+    closeTripManager();
+    setStatus('Firebase · Đã đồng bộ','#2f855a');
+    alert(`Đã xóa chuyến đi "${t.name}" thành công.`);
+  }catch(e){
+    console.error('DELETE TRIP ERROR:',e);
+    const code=e?.code||'unknown';
+    let msg='Không thể xóa chuyến đi.';
+    if(code==='permission-denied') msg='Firebase từ chối quyền xóa. Hãy kiểm tra Firestore Rules: trips/{tripId} phải có allow delete: if isAdmin().';
+    else if(code==='failed-precondition') msg='Firestore đang yêu cầu cấu hình/index hoặc dữ liệu chưa sẵn sàng.';
+    else if(code==='unavailable') msg='Không kết nối được Firebase. Hãy kiểm tra mạng rồi thử lại.';
+    alert(`❌ ${msg}\n\nMã lỗi: ${code}\n\n${e?.message||''}`);
+    setStatus('Lỗi xóa dữ liệu','#c53030');
+  }finally{
+    btns.forEach(b=>{b.disabled=false;b.style.opacity='';});
+  }
+}
 
 async function migrateLegacyData(){if(!v7RequireAdmin())return;const exists=trips.some(t=>t.legacyMigrated===true);if(exists&&!confirm('Đã có một chuyến được đánh dấu nhập V6. Bạn vẫn muốn tạo một bản nhập mới?'))return;const name='HÀNH TRÌNH DU LỊCH HÈ 2026';const startDate='2026-08-28',endDate='2026-09-02';const ref=await db.collection('trips').add({name,description:'Hà Nội – Thanh Hóa – Đồng Hới – Hội An – Huế – Hà Tĩnh – Hà Nội',startDate,endDate,legacyMigrated:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});const trip=ref;const oldPoints=await db.collection('trip_data').doc('points').get();let oldPts=oldPoints.exists&&oldPoints.data().list?oldPoints.data().list:LEGACY_DEFAULT_POINTS;const batch=db.batch();oldPts.forEach((p,i)=>batch.set(trip.collection('points').doc(),{name:String(p.name||'').replace(/^\d+\.\s*/,''),lat:Number(p.lat),lng:Number(p.lng),desc:p.desc||'',order:i,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit();const oldMembers=await db.collection('trip_data').doc('members').get();const ml=oldMembers.exists&&oldMembers.data().list?oldMembers.data().list:[{name:'Nguyễn Tiến Duẩn',phone:'098x xxx xxx',role:'Trưởng đoàn / Lái chính'}];let b=db.batch();ml.forEach(m=>b.set(trip.collection('members').doc(),{name:m.name||'',phone:m.phone||'',role:m.role||'Thành viên',createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldChat=await db.collection('trip_data').doc('chat').get();const cl=oldChat.exists&&oldChat.data().list?oldChat.data().list:[];b=db.batch();cl.forEach(m=>b.set(trip.collection('chat').doc(),{user:m.user||'HỆ THỐNG',text:m.text||'',dateTime:m.dateTime||'',createdAt:firebase.firestore.Timestamp.now()}));await b.commit();const oldExp=await db.collection('trip_expenses').get();b=db.batch();let n=0;for(const d of oldExp.docs){b.set(trip.collection('expenses').doc(),{...d.data(),migratedFrom:'trip_expenses'});n++;if(n===450){await b.commit();b=db.batch();n=0}}if(n)await b.commit();await seedSchedule(ref.id,{startDate,endDate});currentTripId=ref.id;localStorage.setItem('appdulich_current_trip',ref.id);alert(`Đã nhập dữ liệu V6 sang chuyến mới.\nĐiểm: ${oldPts.length}\nThành viên: ${ml.length}\nChat: ${cl.length}\nChi phí: ${oldExp.size}`);}
 async function importLegacyIntoTrip(tripId,t){const trip=db.collection('trips').doc(tripId);const oldPoints=await db.collection('trip_data').doc('points').get();const pts=oldPoints.exists&&oldPoints.data().list?oldPoints.data().list:[];let b=db.batch();pts.forEach((p,i)=>b.set(trip.collection('points').doc(),{name:String(p.name||'').replace(/^\d+\.\s*/,''),lat:Number(p.lat),lng:Number(p.lng),desc:p.desc||'',order:i,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldMembers=await db.collection('trip_data').doc('members').get();const ml=oldMembers.exists&&oldMembers.data().list?oldMembers.data().list:[];b=db.batch();ml.forEach(m=>b.set(trip.collection('members').doc(),{name:m.name||'',phone:m.phone||'',role:m.role||'Thành viên',createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldChat=await db.collection('trip_data').doc('chat').get();const cl=oldChat.exists&&oldChat.data().list?oldChat.data().list:[];b=db.batch();cl.forEach(m=>b.set(trip.collection('chat').doc(),{user:m.user||'HỆ THỐNG',text:m.text||'',dateTime:m.dateTime||'',createdAt:firebase.firestore.Timestamp.now()}));await b.commit();const oldExp=await db.collection('trip_expenses').get();b=db.batch();let n=0;for(const d of oldExp.docs){b.set(trip.collection('expenses').doc(),{...d.data(),migratedFrom:'trip_expenses'});n++;if(n===450){await b.commit();b=db.batch();n=0}}if(n)await b.commit();await seedSchedule(tripId,t)}
