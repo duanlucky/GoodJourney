@@ -1,1237 +1,241 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Hành Trình Du Lịch Khứ Hồi 2026 (28/08 - 02/09/2026)</title>
-  
-  <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Leaflet Routing Machine CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-  <!-- Firebase App & Firestore CDN (Compat Version) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #f4f6f8; padding: 8px; color: #333; -webkit-tap-highlight-color: transparent; }
-    .container { max-width: 980px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    
-    .header { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #007bff; padding-bottom: 12px; }
-    .header h1 { color: #1a365d; font-size: 20px; margin-bottom: 6px; line-height: 1.3; }
-    .header p { color: #4a5568; font-size: 13px; font-weight: 500; }
-    
-    /* Thanh trạng thái đăng nhập */
-    .admin-bar { display: flex; flex-direction: column; gap: 10px; background: #edf2f7; padding: 10px 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center; }
-    .admin-bar-btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; }
-    .badge-role { font-weight: 700; padding: 4px 8px; border-radius: 6px; display: inline-block; }
-    .role-user { background: #e2e8f0; color: #4a5568; }
-    .role-admin { background: #c53030; color: white; }
-
-    .card { background: #ffffff; border: 1px solid #e2e8f0; padding: 14px; border-radius: 10px; margin-bottom: 15px; }
-    .card h2 { color: #2b6cb0; font-size: 16px; margin-bottom: 12px; }
-    
-    .form-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
-    input[type="text"], input[type="number"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; -webkit-appearance: none; }
-    
-    .summary-box { background: #ebf8ff; border: 1px solid #bee3f8; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: bold; color: #2b6cb0; display: flex; flex-direction: column; gap: 8px; text-align: center; }
-    .summary-item span { display: block; font-size: 18px; color: #2c5282; margin-top: 2px; }
-
-    .btn-group { display: flex; flex-direction: column; gap: 8px; }
-    .btn { display: inline-block; width: 100%; text-align: center; background: #3182ce; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
-    .btn:active { opacity: 0.85; }
-    .btn-success { background: #38a169; }
-    .btn-danger { background: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
-    .btn-warning { background: #ed8936; }
-    .btn-dark { background: #4a5568; }
-    
-    #map { height: 380px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e0; margin-top: 12px; z-index: 1; }
-    .leaflet-routing-container { display: none !important; }
-    
-    .custom-div-icon, .leg-badge-icon { background: transparent; border: none; }
-
-    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
-    table { width: 100%; border-collapse: collapse; min-width: 500px; }
-    th, td { border: 1px solid #e2e8f0; padding: 8px 6px; text-align: left; font-size: 12px; line-height: 1.4; }
-    th { background: #f7fafc; color: #2d3748; font-weight: 700; }
-
-    .timeline { border-left: 2px solid #3182ce; padding-left: 12px; margin-left: 5px; }
-    .timeline-item { margin-bottom: 16px; }
-    .timeline-date { font-weight: bold; color: #2b6cb0; font-size: 13px; }
-    .timeline-title { font-size: 14px; font-weight: 600; margin: 3px 0; color: #1a202c; }
-    .timeline-desc { font-size: 12px; color: #4a5568; line-height: 1.5; }
-
-    /* Admin UI */
-    .admin-only { display: none !important; }
-    body.is-admin .admin-only { display: grid !important; }
-    body.is-admin .admin-flex { display: flex !important; }
-    body.is-admin .admin-col { display: table-cell !important; }
-    body:not(.is-admin) .admin-col { display: none !important; }
-
-    /* Khung Chat Online Phong cách Messenger/Zalo */
-    .chat-box { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
-    .chat-messages { height: 260px; overflow-y: auto; background: white; border: 1px solid #cbd5e0; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-    
-    .chat-msg { display: flex; flex-direction: column; max-width: 75%; }
-    .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
-    .chat-msg.other { align-self: flex-start; align-items: flex-start; }
-    .chat-msg.system { align-self: center; align-items: center; max-width: 90%; width: 100%; }
-
-    .chat-msg .msg-info { font-size: 10px; color: #a0aec0; margin-bottom: 2px; }
-    .chat-msg.mine .msg-info { text-align: right; }
-    
-    .chat-msg .bubble { padding: 8px 12px; border-radius: 12px; font-size: 13px; word-break: break-word; line-height: 1.4; }
-    .chat-msg.mine .bubble { background: #007bff; color: white; border-top-right-radius: 2px; }
-    .chat-msg.other .bubble { background: #edf2f7; color: #2d3748; border-top-left-radius: 2px; }
-    .chat-msg.system .bubble { background: #e2e8f0; color: #4a5568; font-style: italic; text-align: center; border-radius: 6px; font-size: 12px; }
-
-    @media (min-width: 600px) {
-      body { padding: 15px; }
-      .container { padding: 25px; border-radius: 16px; }
-      .header h1 { font-size: 26px; }
-      .admin-bar { flex-direction: row; justify-content: space-between; text-align: left; }
-      .admin-bar-btns { width: auto; }
-      .summary-box { flex-direction: row; justify-content: space-around; }
-      .btn-group { flex-direction: row; }
-      .btn { width: auto; }
-      .form-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      #map { height: 500px; }
-      table { min-width: 100%; }
-      th, td { padding: 10px; font-size: 13px; }
-      .chat-form-grid { grid-template-columns: 1fr 2fr auto !important; }
-    }
-
-    @media (max-width: 480px) {
-      .col-coord { display: none; }
-    }
-
-    /* ===========================
-       V6 FINAL - APP TRAVEL UI
-       =========================== */
-    .v6-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 15px;position:sticky;top:6px;z-index:20}
-    .v6-nav button{border:1px solid #dbe5ef;background:#fff;color:#334e68;border-radius:10px;padding:10px 6px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.04)}
-    .v6-nav button.active{background:#1f6feb;color:#fff;border-color:#1f6feb}
-    .v6-hero{background:linear-gradient(135deg,#eaf4ff,#f7fbff);border:1px solid #cfe3f7;border-radius:14px;padding:15px;margin-bottom:15px}
-    .v6-hero-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .v6-hero h2{font-size:20px;color:#163a5f;margin:0 0 5px}
-    .v6-hero p{font-size:12px;color:#52677d;line-height:1.5}
-    .v6-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
-    .v6-pill{background:#fff;border:1px solid #d8e6f2;border-radius:10px;padding:9px;text-align:center}
-    .v6-pill b{display:block;font-size:16px;color:#1f4e79}
-    .v6-pill span{font-size:10px;color:#718096}
-    .v6-section{display:none}
-    .v6-section.active{display:block}
-    .v6-card{background:#fff;border:1px solid #e1e8f0;border-radius:12px;padding:14px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.035)}
-    .v6-card h3{font-size:15px;color:#244b6b;margin-bottom:10px}
-    .v6-table{width:100%;border-collapse:collapse}
-    .v6-table th,.v6-table td{border-bottom:1px solid #edf2f7;padding:9px 6px;font-size:12px;text-align:left;vertical-align:top}
-    .v6-table th{background:#f8fafc;color:#52606d}
-    .v6-actions{display:flex;gap:5px;flex-wrap:wrap}
-    .v6-mini{padding:5px 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}
-    .v6-edit{background:#fff3cd;color:#8a5a00}
-    .v6-del{background:#ffe3e3;color:#b42318}
-    .v6-empty{padding:18px;text-align:center;color:#718096;font-size:12px;background:#f8fafc;border-radius:9px}
-    .v6-expense-grid{display:grid;grid-template-columns:1fr;gap:8px}
-    .v6-expense-grid select,.v6-expense-grid input{width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:7px;font-size:13px;background:#fff}
-    .v6-cost-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-    .v6-cost-box{background:#f8fbff;border:1px solid #d9e8f5;border-radius:9px;padding:9px;text-align:center}
-    .v6-cost-box b{display:block;color:#1f4e79;font-size:15px}
-    .v6-cost-box span{font-size:10px;color:#718096}
-    .v6-cat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf2f7;font-size:12px}
-    .v6-cat-row:last-child{border-bottom:0}
-    .v6-bar{height:7px;background:#edf2f7;border-radius:10px;overflow:hidden;margin:4px 0}
-    .v6-bar i{display:block;height:100%;background:#3182ce;border-radius:10px}
-    .v6-admin-note{font-size:11px;color:#718096;background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:10px}
-    .v6-day{border-left:3px solid #3182ce;padding:9px 10px;margin-bottom:9px;background:#f8fbff;border-radius:0 8px 8px 0}
-    .v6-day b{color:#24557b;font-size:13px}
-    .v6-day p{font-size:11px;color:#52677d;line-height:1.5;margin-top:3px}
-    .v6-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}
-    .v6-modal.show{display:flex}
-    .v6-modal-box{width:100%;max-width:520px;background:#fff;border-radius:14px;padding:16px;max-height:90vh;overflow:auto}
-    .v6-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .v6-close{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;cursor:pointer}
-    .v6-admin-badge{font-size:10px;background:#fff4e5;color:#9a6700;border:1px solid #f6d58d;border-radius:20px;padding:4px 7px;font-weight:700}
-    @media(min-width:600px){
-      .v6-nav{grid-template-columns:repeat(6,1fr)}
-      .v6-pills{grid-template-columns:repeat(4,1fr)}
-      .v6-expense-grid{grid-template-columns:repeat(2,1fr)}
-      .v6-cost-summary{grid-template-columns:repeat(4,1fr)}
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AppDuLich – Quản lý hành trình</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{background:#f4f6f8;padding:8px;color:#333;-webkit-tap-highlight-color:transparent}
+.container{max-width:1050px;margin:0 auto;background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.header{text-align:center;margin-bottom:16px;border-bottom:2px solid #007bff;padding-bottom:12px}.header h1{color:#1a365d;font-size:20px;margin-bottom:6px;line-height:1.3}.header p{color:#4a5568;font-size:13px;font-weight:500;line-height:1.5}
+.admin-bar{display:flex;flex-direction:column;gap:10px;background:#edf2f7;padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:13px;text-align:center}.admin-bar-btns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
+.badge-role{font-weight:700;padding:4px 8px;border-radius:6px;display:inline-block}.role-user{background:#e2e8f0;color:#4a5568}.role-admin{background:#c53030;color:#fff}
+.card,.v7-card{background:#fff;border:1px solid #e2e8f0;padding:14px;border-radius:10px;margin-bottom:15px}.card h2,.v7-card h3{color:#2b6cb0;font-size:16px;margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}.form-grid label,.field label{display:block;font-size:11px;font-weight:700;color:#52606d;margin-bottom:4px}.form-grid input,.form-grid textarea,.form-grid select,.field input,.field textarea,.field select,input[type=text],input[type=number],input[type=password],input[type=email],input[type=date],textarea,select{width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:7px;font-size:13px;background:#fff;-webkit-appearance:none}textarea{min-height:82px;resize:vertical}
+.summary-box{background:#ebf8ff;border:1px solid #bee3f8;padding:12px;border-radius:8px;margin-bottom:12px;font-weight:bold;color:#2b6cb0;display:flex;flex-direction:column;gap:8px;text-align:center}.summary-item span{display:block;font-size:18px;color:#2c5282;margin-top:2px}
+.btn-group{display:flex;flex-direction:column;gap:8px}.btn{display:inline-block;width:100%;text-align:center;background:#3182ce;color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;text-decoration:none;transition:.2s}.btn:hover{filter:brightness(.96)}.btn:active{opacity:.85}.btn-success{background:#38a169}.btn-danger{background:#e53e3e;color:#fff;border:none;padding:7px 10px;font-size:12px;border-radius:4px;cursor:pointer}.btn-warning{background:#ed8936}.btn-dark{background:#4a5568}.btn-purple{background:#6f42c1}.btn-light{background:#edf2f7;color:#2d3748}.btn-small{width:auto;padding:6px 9px;font-size:11px}
+#map{height:380px;width:100%;border-radius:8px;border:1px solid #cbd5e0;margin-top:12px;z-index:1}.leaflet-routing-container{display:none!important}.custom-div-icon,.leg-badge-icon{background:transparent;border:none}
+.table-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;border-radius:8px;border:1px solid #e2e8f0}table{width:100%;border-collapse:collapse;min-width:520px}th,td{border:1px solid #e2e8f0;padding:8px 6px;text-align:left;font-size:12px;line-height:1.4;vertical-align:top}th{background:#f7fafc;color:#2d3748;font-weight:700}
+.timeline{border-left:2px solid #3182ce;padding-left:12px;margin-left:5px}.timeline-item{margin-bottom:16px}.timeline-date{font-weight:bold;color:#2b6cb0;font-size:13px}.timeline-title{font-size:14px;font-weight:600;margin:3px 0;color:#1a202c}.timeline-desc{font-size:12px;color:#4a5568;line-height:1.5;white-space:pre-line}
+.admin-only{display:none!important}body.is-admin .admin-only{display:grid!important}body.is-admin .admin-flex{display:flex!important}body.is-admin .admin-col{display:table-cell!important}body:not(.is-admin) .admin-col{display:none!important}
+.chat-box{background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.chat-messages{height:260px;overflow-y:auto;background:#fff;border:1px solid #cbd5e0;border-radius:6px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}.chat-msg{display:flex;flex-direction:column;max-width:75%}.chat-msg.mine{align-self:flex-end;align-items:flex-end}.chat-msg.other{align-self:flex-start;align-items:flex-start}.chat-msg.system{align-self:center;align-items:center;max-width:90%;width:100%}.chat-msg .msg-info{font-size:10px;color:#a0aec0;margin-bottom:2px}.chat-msg.mine .msg-info{text-align:right}.chat-msg .bubble{padding:8px 12px;border-radius:12px;font-size:13px;word-break:break-word;line-height:1.4}.chat-msg.mine .bubble{background:#007bff;color:#fff;border-top-right-radius:2px}.chat-msg.other .bubble{background:#edf2f7;color:#2d3748;border-top-left-radius:2px}.chat-msg.system .bubble{background:#e2e8f0;color:#4a5568;font-style:italic;text-align:center;border-radius:6px;font-size:12px}
+.v7-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 15px;position:sticky;top:5px;z-index:20}.v7-nav button{border:1px solid #dbe5ef;background:#fff;color:#334e68;border-radius:10px;padding:10px 6px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.04)}.v7-nav button.active{background:#1f6feb;color:#fff;border-color:#1f6feb}.v7-section{display:none}.v7-section.active{display:block}.v7-hero{background:linear-gradient(135deg,#eaf4ff,#f7fbff);border:1px solid #cfe3f7;border-radius:14px;padding:15px;margin-bottom:15px}.v7-hero-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.v7-hero h2{font-size:20px;color:#163a5f;margin:0 0 5px}.v7-hero p{font-size:12px;color:#52677d;line-height:1.5}.v7-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.v7-pill{background:#fff;border:1px solid #d8e6f2;border-radius:10px;padding:9px;text-align:center}.v7-pill b{display:block;font-size:16px;color:#1f4e79}.v7-pill span{font-size:10px;color:#718096}.v7-admin-note{font-size:11px;color:#718096;background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:10px;line-height:1.5}.v7-day{border-left:3px solid #3182ce;padding:9px 10px;margin-bottom:9px;background:#f8fbff;border-radius:0 8px 8px 0}.v7-day b{color:#24557b;font-size:13px}.v7-day p{font-size:11px;color:#52677d;line-height:1.5;margin-top:3px;white-space:pre-line}.v7-cost-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}.v7-cost-box{background:#f8fbff;border:1px solid #d9e8f5;border-radius:9px;padding:9px;text-align:center}.v7-cost-box b{display:block;color:#1f4e79;font-size:15px}.v7-cost-box span{font-size:10px;color:#718096}.v7-cat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf2f7;font-size:12px}.v7-cat-row:last-child{border-bottom:0}.v7-bar{height:7px;background:#edf2f7;border-radius:10px;overflow:hidden;margin:4px 0}.v7-bar i{display:block;height:100%;background:#3182ce;border-radius:10px}.v7-actions{display:flex;gap:5px;flex-wrap:wrap}.v7-mini{padding:5px 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}.v7-edit{background:#fff3cd;color:#8a5a00}.v7-del{background:#ffe3e3;color:#b42318}.v7-empty{padding:18px;text-align:center;color:#718096;font-size:12px;background:#f8fafc;border-radius:9px}.v7-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}.v7-modal.show{display:flex}.v7-modal-box{width:100%;max-width:650px;background:#fff;border-radius:14px;padding:16px;max-height:92vh;overflow:auto}.v7-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.v7-close{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;cursor:pointer}.v7-trip-list{display:grid;gap:9px}.v7-trip-item{border:1px solid #dbe5ef;border-radius:10px;padding:10px;background:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.v7-trip-item.active{border-color:#3182ce;background:#f3f9ff}.v7-trip-info{min-width:0}.v7-trip-info b{display:block;color:#1f4e79;font-size:13px}.v7-trip-info span{display:block;color:#718096;font-size:10px;margin-top:3px;line-height:1.4}.v7-trip-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#38a169;margin-right:5px}.danger-note{background:#fff5f5;border:1px solid #fed7d7;color:#c53030;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.success-note{background:#f0fff4;border:1px solid #c6f6d5;color:#276749;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.muted{color:#718096;font-size:11px}.two-col{display:grid;grid-template-columns:1fr;gap:10px}.field{margin-bottom:9px}.switch-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#52606d}.switch-row input{width:auto}.sticky-select{display:flex;gap:8px;align-items:center;margin-bottom:12px}.sticky-select select{flex:1}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px}
+@media(min-width:600px){body{padding:15px}.container{padding:25px;border-radius:16px}.header h1{font-size:26px}.admin-bar{flex-direction:row;justify-content:space-between;text-align:left}.admin-bar-btns{width:auto}.summary-box{flex-direction:row;justify-content:space-around}.btn-group{flex-direction:row}.btn{width:auto}.form-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}#map{height:500px}table{min-width:100%}th,td{padding:10px;font-size:13px}.chat-form-grid{grid-template-columns:1fr 2fr auto!important}.v7-nav{grid-template-columns:repeat(7,1fr)}.v7-pills{grid-template-columns:repeat(4,1fr)}.v7-cost-summary{grid-template-columns:repeat(4,1fr)}.two-col{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.col-coord{display:none}.v7-trip-item{align-items:flex-start;flex-direction:column}.v7-trip-actions{width:100%;justify-content:flex-start}}
+</style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="header">
-      <h1>HÀNH TRÌNH DU LỊCH KHỨ HỒI 2026</h1>
-      <p>6 Ngày 5 Đêm: Hà Nội – Thanh Hóa – Đồng Hới – Hội An – Huế – Hà Tĩnh – Hà Nội</p>
-    </div>
-
-    <!-- Thanh Quyền Hạn -->
-    <div class="admin-bar">
-      <div>
-        Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Chỉ Xem)</span>
-      </div>
-      <div class="admin-bar-btns">
-        <button id="btn-login-admin" class="btn btn-warning" onclick="loginAdmin()">🔐 Đăng Nhập Quản Trị</button>
-        <button id="btn-change-pwd" class="btn btn-dark admin-only admin-flex" onclick="changeAdminPassword()">🔑 Đổi Mật Khẩu</button>
-        <button id="btn-logout-admin" class="btn btn-danger admin-only admin-flex" onclick="logoutAdmin()">Thoát Quản Trị</button>
-      </div>
-    </div>
-
-    <!-- Kho ảnh Google Drive -->
-    <div class="card">
-      <h2>📸 Kho Ảnh Chuyến Đi (Drive 100GB)</h2>
-      <p style="color: #4a5568; margin-bottom: 12px; font-size: 0.85em;">
-        Thành viên trong đoàn bấm nút dưới đây để xem toàn bộ ảnh hoặc tải ảnh mới chụp lên thư mục chung.
-      </p>
-      <div class="btn-group">
-        <a href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn">
-          📤 Tải Ảnh Lên Kho
-        </a>
-        <a href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn btn-success">
-          🖼️ Xem Kho Ảnh Đoàn
-        </a>
-      </div>
-    </div>
-
-    <!-- Bản đồ & Lộ trình -->
-    <div class="card">
-      <h2>🗺️ Lộ Trình & Tính Quãng Đường</h2>
-      
-      <div class="summary-box">
-        <div class="summary-item">Tổng Quãng Đường: <span id="total-distance">0 km</span></div>
-        <div class="summary-item">Thời Gian Lái Ước Tính: <span id="total-time">0 giờ</span></div>
-      </div>
-
-      <div class="form-grid admin-only">
-        <input type="text" id="point-name" placeholder="Tên điểm đến mới">
-        <input type="text" id="point-desc" placeholder="Mô tả / Ghi chú">
-        <input type="number" step="any" id="point-lat" placeholder="Vĩ độ (Lat)">
-        <input type="number" step="any" id="point-lng" placeholder="Kinh độ (Lng)">
-      </div>
-      <div class="btn-group admin-only admin-flex" style="margin-bottom: 12px;">
-        <button class="btn" onclick="addCustomPoint()">➕ Thêm Điểm Vào Lộ Trình</button>
-        <button class="btn btn-warning" onclick="resetDefaultPoints()">🔄 Khôi Phục 7 Điểm Chuẩn</button>
-      </div>
-
-      <h3 style="font-size: 14px; margin-top: 10px;">📍 Danh Sách Các Điểm Dừng:</h3>
-      
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 35px;">STT</th>
-              <th>Tên Điểm</th>
-              <th class="col-coord">Tọa Độ</th>
-              <th>Mô Tả</th>
-              <th>Chặng Tiếp Theo</th>
-              <th class="admin-col">Xóa</th>
-            </tr>
-          </thead>
-          <tbody id="route-points-list"></tbody>
-        </table>
-      </div>
-
-      <div id="map"></div>
-    </div>
-
-    <!-- Quản lý Thành viên -->
-    <div class="card">
-      <h2>👥 Thành Viên Trong Đoàn</h2>
-      
-      <div class="form-grid admin-only">
-        <input type="text" id="member-name" placeholder="Họ và tên">
-        <input type="text" id="member-phone" placeholder="Số điện thoại">
-        <input type="text" id="member-role" placeholder="Vai trò (VD: Lái chính)">
-      </div>
-      <button class="btn btn-success admin-only admin-flex" onclick="addMember()" style="margin-bottom: 12px;">➕ Thêm Thành Viên</button>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Họ Tên</th>
-              <th>SĐT</th>
-              <th>Vai Trò</th>
-              <th class="admin-col">Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody id="member-list"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Khung Chat Online -->
-    <div class="card">
-      <h2>💬 Trò Chuyện Online</h2>
-      <div class="chat-box">
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="form-grid chat-form-grid" style="gap: 6px;">
-          <input type="text" id="chat-user" placeholder="HỌ VÀ TÊN (IN HOA)" style="text-transform: uppercase;">
-          <input type="text" id="chat-text" placeholder="Nhập tin nhắn..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
-          <button class="btn btn-success" onclick="sendChatMessage()">Gửi 📤</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lịch trình chi tiết 6 ngày 5 đêm -->
-    <div class="card">
-      <h2>📅 Lịch Trình Chi Tiết 6N5Đ</h2>
-      <div class="timeline">
-        
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 1: THỨ 6 - 28/08/2026</div>
-          <div class="timeline-title">Hà Nội ➔ Thanh Hóa</div>
-          <div class="timeline-desc">
-            • <b>17:00:</b> Xuất phát từ Hateco Apollo.<br>
-            • <b>22:00:</b> Đến TP Thanh Hóa, nhận phòng nghỉ đêm (Đêm 1).
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 2: THỨ 7 - 29/08/2026</div>
-          <div class="timeline-title">Thanh Hóa ➔ Đồng Hới ➔ Hội An</div>
-          <div class="timeline-desc">
-            • <b>05:00 - 07:00:</b> Xuất phát đi Đồng Hới.<br>
-            • <b>Trưa:</b> Ăn trưa tại Đồng Hới.<br>
-            • <b>Chiều:</b> Tiếp tục di chuyển vào Hội An.<br>
-            • <b>Tối:</b> Đến Hội An, nhận phòng và nghỉ đêm (Đêm 2).
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 3: CHỦ NHẬT - 30/08/2026</div>
-          <div class="timeline-title">Hội An ➔ Di Chuyển Sang Huế</div>
-          <div class="timeline-desc">
-            • <b>Sáng & Trưa:</b> Khám phá Phố cổ Hội An & Rừng dừa Bảy Mẫu.<br>
-            • <b>16:00 - 17:00:</b> Khởi hành sang TP Huế.<br>
-            • <b>Tối:</b> Ăn tối, thưởng thức ẩm thực Cố đô, nghỉ đêm tại Huế (Đêm 3).
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 4: THỨ 2 - 31/08/2026</div>
-          <div class="timeline-title">Khám Phá Cố Đô Huế</div>
-          <div class="timeline-desc">
-            • <b>Cả ngày:</b> Tham quan Đại Nội, các Lăng tẩm, Chùa Thiên Mụ...<br>
-            • <b>Tối:</b> Tự do dạo phố, ngắm sông Hương và nghỉ đêm tại Huế (Đêm 4).
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 5: THỨ 3 - 01/09/2026</div>
-          <div class="timeline-title">Huế ➔ Đồng Hới ➔ Vinpearl Hà Tĩnh</div>
-          <div class="timeline-desc">
-            • <b>08:00:</b> Khởi hành từ Huế về hướng Hà Tĩnh.<br>
-            • <b>Trưa:</b> Dừng ăn trưa tại Đồng Hới.<br>
-            • <b>Chiều tối:</b> Đến Vinpearl Hà Tĩnh, nhận phòng nghỉ đêm (Đêm 5).
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-date">NGÀY 6: THỨ 4 - 02/09/2026</div>
-          <div class="timeline-title">Hà Tĩnh ➔ Hateco Apollo (Về Đích)</div>
-          <div class="timeline-desc">
-            • <b>Sáng:</b> Dạo chơi, tắm biển Hà Tĩnh, ăn sáng.<br>
-            • <b>08:00 - 09:00:</b> Khởi hành về Hà Nội.<br>
-            • <b>Chiều:</b> Về tới Hateco Apollo. Kết thúc chuyến đi an toàn!
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-
-
-    <!-- ================= V6 FINAL ================= -->
-    <div class="v6-nav">
-      <button class="active" onclick="v6Show('home',this)">🏠 Tổng quan</button>
-      <button onclick="v6Show('route',this)">🗺️ Lộ trình</button>
-      <button onclick="v6Show('schedule',this)">📅 Lịch trình</button>
-      <button onclick="v6Show('members',this)">👥 Thành viên</button>
-      <button onclick="v6Show('cost',this)">💰 Chi phí</button>
-      <button onclick="v6Show('tools',this)">⚙️ Quản trị</button>
-    </div>
-
-    <section id="v6-home" class="v6-section active">
-      <div class="v6-hero">
-        <div class="v6-hero-top">
-          <div>
-            <h2>🌄 Hành trình 2026</h2>
-            <p>28/08 → 02/09/2026 · 6 ngày 5 đêm<br>Hà Nội → Thanh Hóa → Đồng Hới → Hội An → Huế → Hà Tĩnh → Hà Nội</p>
-          </div>
-          <span class="v6-admin-badge" id="v6-role-badge">THÀNH VIÊN</span>
-        </div>
-        <div class="v6-pills">
-          <div class="v6-pill"><b id="v6-total-km">0 km</b><span>Quãng đường</span></div>
-          <div class="v6-pill"><b>6 ngày</b><span>Hành trình</span></div>
-          <div class="v6-pill"><b id="v6-member-count">0</b><span>Thành viên</span></div>
-          <div class="v6-pill"><b id="v6-cost-total">0 đ</b><span>Tổng chi phí</span></div>
-        </div>
-      </div>
-      <div class="v6-card">
-        <h3>🧭 Trạng thái chuyến đi</h3>
-        <div class="v6-day"><b>28/08 · Hà Nội → Thanh Hóa</b><p>Xuất phát 17:00 · nghỉ đêm 1</p></div>
-        <div class="v6-day"><b>29/08 · Thanh Hóa → Đồng Hới → Hội An</b><p>Ngày di chuyển dài · nghỉ đêm 2</p></div>
-        <div class="v6-day"><b>30/08 · Hội An → Huế</b><p>Tham quan Hội An · nghỉ đêm 3</p></div>
-        <div class="v6-day"><b>31/08 · Huế</b><p>Khám phá Cố đô · nghỉ đêm 4</p></div>
-        <div class="v6-day"><b>01/09 · Huế → Hà Tĩnh</b><p>Di chuyển về phía Bắc · nghỉ đêm 5</p></div>
-        <div class="v6-day"><b>02/09 · Hà Tĩnh → Hà Nội</b><p>Chặng cuối · kết thúc hành trình</p></div>
-      </div>
-    </section>
-
-    <section id="v6-route" class="v6-section">
-      <div class="v6-card">
-        <h3>🗺️ Bản đồ & lộ trình</h3>
-        <div id="v6-route-summary" class="v6-admin-note">Lộ trình được đồng bộ từ dữ liệu chuyến đi.</div>
-        <div id="v6-route-copy"></div>
-      </div>
-    </section>
-
-    <section id="v6-schedule" class="v6-section">
-      <div class="v6-card">
-        <h3>📅 Lịch trình 6 ngày 5 đêm</h3>
-        <div class="v6-day"><b>NGÀY 1 · 28/08</b><p>17:00 xuất phát từ Hateco Apollo → Thanh Hóa · nhận phòng.</p></div>
-        <div class="v6-day"><b>NGÀY 2 · 29/08</b><p>Thanh Hóa → Đồng Hới → Hội An · ăn trưa tại Đồng Hới · nhận phòng Hội An.</p></div>
-        <div class="v6-day"><b>NGÀY 3 · 30/08</b><p>Khám phá Hội An → chiều di chuyển sang Huế.</p></div>
-        <div class="v6-day"><b>NGÀY 4 · 31/08</b><p>Khám phá Đại Nội, lăng tẩm, Chùa Thiên Mụ và Huế.</p></div>
-        <div class="v6-day"><b>NGÀY 5 · 01/09</b><p>Huế → Đồng Hới → Vinpearl Hà Tĩnh.</p></div>
-        <div class="v6-day"><b>NGÀY 6 · 02/09</b><p>Hà Tĩnh → Hà Nội · kết thúc hành trình.</p></div>
-      </div>
-    </section>
-
-    <section id="v6-members" class="v6-section">
-      <div class="v6-card">
-        <h3>👥 Thành viên trong đoàn</h3>
-        <div id="v6-members-copy"></div>
-      </div>
-    </section>
-
-    <section id="v6-cost" class="v6-section">
-      <div class="v6-card">
-        <h3>💰 Quản lý chi phí thực tế</h3>
-        <div class="v6-admin-note">
-          ☁️ <b>Dữ liệu được lưu trực tiếp trên Firebase Firestore</b> — không lưu cục bộ trên máy.
-          Khi ứng dụng được đưa lên GitHub Pages, mọi thành viên mở cùng ứng dụng sẽ đọc cùng một cơ sở dữ liệu.
-          Chỉ Quản trị viên đã đăng nhập mới được thêm, sửa hoặc xóa.
-        </div>
-        <div class="v6-cost-summary">
-          <div class="v6-cost-box"><b id="v6-cost-total2">0 đ</b><span>Tổng cộng</span></div>
-          <div class="v6-cost-box"><b id="v6-cost-count">0</b><span>Khoản chi</span></div>
-          <div class="v6-cost-box"><b id="v6-cost-avg">0 đ</b><span>Bình quân/khoản</span></div>
-          <div class="v6-cost-box"><b id="v6-cost-dayavg">0 đ</b><span>Bình quân/ngày</span></div>
-        </div>
-        <div id="v6-cost-cats"></div>
-      </div>
-
-      <div class="v6-card">
-        <h3>📋 Chi phí thực tế <span id="v6-db-status" style="font-size:10px;color:#3182ce;font-weight:600">● Đang kết nối Firebase...</span></h3>
-        <div id="v6-cost-admin-form" class="admin-only">
-          <div class="v6-expense-grid">
-            <input type="date" id="v6-exp-date">
-            <select id="v6-exp-cat">
-              <option>Xăng</option>
-              <option>Lưu trú</option>
-              <option>Ăn uống</option>
-              <option>Vé tham quan</option>
-              <option>Quà lưu niệm</option>
-              <option>Vé đường bộ</option>
-              <option>Gửi xe</option>
-            </select>
-            <input type="text" id="v6-exp-desc" placeholder="Nội dung khoản chi thực tế">
-            <input type="text" id="v6-exp-amount" inputmode="numeric" autocomplete="off" title="Ví dụ: 1.500.000" placeholder="Số tiền (VNĐ)" oninput="v6FormatMoneyInput(this)">
-            <input type="text" id="v6-exp-payer" placeholder="Người trả / gia đình">
-          </div>
-          <button class="btn btn-success" style="margin-top:8px" onclick="v6SaveExpense()">💾 Lưu khoản chi</button>
-        </div>
-        <div class="table-container" style="margin-top:12px">
-          <table class="v6-table">
-            <thead><tr><th>Ngày</th><th>Khoản mục</th><th>Nội dung</th><th>Người trả</th><th>Số tiền</th><th class="admin-col">Thao tác</th></tr></thead>
-            <tbody id="v6-expense-list"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="v6-tools" class="v6-section">
-      <div class="v6-card">
-        <h3>⚙️ Khu vực quản trị</h3>
-        <div class="v6-admin-note">Khi chưa đăng nhập: toàn bộ ứng dụng ở chế độ Thành viên — chỉ xem. Sau khi đăng nhập Quản trị, các nút thêm/sửa/xóa mới được kích hoạt. Nút “Xóa chi phí mẫu” chỉ xóa dữ liệu mẫu; chi phí thực tế phải sửa/xóa ngay tại bảng Quản lý chi phí.</div>
-        <button class="btn btn-warning admin-only admin-flex" onclick="v6SeedCostDemo()">🧪 Tạo dữ liệu mẫu chi phí</button>
-        <button class="btn btn-danger admin-only admin-flex" style="margin-top:8px" onclick="v6ClearDemoExpenses()">🗑️ Xóa chi phí mẫu</button>
-      </div>
-    </section>
-
-    <div id="v6-expense-modal" class="v6-modal">
-      <div class="v6-modal-box">
-        <div class="v6-modal-head"><b>✏️ Sửa khoản chi</b><button class="v6-close" onclick="v6CloseModal()">×</button></div>
-        <input type="hidden" id="v6-edit-id">
-        <div class="v6-expense-grid">
-          <input type="date" id="v6-edit-date">
-          <select id="v6-edit-cat">
-            <option>Xăng</option><option>Lưu trú</option><option>Ăn uống</option><option>Vé tham quan</option>
-            <option>Quà lưu niệm</option><option>Vé đường bộ</option><option>Gửi xe</option>
-          </select>
-          <input type="text" id="v6-edit-desc" placeholder="Nội dung">
-          <input type="text" id="v6-edit-amount" inputmode="numeric" autocomplete="off" title="Ví dụ: 1.500.000" placeholder="Số tiền" oninput="v6FormatMoneyInput(this)">
-          <input type="text" id="v6-edit-payer" placeholder="Người trả / gia đình">
-        </div>
-        <button class="btn btn-success" style="margin-top:10px" onclick="v6UpdateExpense()">Cập nhật</button>
-      </div>
-    </div>
-
+<div class="container">
+  <div class="header">
+    <h1 id="app-title">HÀNH TRÌNH DU LỊCH</h1>
+    <p id="app-subtitle">Đang tải dữ liệu chuyến đi...</p>
   </div>
 
-  <script>
-    // ==========================================
-    // CẤU HÌNH FIREBASE (Dự án: AppDuLich)
-    // ==========================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyCVuCRzrkhCGqQCZuXYcnHovAu0dgy0Fao",
-      authDomain: "appdulich-d2203.firebaseapp.com",
-      projectId: "appdulich-d2203",
-      storageBucket: "appdulich-d2203.firebasestorage.app",
-      messagingSenderId: "618555116660",
-      appId: "1:618555116660:web:881d55194389af106a5521",
-      measurementId: "G-6PJ7PGX2GZ"
-    };
-
-    // Khởi tạo Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    let map = null;
-    let routingControl = null;
-    let legBadgeMarkers = [];
-    let fallbackPolyline = null;
-
-    const defaultPoints = [
-      { name: "1. Hateco Apollo (Xuân Phương)", lat: 21.0477, lng: 105.7344, desc: "Xuất phát: 17:00 ngày 28/08/2026" },
-      { name: "2. TP Thanh Hoá", lat: 19.8079, lng: 105.7770, desc: "Nghỉ đêm 1 (22:00 ngày 28/08)" },
-      { name: "3. TP Đồng Hới", lat: 17.4661, lng: 106.6192, desc: "Dừng ăn trưa ngày 29/08 & 01/09" },
-      { name: "4. Phố cổ Hội An", lat: 15.8806, lng: 108.3307, desc: "Khám phá Hội An & Nghỉ đêm 2" },
-      { name: "5. Thành phố Huế", lat: 16.4759, lng: 107.5891, desc: "Khám phá Huế & Nghỉ đêm 3, Đêm 4" },
-      { name: "6. Vinpearl Hà Tĩnh", lat: 18.5054, lng: 105.8871, desc: "Nghỉ đêm 5 (Ngày 01/09)" },
-      { name: "7. Hateco Apollo (Về đích)", lat: 21.0477, lng: 105.7344, desc: "Kết thúc hành trình (Ngày 02/09)" }
-    ];
-
-    const presetLegs = [
-      { km: 158.0, timeMin: 135 },
-      { km: 325.0, timeMin: 285 },
-      { km: 310.0, timeMin: 330 },
-      { km: 125.0, timeMin: 150 },
-      { km: 270.0, timeMin: 270 },
-      { km: 340.0, timeMin: 315 }
-    ];
-
-    document.addEventListener('DOMContentLoaded', function() {
-      checkAdminStatus();
-      initMap();
-      listenFirebaseData();
-
-      // Điền sẵn tên nếu đã lưu trên trình duyệt
-      const savedName = localStorage.getItem('chat_my_name');
-      if (savedName) {
-        document.getElementById('chat-user').value = savedName;
-      }
-
-      document.getElementById('chat-user').addEventListener('input', function() {
-        this.value = this.value.toUpperCase();
-        localStorage.setItem('chat_my_name', this.value.trim());
-      });
-    });
-
-    function getAdminPassword() {
-      return localStorage.getItem('admin_pwd') || 'admin123';
-    }
-
-    function checkAdminStatus() {
-      const isAdmin = sessionStorage.getItem('is_admin') === 'true';
-      const roleDisplay = document.getElementById('role-display');
-      const btnLogin = document.getElementById('btn-login-admin');
-
-      if (isAdmin) {
-        document.body.classList.add('is-admin');
-        roleDisplay.className = 'badge-role role-admin';
-        roleDisplay.innerText = 'Quản Trị Viên';
-        btnLogin.style.display = 'none';
-      } else {
-        document.body.classList.remove('is-admin');
-        roleDisplay.className = 'badge-role role-user';
-        roleDisplay.innerText = 'Thành Viên (Chỉ Xem)';
-        btnLogin.style.display = 'inline-block';
-      }
-    }
-
-    function loginAdmin() {
-      const pwd = prompt("Nhập mật khẩu quản trị:");
-      if (pwd === getAdminPassword()) {
-        sessionStorage.setItem('is_admin', 'true');
-        checkAdminStatus();
-        alert("Đăng nhập quản trị thành công!");
-      } else if (pwd !== null) {
-        alert("Mật khẩu không chính xác!");
-      }
-    }
-
-    function logoutAdmin() {
-      sessionStorage.removeItem('is_admin');
-      checkAdminStatus();
-    }
-
-    function changeAdminPassword() {
-      const oldPwd = prompt("Nhập mật khẩu cũ:");
-      if (oldPwd === getAdminPassword()) {
-        const newPwd = prompt("Nhập mật khẩu mới:");
-        if (newPwd && newPwd.trim() !== '') {
-          localStorage.setItem('admin_pwd', newPwd.trim());
-          alert("Cập nhật mật khẩu thành công!");
-        }
-      } else if (oldPwd !== null) {
-        alert("Mật khẩu cũ không khớp!");
-      }
-    }
-
-    // ==========================================
-    // ĐỒNG BỘ DỮ LIỆU THỜI GIAN THỰC TỪ FIRESTORE
-    // ==========================================
-    function listenFirebaseData() {
-      db.collection("trip_data").doc("points").onSnapshot((doc) => {
-        let points = defaultPoints;
-        if (doc.exists && doc.data().list) {
-          points = doc.data().list;
-        } else {
-          db.collection("trip_data").doc("points").set({ list: defaultPoints });
-        }
-        renderPointsTable(points, null);
-        renderRoadRouting(points);
-      });
-
-      db.collection("trip_data").doc("members").onSnapshot((doc) => {
-        let members = [{ name: "Nguyễn Tiến Duẩn", phone: "098x xxx xxx", role: "Trưởng đoàn / Lái chính" }];
-        if (doc.exists && doc.data().list) {
-          members = doc.data().list;
-        } else {
-          db.collection("trip_data").doc("members").set({ list: members });
-        }
-        renderMembers(members);
-      });
-
-      db.collection("trip_data").doc("chat").onSnapshot((doc) => {
-        let messages = [{ user: "HỆ THỐNG", text: "Chào mừng cả đoàn đến với kênh trao đổi chuyến đi 2026!", time: "10:00" }];
-        if (doc.exists && doc.data().list) {
-          messages = doc.data().list;
-        } else {
-          db.collection("trip_data").doc("chat").set({ list: messages });
-        }
-        renderChatMessages(messages);
-      });
-    }
-
-    function renderChatMessages(messages) {
-      const chatBox = document.getElementById('chat-messages');
-      const myName = (localStorage.getItem('chat_my_name') || '').trim().toUpperCase();
-      chatBox.innerHTML = '';
-
-      messages.forEach(msg => {
-        let msgUserUpper = (msg.user || '').trim().toUpperCase();
-        let msgType = 'other';
-
-        if (msgUserUpper === 'HỆ THỐNG') {
-          msgType = 'system';
-        } else if (myName && msgUserUpper === myName) {
-          msgType = 'mine';
-        }
-
-        chatBox.innerHTML += `
-          <div class="chat-msg ${msgType}">
-            <div class="msg-info"><b>${msg.user}</b> • ${msg.time}</div>
-            <div class="bubble">${msg.text}</div>
-          </div>
-        `;
-      });
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function sendChatMessage() {
-      let userInput = document.getElementById('chat-user').value.trim().toUpperCase();
-      let textInput = document.getElementById('chat-text').value.trim();
-
-      if (!userInput) return alert("Vui lòng nhập Họ tên!");
-      if (!textInput) return alert("Vui lòng nhập nội dung nhắn!");
-
-      localStorage.setItem('chat_my_name', userInput);
-
-      const now = new Date();
-      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-      db.collection("trip_data").doc("chat").get().then((doc) => {
-        let messages = doc.exists && doc.data().list ? doc.data().list : [];
-        messages.push({ user: userInput, text: textInput, time: timeStr });
-        db.collection("trip_data").doc("chat").set({ list: messages }).then(() => {
-          document.getElementById('chat-text').value = '';
-        });
-      });
-    }
-
-    function calcDistanceKm(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c * 1.25;
-    }
-
-    function initMap() {
-      try {
-        if (!map) {
-          map = L.map('map').setView([18.5, 106.0], 6);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-          }).addTo(map);
-        }
-      } catch (err) {
-        console.error("Lỗi khởi tạo bản đồ:", err);
-      }
-    }
-
-    function clearLegBadges() {
-      legBadgeMarkers.forEach(m => map.removeLayer(m));
-      legBadgeMarkers = [];
-      if (fallbackPolyline) {
-        map.removeLayer(fallbackPolyline);
-        fallbackPolyline = null;
-      }
-    }
-
-    function renderRoadRouting(points) {
-      if (routingControl) {
-        map.removeControl(routingControl);
-      }
-
-      let waypoints = points.map(p => L.latLng(p.lat, p.lng));
-
-      routingControl = L.Routing.control({
-        waypoints: waypoints,
-        router: L.Routing.osrmv1({
-          serviceUrl: 'https://router.project-osrm.org/route/v1',
-          profile: 'car'
-        }),
-        lineOptions: {
-          styles: [{ color: '#007bff', weight: 4, opacity: 0.8 }]
-        },
-        createMarker: function(i, wp) {
-          let p = points[i] || { name: `Điểm ${i+1}`, desc: "" };
-          let customIcon;
-
-          let isSameLocation = (points.length > 1 && points[0].lat === points[points.length-1].lat && points[0].lng === points[points.length-1].lng);
-          let transformStyle = "";
-          if (isSameLocation) {
-            if (i === 0) {
-              transformStyle = "transform: translateX(-16px);";
-            } else if (i === points.length - 1) {
-              transformStyle = "transform: translateX(16px);";
-            }
-          }
-
-          if (i === 0) {
-            customIcon = L.divIcon({
-              className: 'custom-div-icon',
-              html: `<div style="background-color:#28a745;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);${transformStyle}" title="Xuất phát">${i + 1}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
-            });
-          } else if (i === points.length - 1) {
-            customIcon = L.divIcon({
-              className: 'custom-div-icon',
-              html: `<div style="background-color:#6f42c1;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);${transformStyle}" title="Về đích">${i + 1}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
-            });
-          } else {
-            customIcon = L.divIcon({
-              className: 'custom-div-icon',
-              html: `<div style="background-color:#007bff;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${i + 1}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
-            });
-          }
-
-          return L.marker(wp.latLng, { icon: customIcon }).bindPopup(`<b>${p.name}</b><br>${p.desc}`);
-        },
-        addWaypoints: false,
-        routeWhileDragging: false
-      }).addTo(map);
-
-      routingControl.on('routesfound', function(e) {
-        let route = e.routes[0];
-        renderPointsTable(points, route);
-      });
-
-      routingControl.on('routingerror', function() {
-        if (!fallbackPolyline) {
-          let latLngs = points.map(p => [p.lat, p.lng]);
-          fallbackPolyline = L.polyline(latLngs, { color: '#007bff', weight: 3, dashArray: '5, 8' }).addTo(map);
-        }
-      });
-    }
-
-    function renderPointsTable(points, route) {
-      clearLegBadges();
-      let tbody = document.getElementById('route-points-list');
-      tbody.innerHTML = '';
-
-      let totalKmSum = 0;
-      let totalMinSum = 0;
-      let isDefaultList = points.length === defaultPoints.length;
-
-      points.forEach((p, index) => {
-        let legInfo = "-";
-
-        if (index < points.length - 1) {
-          let legKm = 0;
-          let legMin = 0;
-          let midLat = (p.lat + points[index+1].lat) / 2;
-          let midLng = (p.lng + points[index+1].lng) / 2;
-
-          if (route && route.legs && route.legs[index]) {
-            let leg = route.legs[index];
-            legKm = (leg.summary.totalDistance / 1000);
-            legMin = Math.round(leg.summary.totalTime / 60);
-
-            if (leg.coordinates && leg.coordinates.length > 0) {
-              let midCoord = leg.coordinates[Math.floor(leg.coordinates.length / 2)];
-              midLat = midCoord.lat;
-              midLng = midCoord.lng;
-            }
-          } 
-          else if (isDefaultList && presetLegs[index]) {
-            legKm = presetLegs[index].km;
-            legMin = presetLegs[index].timeMin;
-          } 
-          else {
-            legKm = calcDistanceKm(p.lat, p.lng, points[index+1].lat, points[index+1].lng);
-            legMin = Math.round((legKm / 60) * 60);
-          }
-
-          totalKmSum += legKm;
-          totalMinSum += legMin;
-
-          let legH = Math.floor(legMin / 60);
-          let legM = legMin % 60;
-          let timeStr = legH > 0 ? `${legH}g${legM}p` : `${legM}p`;
-
-          legInfo = `<span style="color:#2b6cb0; font-weight:600;">➔ Điểm ${index+2}: ${legKm.toFixed(1)} km (~${timeStr})</span>`;
-
-          let badge = L.marker([midLat, midLng], {
-            icon: L.divIcon({
-              className: 'leg-badge-icon',
-              html: `<div style="background:#1a365d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;white-space:nowrap;border:1px solid white;">➔ ${legKm.toFixed(1)} km</div>`,
-              iconAnchor: [25, 8]
-            })
-          }).addTo(map);
-
-          legBadgeMarkers.push(badge);
-
-        } else if (index === points.length - 1) {
-          legInfo = `<span style="color:#6f42c1; font-weight:600;">🏁 Về đích</span>`;
-        }
-
-        tbody.innerHTML += `
-          <tr>
-            <td><b>${index + 1}</b></td>
-            <td><b>${p.name}</b></td>
-            <td class="col-coord"><code>${p.lat}, ${p.lng}</code></td>
-            <td>${p.desc || '-'}</td>
-            <td>${legInfo}</td>
-            <td class="admin-col">
-              <button class="btn btn-danger" onclick="deletePoint(${index})">Xóa</button>
-            </td>
-          </tr>
-        `;
-      });
-
-      let sumH = Math.floor(totalMinSum / 60);
-      let sumM = totalMinSum % 60;
-      document.getElementById('total-distance').innerText = `${totalKmSum.toFixed(1)} km`;
-      document.getElementById('total-time').innerText = `${sumH} giờ ${sumM} phút`;
-    }
-
-    function addCustomPoint() {
-      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
-      let name = document.getElementById('point-name').value;
-      let desc = document.getElementById('point-desc').value;
-      let lat = parseFloat(document.getElementById('point-lat').value);
-      let lng = parseFloat(document.getElementById('point-lng').value);
-
-      if (!name || isNaN(lat) || isNaN(lng)) {
-        return alert("Vui lòng nhập Tên điểm, Vĩ độ và Kinh độ!");
-      }
-
-      db.collection("trip_data").doc("points").get().then((doc) => {
-        let points = doc.exists && doc.data().list ? doc.data().list : defaultPoints;
-        points.splice(points.length - 1, 0, { name, lat, lng, desc });
-        
-        db.collection("trip_data").doc("points").set({ list: points }).then(() => {
-          document.getElementById('point-name').value = '';
-          document.getElementById('point-desc').value = '';
-          document.getElementById('point-lat').value = '';
-          document.getElementById('point-lng').value = '';
-        });
-      });
-    }
-
-    function deletePoint(index) {
-      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
-      db.collection("trip_data").doc("points").get().then((doc) => {
-        let points = doc.exists && doc.data().list ? doc.data().list : defaultPoints;
-        if (points.length <= 2) return alert("Lộ trình cần ít nhất 2 điểm!");
-        points.splice(index, 1);
-        db.collection("trip_data").doc("points").set({ list: points });
-      });
-    }
-
-    function resetDefaultPoints() {
-      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
-      if (confirm("Bạn có chắc chắn muốn khôi phục lại 7 điểm chuẩn ban đầu?")) {
-        db.collection("trip_data").doc("points").set({ list: defaultPoints });
-      }
-    }
-
-    function renderMembers(members) {
-      let tbody = document.getElementById('member-list');
-      tbody.innerHTML = '';
-      members.forEach((m, index) => {
-        tbody.innerHTML += `
-          <tr>
-            <td><b>${m.name}</b></td>
-            <td>${m.phone}</td>
-            <td>${m.role}</td>
-            <td class="admin-col"><button class="btn btn-danger" onclick="deleteMember(${index})">Xóa</button></td>
-          </tr>
-        `;
-      });
-    }
-
-    function addMember() {
-      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
-      let name = document.getElementById('member-name').value;
-      let phone = document.getElementById('member-phone').value;
-      let role = document.getElementById('member-role').value || "Thành viên";
-
-      if (!name) return alert("Vui lòng nhập họ tên!");
-
-      db.collection("trip_data").doc("members").get().then((doc) => {
-        let members = doc.exists && doc.data().list ? doc.data().list : [];
-        members.push({ name, phone, role });
-        db.collection("trip_data").doc("members").set({ list: members }).then(() => {
-          document.getElementById('member-name').value = '';
-          document.getElementById('member-phone').value = '';
-          document.getElementById('member-role').value = '';
-        });
-      });
-    }
-
-    function deleteMember(index) {
-      if (sessionStorage.getItem('is_admin') !== 'true') return alert('Chức năng này chỉ dành cho Quản trị viên.');
-      db.collection("trip_data").doc("members").get().then((doc) => {
-        let members = doc.exists && doc.data().list ? doc.data().list : [];
-        members.splice(index, 1);
-        db.collection("trip_data").doc("members").set({ list: members });
-      });
-    }
-
-
-    /* =========================================================
-       V6 FINAL LOGIC
-       ========================================================= */
-    const V6_EXPENSE_COLLECTION = "trip_expenses";
-    let v6Expenses = [];
-    let v6EditingId = null;
-
-    const V6_CATS = ["Xăng","Lưu trú","Ăn uống","Vé tham quan","Quà lưu niệm","Vé đường bộ","Gửi xe"];
-
-    function v6IsAdmin(){
-      return sessionStorage.getItem('is_admin') === 'true';
-    }
-
-    function v6RequireAdmin(){
-      if(!v6IsAdmin()){
-        alert("Bạn đang ở chế độ Thành viên. Vui lòng đăng nhập Quản trị để thực hiện thao tác này.");
-        return false;
-      }
-      return true;
-    }
-
-    function v6Money(n){
-      return new Intl.NumberFormat('vi-VN', {
-        maximumFractionDigits: 0
-      }).format(Number(n)||0) + ' đ';
-    }
-
-    // Hiển thị số tiền theo chuẩn Việt Nam: 50000 -> 50.000
-    // Dữ liệu lưu Firestore vẫn là NUMBER nguyên, không lưu chuỗi "50.000".
-    function v6ParseMoney(value){
-      if (typeof value === 'number') return Math.round(value);
-      const digits = String(value ?? '').replace(/\D/g, '');
-      return digits ? Number(digits) : 0;
-    }
-
-    function v6FormatMoneyInput(input){
-      const n = v6ParseMoney(input.value);
-      input.value = n ? new Intl.NumberFormat('vi-VN', {
-        maximumFractionDigits: 0
-      }).format(n) : '';
-    }
-
-    function v6Esc(v){
-      return String(v ?? '').replace(/[&<>"']/g, c => ({
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-      }[c]));
-    }
-
-    function v6Show(name, btn){
-      document.querySelectorAll('.v6-section').forEach(x=>x.classList.remove('active'));
-      document.getElementById('v6-'+name).classList.add('active');
-      document.querySelectorAll('.v6-nav button').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
-      if(name==='route') v6RenderRouteCopy();
-      if(name==='members') v6RenderMembersCopy();
-    }
-
-    function v6SyncRoleUI(){
-      const admin = v6IsAdmin();
-      document.getElementById('v6-role-badge').textContent = admin ? 'QUẢN TRỊ VIÊN' : 'THÀNH VIÊN · CHỈ XEM';
-      v6RenderExpenses();
-      // CSS already controls .admin-only; this refresh handles dynamic table actions.
-    }
-
-    function v6ListenExpenses(){
-      db.collection(V6_EXPENSE_COLLECTION)
-        .orderBy('date','asc')
-        .onSnapshot(snap=>{
-          v6Expenses = [];
-          snap.forEach(doc=>v6Expenses.push({id:doc.id,...doc.data()}));
-          const status=document.getElementById('v6-db-status');
-          if(status){status.textContent='● Firebase · Đã đồng bộ';status.style.color='#2f855a';}
-          v6RenderExpenses();
-        }, err=>{
-          // If an index/order issue occurs, fall back to the collection without orderBy.
-          console.error(err);
-          const status=document.getElementById('v6-db-status');
-          if(status){status.textContent='● Firebase · Lỗi kết nối';status.style.color='#c53030';}
-          db.collection(V6_EXPENSE_COLLECTION).onSnapshot(snap=>{
-            const status=document.getElementById('v6-db-status');
-            if(status){status.textContent='● Firebase · Đã đồng bộ';status.style.color='#2f855a';}
-            v6Expenses=[];
-            snap.forEach(doc=>v6Expenses.push({id:doc.id,...doc.data()}));
-            v6Expenses.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
-            v6RenderExpenses();
-          });
-        });
-    }
-
-    function v6RenderExpenses(){
-      const tbody=document.getElementById('v6-expense-list');
-      if(!tbody) return;
-
-      const total=v6Expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-      document.getElementById('v6-cost-total').textContent=v6Money(total);
-      document.getElementById('v6-cost-total2').textContent=v6Money(total);
-      document.getElementById('v6-cost-count').textContent=v6Expenses.length;
-      document.getElementById('v6-cost-avg').textContent=v6Money(v6Expenses.length?total/v6Expenses.length:0);
-      document.getElementById('v6-cost-dayavg').textContent=v6Money(total/6);
-
-      const byCat={};
-      V6_CATS.forEach(c=>byCat[c]=0);
-      v6Expenses.forEach(x=>{ if(byCat[x.category]!==undefined) byCat[x.category]+=Number(x.amount||0); });
-
-      const max=Math.max(...Object.values(byCat),1);
-      document.getElementById('v6-cost-cats').innerHTML=V6_CATS.map(c=>`
-        <div class="v6-cat-row">
-          <div style="min-width:105px"><b>${v6Esc(c)}</b><div class="v6-bar"><i style="width:${byCat[c]/max*100}%"></i></div></div>
-          <b>${v6Money(byCat[c])}</b>
-        </div>`).join('');
-
-      if(!v6Expenses.length){
-        tbody.innerHTML='<tr><td colspan="6"><div class="v6-empty">Chưa có khoản chi thực tế nào.</div></td></tr>';
-        return;
-      }
-
-      tbody.innerHTML=v6Expenses.map(x=>`
-        <tr>
-          <td>${v6Esc(x.date||'')}</td>
-          <td><b>${v6Esc(x.category||'')}</b></td>
-          <td>${v6Esc(x.description||'')}</td>
-          <td>${v6Esc(x.payer||'')}</td>
-          <td><b>${v6Money(x.amount)}</b></td>
-          <td class="admin-col">
-            ${v6IsAdmin()?`<div class="v6-actions">
-              <button class="v6-mini v6-edit" onclick="v6OpenEdit('${x.id}')">Sửa</button>
-              <button class="v6-mini v6-del" onclick="v6DeleteExpense('${x.id}')">Xóa</button>
-            </div>`:''}
-          </td>
-        </tr>`).join('');
-    }
-
-    function v6SaveExpense(){
-      if(!v6RequireAdmin()) return;
-      const date=document.getElementById('v6-exp-date').value;
-      const category=document.getElementById('v6-exp-cat').value;
-      const description=document.getElementById('v6-exp-desc').value.trim();
-      const amount=v6ParseMoney(document.getElementById('v6-exp-amount').value);
-      const payer=document.getElementById('v6-exp-payer').value.trim();
-
-      if(!date||!category||!description||!amount||amount<=0||!payer){
-        alert("Vui lòng nhập đầy đủ ngày, khoản mục, nội dung, số tiền và người trả.");
-        return;
-      }
-
-      db.collection(V6_EXPENSE_COLLECTION).add({
-        date, category, description, amount, payer,
-        isDemo: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(()=>{
-        document.getElementById('v6-exp-desc').value='';
-        document.getElementById('v6-exp-amount').value='';
-        document.getElementById('v6-exp-payer').value='';
-        alert("Đã lưu khoản chi vào Firebase Firestore.");
-      }).catch(e=>alert("Không thể lưu khoản chi: "+e.message));
-    }
-
-    function v6OpenEdit(id){
-      if(!v6RequireAdmin()) return;
-      const x=v6Expenses.find(a=>a.id===id);
-      if(!x) return;
-      v6EditingId=id;
-      document.getElementById('v6-edit-id').value=id;
-      document.getElementById('v6-edit-date').value=x.date||'';
-      document.getElementById('v6-edit-cat').value=x.category||V6_CATS[0];
-      document.getElementById('v6-edit-desc').value=x.description||'';
-      document.getElementById('v6-edit-amount').value=x.amount||'';
-      document.getElementById('v6-edit-payer').value=x.payer||'';
-      document.getElementById('v6-expense-modal').classList.add('show');
-    }
-
-    function v6CloseModal(){
-      document.getElementById('v6-expense-modal').classList.remove('show');
-      v6EditingId=null;
-    }
-
-    function v6UpdateExpense(){
-      if(!v6RequireAdmin()||!v6EditingId) return;
-      const data={
-        date:document.getElementById('v6-edit-date').value,
-        category:document.getElementById('v6-edit-cat').value,
-        description:document.getElementById('v6-edit-desc').value.trim(),
-        amount:v6ParseMoney(document.getElementById('v6-edit-amount').value),
-        payer:document.getElementById('v6-edit-payer').value.trim(),
-        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if(!data.date||!data.description||!data.amount||!data.payer){
-        alert("Vui lòng nhập đầy đủ thông tin.");
-        return;
-      }
-      db.collection(V6_EXPENSE_COLLECTION).doc(v6EditingId).update(data)
-        .then(v6CloseModal)
-        .catch(e=>alert("Không thể cập nhật: "+e.message));
-    }
-
-    function v6DeleteExpense(id){
-      if(!v6RequireAdmin()) return;
-      if(!confirm("Xóa khoản chi này khỏi database?")) return;
-      db.collection(V6_EXPENSE_COLLECTION).doc(id).delete()
-        .catch(e=>alert("Không thể xóa: "+e.message));
-    }
-
-    function v6ClearDemoExpenses(){
-      if(!v6RequireAdmin()) return;
-      const demoExpenses = v6Expenses.filter(x => x.isDemo === true);
-      if(!demoExpenses.length){
-        alert("Không có chi phí mẫu nào để xóa.");
-        return;
-      }
-      if(!confirm("Xóa các khoản chi MẪU do quản trị tạo? Chi phí thực tế sẽ không bị ảnh hưởng.")) return;
-
-      Promise.all(
-        demoExpenses.map(x =>
-          db.collection(V6_EXPENSE_COLLECTION).doc(x.id).delete()
-        )
-      )
-      .then(()=>alert("Đã xóa chi phí mẫu. Các khoản chi thực tế vẫn được giữ nguyên."))
-      .catch(e=>alert("Có lỗi khi xóa chi phí mẫu: "+e.message));
-    }
-
-    function v6SeedCostDemo(){
-      if(!v6RequireAdmin()) return;
-      const demo=[
-        ['2026-08-28','Xăng','Đổ xăng xe 01',1200000,'Duẩn'],
-        ['2026-08-28','Lưu trú','Khách sạn Thanh Hóa',1600000,'Giang'],
-        ['2026-08-29','Ăn uống','Ăn trưa Đồng Hới',950000,'Duẩn'],
-        ['2026-08-29','Vé đường bộ','Phí cao tốc',350000,'Duẩn'],
-        ['2026-08-30','Vé tham quan','Vé tham quan Hội An',700000,'Giang'],
-        ['2026-08-30','Gửi xe','Gửi xe Hội An',120000,'Duẩn']
-      ];
-      const batch=db.batch();
-      demo.forEach(d=>{
-        const ref=db.collection(V6_EXPENSE_COLLECTION).doc();
-        batch.set(ref,{date:d[0],category:d[1],description:d[2],amount:d[3],payer:d[4],isDemo:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-      });
-      batch.commit().then(()=>alert("Đã tạo dữ liệu mẫu.")).catch(e=>alert(e.message));
-    }
-
-    function v6RenderRouteCopy(){
-      const source=document.getElementById('route-points-list');
-      const target=document.getElementById('v6-route-copy');
-      if(!source||!target) return;
-      target.innerHTML='<div class="v6-admin-note">Bản đồ chi tiết vẫn nằm ở khu vực Lộ trình gốc phía trên. Danh sách bên dưới là bản xem nhanh.</div>'+source.closest('.table-container').outerHTML;
-      const copy=target.querySelector('tbody');
-      if(copy) copy.id='v6-route-copy-tbody';
-    }
-
-    function v6RenderMembersCopy(){
-      const source=document.getElementById('member-list');
-      const target=document.getElementById('v6-members-copy');
-      if(!source||!target) return;
-      const rows=[...source.querySelectorAll('tr')];
-      target.innerHTML=rows.length
-        ? `<div class="table-container"><table class="v6-table"><thead><tr><th>Họ tên</th><th>SĐT</th><th>Vai trò</th></tr></thead><tbody>${rows.map(r=>{
-            const c=r.querySelectorAll('td');
-            return `<tr><td>${c[0]?.innerHTML||''}</td><td>${c[1]?.innerHTML||''}</td><td>${c[2]?.innerHTML||''}</td></tr>`;
-          }).join('')}</tbody></table></div>`
-        : '<div class="v6-empty">Chưa có thành viên.</div>';
-      document.getElementById('v6-member-count').textContent=rows.length;
-    }
-
-    // Patch the existing role checker so V6 updates instantly.
-    const v6OriginalCheckAdminStatus = checkAdminStatus;
-    checkAdminStatus = function(){
-      v6OriginalCheckAdminStatus();
-      v6SyncRoleUI();
-    };
-
-    document.addEventListener('DOMContentLoaded',function(){
-      v6ListenExpenses();
-      v6SyncRoleUI();
-
-      const originalListen = listenFirebaseData;
-      // Existing listener remains authoritative for original modules.
-      setTimeout(()=>{v6RenderMembersCopy();v6RenderRouteCopy();},1200);
-
-      const costDate=document.getElementById('v6-exp-date');
-      if(costDate) costDate.value='2026-08-28';
-    });
-
-  </script>
+  <div class="admin-bar">
+    <div>Quyền: <span id="role-display" class="badge-role role-user">Thành Viên (Chỉ Xem)</span><span id="admin-email-display" style="display:none;margin-left:6px;color:#52677d;font-size:12px"></span></div>
+    <div class="admin-bar-btns">
+      <button id="btn-login-admin" class="btn btn-warning" onclick="openAdminLogin()">🔐 Đăng Nhập Quản Trị</button>
+      <button id="btn-change-pwd" class="btn btn-dark admin-only admin-flex" onclick="changeAdminPassword()">🔑 Đổi Mật Khẩu</button>
+      <button id="btn-logout-admin" class="btn btn-danger admin-only admin-flex" onclick="logoutAdmin()">Thoát Quản Trị</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🗂️ Chuyến đi đang mở</h2>
+    <div class="sticky-select">
+      <select id="trip-selector" onchange="switchTrip(this.value)"><option value="">Đang tải...</option></select>
+      <button class="btn btn-small btn-dark admin-only admin-flex" onclick="openTripManager()">⚙️ Quản lý</button>
+    </div>
+    <div id="trip-meta" class="v7-admin-note">Đang tải thông tin chuyến đi...</div>
+  </div>
+
+  <div class="card">
+    <h2>📸 Kho Ảnh Chuyến Đi (Drive)</h2>
+    <p style="color:#4a5568;margin-bottom:12px;font-size:.85em">Thành viên trong đoàn bấm nút dưới đây để xem toàn bộ ảnh hoặc tải ảnh mới lên thư mục chung.</p>
+    <div class="btn-group">
+      <a id="drive-upload-link" href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn">📤 Tải Ảnh Lên Kho</a>
+      <a id="drive-view-link" href="https://drive.google.com/drive/folders/1M5zW8BWHiyxcm79u8gM8M1ygGRYj4az4?usp=drive_link" target="_blank" class="btn btn-success">🖼️ Xem Kho Ảnh Đoàn</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🗺️ Lộ Trình & Tính Quãng Đường</h2>
+    <div class="summary-box"><div class="summary-item">Tổng Quãng Đường:<span id="total-distance">0 km</span></div><div class="summary-item">Thời Gian Lái Ước Tính:<span id="total-time">0 giờ 0 phút</span></div></div>
+    <div class="form-grid admin-only">
+      <div class="field"><label>Tên điểm</label><input type="text" id="point-name" placeholder="VD: TP Thanh Hóa"></div>
+      <div class="field"><label>Mô tả / Ghi chú</label><input type="text" id="point-desc" placeholder="VD: Nghỉ đêm 1"></div>
+      <div class="field"><label>Vĩ độ (Lat)</label><input type="number" step="any" id="point-lat" placeholder="19.8079"></div>
+      <div class="field"><label>Kinh độ (Lng)</label><input type="number" step="any" id="point-lng" placeholder="105.7770"></div>
+    </div>
+    <div class="btn-group admin-only admin-flex" style="margin-bottom:12px"><button class="btn" onclick="addCustomPoint()">➕ Thêm Điểm Vào Lộ Trình</button><button class="btn btn-light" onclick="openReorderPoints()">↕️ Sắp Xếp Điểm</button></div>
+    <h3 style="font-size:14px;margin-top:10px">📍 Danh Sách Các Điểm Dừng:</h3>
+    <div class="table-container"><table><thead><tr><th style="width:35px">STT</th><th>Tên Điểm</th><th class="col-coord">Tọa Độ</th><th>Mô Tả</th><th>Chặng Tiếp Theo</th><th class="admin-col">Xóa</th></tr></thead><tbody id="route-points-list"></tbody></table></div>
+    <div id="map"></div>
+  </div>
+
+  <div class="v7-nav">
+    <button class="active" onclick="v7Show('home',this)">🏠 Tổng quan</button>
+    <button onclick="v7Show('route',this)">🗺️ Lộ trình</button>
+    <button onclick="v7Show('schedule',this)">📅 Lịch trình</button>
+    <button onclick="v7Show('members',this)">👥 Thành viên</button>
+    <button onclick="v7Show('chat',this)">💬 Chat</button>
+    <button onclick="v7Show('cost',this)">💰 Chi phí</button>
+    <button class="admin-only admin-flex" onclick="v7Show('tools',this)">⚙️ Quản trị</button>
+  </div>
+
+  <section id="v7-home" class="v7-section active">
+    <div class="v7-hero"><div class="v7-hero-top"><div><h2 id="hero-title">🌄 Hành trình</h2><p id="hero-desc">Đang tải...</p></div><span class="badge-role role-user" id="v7-role-badge">THÀNH VIÊN</span></div><div class="v7-pills"><div class="v7-pill"><b id="v7-total-km">0 km</b><span>Quãng đường</span></div><div class="v7-pill"><b id="v7-days">0 ngày</b><span>Thời lượng</span></div><div class="v7-pill"><b id="v7-member-count">0</b><span>Thành viên</span></div><div class="v7-pill"><b id="v7-cost-total">0 đ</b><span>Tổng chi phí</span></div></div></div>
+    <div class="v7-card"><h3>🧭 Tóm tắt hành trình</h3><div id="home-summary"></div></div>
+  </section>
+
+  <section id="v7-route" class="v7-section"><div class="v7-card"><h3>🗺️ Danh sách lộ trình</h3><div id="v7-route-copy"></div></div></section>
+
+  <section id="v7-schedule" class="v7-section"><div class="v7-card"><h3>📅 Lịch trình chi tiết</h3><div id="schedule-list"></div></div></section>
+
+  <section id="v7-members" class="v7-section"><div class="v7-card"><h3>👥 Thành viên trong đoàn</h3><div class="form-grid admin-only"><div class="field"><label>Họ và tên</label><input id="member-name" placeholder="Họ và tên"></div><div class="field"><label>Số điện thoại</label><input id="member-phone" placeholder="Số điện thoại"></div><div class="field"><label>Vai trò</label><input id="member-role" placeholder="VD: Lái chính"></div></div><button class="btn btn-success admin-only admin-flex" onclick="addMember()" style="margin-bottom:12px">➕ Thêm Thành Viên</button><div class="table-container"><table><thead><tr><th>Họ Tên</th><th>SĐT</th><th>Vai Trò</th><th class="admin-col">Thao Tác</th></tr></thead><tbody id="member-list"></tbody></table></div></div></section>
+
+  <section id="v7-chat" class="v7-section"><div class="v7-card"><h3>💬 Trò Chuyện Online</h3><div class="chat-box"><div class="chat-messages" id="chat-messages"></div><div class="form-grid chat-form-grid" style="gap:6px"><input type="text" id="chat-user" placeholder="HỌ VÀ TÊN (IN HOA)" style="text-transform:uppercase"><input type="text" id="chat-text" placeholder="Nhập tin nhắn..." onkeypress="if(event.key==='Enter')sendChatMessage()"><button class="btn btn-success" onclick="sendChatMessage()">Gửi 📤</button></div></div></div></section>
+
+  <section id="v7-cost" class="v7-section">
+    <div class="v7-card"><h3>💰 Quản lý chi phí thực tế <span id="db-status" style="font-size:10px;color:#3182ce;font-weight:600">● Đang kết nối...</span></h3><div class="v7-admin-note">☁️ Dữ liệu chi phí được lưu riêng cho từng chuyến đi trong Firebase Firestore. Chỉ Quản trị viên mới được thêm, sửa hoặc xóa.</div><div class="v7-cost-summary"><div class="v7-cost-box"><b id="cost-total2">0 đ</b><span>Tổng cộng</span></div><div class="v7-cost-box"><b id="cost-count">0</b><span>Khoản chi</span></div><div class="v7-cost-box"><b id="cost-avg">0 đ</b><span>Bình quân/khoản</span></div><div class="v7-cost-box"><b id="cost-dayavg">0 đ</b><span>Bình quân/ngày</span></div></div><div id="cost-cats"></div></div>
+    <div class="v7-card"><div id="cost-admin-form" class="admin-only"><div class="form-grid"><div class="field"><label>Ngày</label><input type="date" id="exp-date"></div><div class="field"><label>Khoản mục</label><select id="exp-cat"></select></div><div class="field"><label>Nội dung</label><input id="exp-desc" placeholder="Nội dung khoản chi"></div><div class="field"><label>Số tiền</label><input id="exp-amount" inputmode="numeric" placeholder="VD: 1.500.000" oninput="formatMoneyInput(this)"></div><div class="field"><label>Người trả</label><input id="exp-payer" list="member-payer-list" placeholder="Chọn hoặc tự nhập"><datalist id="member-payer-list"></datalist></div></div><button class="btn btn-success" onclick="saveExpense()">💾 Lưu khoản chi</button></div><div class="table-container"><table><thead><tr><th>Ngày</th><th>Khoản mục</th><th>Nội dung</th><th>Người trả</th><th>Số tiền</th><th class="admin-col">Thao tác</th></tr></thead><tbody id="expense-list"></tbody></table></div></div>
+  </section>
+
+  <section id="v7-tools" class="v7-section">
+    <div class="v7-card"><h3>⚙️ Quản lý chuyến đi</h3><div class="v7-admin-note">Tạo, sửa, chọn và xóa chuyến đi. Mỗi chuyến có dữ liệu độc lập: điểm, lịch trình, thành viên, chat và chi phí.</div><button class="btn btn-success admin-only admin-flex" onclick="openTripManager()">🗂️ Mở quản lý chuyến đi</button></div>
+    <div class="v7-card"><h3>🔄 Chuyển dữ liệu V6 hiện tại</h3><div class="v7-admin-note">Công cụ này đọc dữ liệu cũ trong <span class="code">trip_data</span> và <span class="code">trip_expenses</span>, sau đó sao chép sang một chuyến mới. Dữ liệu cũ không bị xóa.</div><button class="btn btn-warning admin-only admin-flex" onclick="migrateLegacyData()">📦 Nhập chuyến Hè 2026 từ V6</button></div>
+    <div class="v7-card"><h3>🛡️ Kiểm tra hệ thống</h3><div id="system-status" class="v7-admin-note">Đang kiểm tra...</div></div>
+  </section>
+
+  <div id="admin-login-modal" class="v7-modal" onclick="if(event.target===this)closeAdminLogin()"><div class="v7-modal-box" style="max-width:420px"><div class="v7-modal-head"><b>🔐 Đăng nhập Quản trị</b><button class="v7-close" onclick="closeAdminLogin()">×</button></div><div class="field"><label>Email</label><input id="admin-login-email" type="email" autocomplete="username" placeholder="admin@example.com"></div><div class="field"><label>Mật khẩu</label><input id="admin-login-password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu"></div><div id="admin-login-error" class="danger-note" style="display:none;margin-top:8px"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn btn-dark" onclick="closeAdminLogin()">Hủy</button><button class="btn btn-success" onclick="loginAdmin()">Đăng nhập</button></div></div></div>
+
+  <div id="trip-manager-modal" class="v7-modal" onclick="if(event.target===this)closeTripManager()"><div class="v7-modal-box"><div class="v7-modal-head"><b>🗂️ Quản lý chuyến đi</b><button class="v7-close" onclick="closeTripManager()">×</button></div><div class="v7-admin-note">Mỗi chuyến đi là một hồ sơ độc lập trong Firestore. Bạn có thể mở chuyến để làm việc hoặc tạo chuyến mới.</div><div id="trip-manager-list" class="v7-trip-list"></div><hr style="margin:15px 0;border:0;border-top:1px solid #edf2f7"><h3 style="font-size:14px;color:#2b6cb0;margin-bottom:10px">➕ Tạo / sửa chuyến đi</h3><input type="hidden" id="trip-edit-id"><div class="two-col"><div class="field"><label>Tên chuyến đi *</label><input id="trip-name" placeholder="VD: Du lịch Tây Bắc 2027"></div><div class="field"><label>Mã / Drive folder (tùy chọn)</label><input id="trip-drive-url" placeholder="https://drive.google.com/..." value=""></div></div><div class="field"><label>Mô tả</label><textarea id="trip-description" placeholder="Mô tả ngắn về chuyến đi..."></textarea></div><div class="two-col"><div class="field"><label>Ngày đi *</label><input type="date" id="trip-start-date"></div><div class="field"><label>Ngày về *</label><input type="date" id="trip-end-date"></div></div><div class="switch-row"><input type="checkbox" id="trip-copy-legacy"><label for="trip-copy-legacy">Khi tạo chuyến đầu tiên, nhập luôn dữ liệu V6 cũ nếu có</label></div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-success" onclick="saveTrip()">💾 Lưu chuyến đi</button><button class="btn btn-light" onclick="resetTripForm()">Làm mới</button></div></div></div>
+
+  <div id="schedule-edit-modal" class="v7-modal" onclick="if(event.target===this)closeScheduleModal()"><div class="v7-modal-box" style="max-width:600px"><div class="v7-modal-head"><b>✏️ Sửa lịch trình</b><button class="v7-close" onclick="closeScheduleModal()">×</button></div><input type="hidden" id="schedule-edit-id"><div class="field"><label>Ngày</label><input type="date" id="schedule-date"></div><div class="field"><label>Tiêu đề</label><input id="schedule-title" placeholder="VD: Hà Nội → Thanh Hóa"></div><div class="field"><label>Nội dung chi tiết</label><textarea id="schedule-desc" placeholder="17:00: Xuất phát...\n22:00: Nhận phòng..."></textarea></div><button class="btn btn-success" onclick="saveSchedule()">💾 Lưu lịch trình</button></div></div>
+
+  <div id="expense-edit-modal" class="v7-modal"><div class="v7-modal-box" style="max-width:600px"><div class="v7-modal-head"><b>✏️ Sửa khoản chi</b><button class="v7-close" onclick="closeExpenseModal()">×</button></div><input type="hidden" id="edit-exp-id"><div class="form-grid"><div class="field"><label>Ngày</label><input type="date" id="edit-exp-date"></div><div class="field"><label>Khoản mục</label><select id="edit-exp-cat"></select></div><div class="field"><label>Nội dung</label><input id="edit-exp-desc"></div><div class="field"><label>Số tiền</label><input id="edit-exp-amount" inputmode="numeric" oninput="formatMoneyInput(this)"></div><div class="field"><label>Người trả</label><input id="edit-exp-payer" list="edit-member-payer-list"><datalist id="edit-member-payer-list"></datalist></div></div><button class="btn btn-success" onclick="updateExpense()">Cập nhật</button></div></div>
+
+  <div id="reorder-modal" class="v7-modal"><div class="v7-modal-box" style="max-width:600px"><div class="v7-modal-head"><b>↕️ Sắp xếp điểm</b><button class="v7-close" onclick="closeReorder()">×</button></div><div class="v7-admin-note">Dùng nút ↑ ↓ để đổi thứ tự. Sau khi lưu, số thứ tự và tuyến đường sẽ tự cập nhật.</div><div id="reorder-list"></div><button class="btn btn-success" style="margin-top:10px" onclick="saveReorder()">💾 Lưu thứ tự</button></div></div>
+</div>
+
+<script>
+/* =========================================================
+   AppDuLich V7 – Dynamic Trip Architecture
+   GitHub Pages frontend + Firebase Firestore backend
+   ========================================================= */
+const firebaseConfig={apiKey:"AIzaSyCnBeyTJa9ljNv9uajQOWJuHyYZp3Mwrt0",authDomain:"appdulich-d2203.firebaseapp.com",projectId:"appdulich-d2203",storageBucket:"appdulich-d2203.firebasestorage.app",messagingSenderId:"709157497489",appId:"1:709157497489:web:decfd9bb170a5eb931ed30",measurementId:"G-N7PRCXJG8E"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();const auth=firebase.auth();
+let currentUser=null,isAdminUser=false,currentTripId=localStorage.getItem('appdulich_current_trip')||null;
+let trips=[],points=[],members=[],schedule=[],messages=[],expenses=[];let map=null,routingControl=null,legBadgeMarkers=[],fallbackPolyline=null;let tripUnsubscribe=null;let unsubscribers=[];let routeRenderToken=0;let reorderBuffer=[];
+const EXPENSE_CATS=["Xăng","Lưu trú","Ăn uống","Vé tham quan","Quà lưu niệm","Vé đường bộ","Gửi xe"];
+const LEGACY_DEFAULT_POINTS=[
+{name:"Hateco Apollo (Xuân Phương)",lat:21.0477,lng:105.7344,desc:"Xuất phát: 17:00 ngày 28/08/2026"},
+{name:"TP Thanh Hoá",lat:19.8079,lng:105.7770,desc:"Nghỉ đêm 1 (22:00 ngày 28/08)"},
+{name:"TP Đồng Hới",lat:17.4661,lng:106.6192,desc:"Dừng ăn trưa ngày 29/08 & 01/09"},
+{name:"Phố cổ Hội An",lat:15.8806,lng:108.3307,desc:"Khám phá Hội An & Nghỉ đêm 2"},
+{name:"Thành phố Huế",lat:16.4759,lng:107.5891,desc:"Khám phá Huế & Nghỉ đêm 3, Đêm 4"},
+{name:"Vinpearl Hà Tĩnh",lat:18.5054,lng:105.8871,desc:"Nghỉ đêm 5 (Ngày 01/09)"},
+{name:"Hateco Apollo (Về đích)",lat:21.0477,lng:105.7344,desc:"Kết thúc hành trình (Ngày 02/09)"}];
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function money(n){return new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Number(n)||0)+' đ';}
+function parseMoney(v){if(typeof v==='number')return Math.round(v);const d=String(v??'').replace(/\D/g,'');return d?Number(d):0;}
+function formatMoneyInput(input){const n=parseMoney(input.value);input.value=n?new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(n):'';}
+function dateObj(s){const [y,m,d]=String(s||'').split('-').map(Number);return y&&m&&d?new Date(y,m-1,d):null;}
+function dateLabel(s,withWeekday=true){const d=dateObj(s);if(!d)return s||'';const days=['CHỦ NHẬT','THỨ 2','THỨ 3','THỨ 4','THỨ 5','THỨ 6','THỨ 7'];return withWeekday?`${days[d.getDay()]} - ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`:`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;}
+function durationDays(start,end){const a=dateObj(start),b=dateObj(end);return a&&b?Math.max(1,Math.round((b-a)/86400000)+1):0;}
+function nights(start,end){return Math.max(0,durationDays(start,end)-1);}
+function currentTrip(){return trips.find(t=>t.id===currentTripId)||null;}
+function tripRef(){if(!currentTripId)throw new Error('Chưa chọn chuyến đi');return db.collection('trips').doc(currentTripId);}
+function subRef(name){return tripRef().collection(name);}
+function tripTitle(t=currentTrip()){if(!t)return 'HÀNH TRÌNH DU LỊCH';return String(t.name||'HÀNH TRÌNH DU LỊCH').toUpperCase();}
+function routeNames(){return points.map(p=>p.name).filter(Boolean);}
+function routeSubtitle(){const t=currentTrip();if(!t)return 'Đang tải dữ liệu chuyến đi...';const d=durationDays(t.startDate,t.endDate),n=Math.max(0,d-1);const names=routeNames();const route=names.length?names.join(' – '):'Chưa khai báo điểm hành trình';return `${d} Ngày ${n} Đêm: ${route}`;}
+
+function clearListeners(){unsubscribers.forEach(fn=>{try{fn&&fn()}catch(e){}});unsubscribers=[];}
+function setStatus(text,color='#3182ce'){const el=document.getElementById('db-status');if(el){el.textContent='● '+text;el.style.color=color;}}
+
+function initMap(){try{if(!map){map=L.map('map').setView([18.5,106],6);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);}}catch(e){console.error(e)}}
+function clearMapExtras(){legBadgeMarkers.forEach(x=>{try{map.removeLayer(x)}catch(e){}});legBadgeMarkers=[];if(fallbackPolyline){try{map.removeLayer(fallbackPolyline)}catch(e){}fallbackPolyline=null;}}
+function haversineKm(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lng-a.lng)*Math.PI/180;const q=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))*1.25;}
+function renderRoadRouting(){if(!map)return;const token=++routeRenderToken;clearMapExtras();if(routingControl){try{map.removeControl(routingControl)}catch(e){}routingControl=null}if(points.length<2){renderPointsTable(points,null);if(points.length)map.setView([points[0].lat,points[0].lng],12);return}const waypoints=points.map(p=>L.latLng(Number(p.lat),Number(p.lng)));const same=points.length>1&&points[0].lat===points.at(-1).lat&&points[0].lng===points.at(-1).lng;routingControl=L.Routing.control({waypoints,router:L.Routing.osrmv1({serviceUrl:'https://router.project-osrm.org/route/v1',profile:'car'}),lineOptions:{styles:[{color:'#007bff',weight:4,opacity:.8}]},createMarker:function(i,wp){const p=points[i]||{};let shift='';if(same&&i===0)shift='transform:translateX(-16px);';if(same&&i===points.length-1)shift='transform:translateX(16px);';const bg=i===0?'#28a745':i===points.length-1?'#6f42c1':'#007bff';const icon=L.divIcon({className:'custom-div-icon',html:`<div style="background:${bg};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);${shift}" title="${i===0?'Xuất phát':i===points.length-1?'Về đích':'Điểm '+(i+1)}">${i+1}</div>`,iconSize:[32,32],iconAnchor:[16,16]});return L.marker(wp.latLng,{icon}).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.desc||'')}<br><small>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</small>`);},addWaypoints:false,routeWhileDragging:false}).addTo(map);routingControl.on('routesfound',e=>{if(token!==routeRenderToken)return;renderPointsTable(points,e.routes[0]);}).on('routingerror',e=>{console.warn('OSRM routing error',e);if(token!==routeRenderToken)return;fallbackPolyline=L.polyline(points.map(p=>[p.lat,p.lng]),{color:'#007bff',weight:3,dashArray:'5,8'}).addTo(map);renderPointsTable(points,null);});}
+function renderPointsTable(list,route){const tbody=document.getElementById('route-points-list');if(!tbody)return;clearMapExtras();let totalKm=0,totalMin=0;tbody.innerHTML='';list.forEach((p,i)=>{let legHtml='';if(i<list.length-1){let km=0,min=0,midLat=(Number(p.lat)+Number(list[i+1].lat))/2,midLng=(Number(p.lng)+Number(list[i+1].lng))/2;if(route&&route.legs&&route.legs[i]){const leg=route.legs[i];km=leg.summary.totalDistance/1000;min=Math.round(leg.summary.totalTime/60);if(leg.coordinates?.length){const c=leg.coordinates[Math.floor(leg.coordinates.length/2)];midLat=c.lat;midLng=c.lng;}}else{km=haversineKm(p,list[i+1]);min=Math.round(km/55*60);}totalKm+=km;totalMin+=min;const h=Math.floor(min/60),m=min%60,ts=h?`${h}g${m}p`:`${m}p`;legHtml=`<span style="color:#2b6cb0;font-weight:600">➔ Điểm ${i+2}: ${km.toFixed(1)} km (~${ts})</span>`;if(map){const badge=L.marker([midLat,midLng],{icon:L.divIcon({className:'leg-badge-icon',html:`<div style="background:#1a365d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;white-space:nowrap;border:1px solid white">➔ ${km.toFixed(1)} km</div>`,iconAnchor:[25,8]})}).addTo(map);legBadgeMarkers.push(badge)}}else{legHtml='<span style="color:#6f42c1;font-weight:600">🏁 Về đích</span>'}tbody.innerHTML+=`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td class="col-coord"><code>${esc(Number(p.lat).toFixed(6))}, ${esc(Number(p.lng).toFixed(6))}</code></td><td>${esc(p.desc||'-')}</td><td>${legHtml}</td><td class="admin-col"><button class="btn btn-danger" onclick="deletePoint('${esc(p.id||'')}')">Xóa</button></td></tr>`});const h=Math.floor(totalMin/60),m=totalMin%60;document.getElementById('total-distance').textContent=`${totalKm.toFixed(1)} km`;document.getElementById('total-time').textContent=`${h} giờ ${m} phút`;document.getElementById('v7-total-km').textContent=`${totalKm.toFixed(1)} km`;renderHome();renderRouteCopy();}
+
+function loadTrips(){if(tripUnsubscribe)try{tripUnsubscribe()}catch(e){};tripUnsubscribe=db.collection('trips').orderBy('startDate','desc').onSnapshot(snap=>{trips=snap.docs.map(d=>({id:d.id,...d.data()}));if(!trips.length){clearListeners();points=[];members=[];schedule=[];messages=[];expenses=[];renderTripSelector();if(v7IsAdmin())setStatus('Chưa có chuyến – hãy tạo chuyến đầu tiên','#ed8936');return}if(!currentTripId||!trips.some(t=>t.id===currentTripId)){currentTripId=trips[0].id;localStorage.setItem('appdulich_current_trip',currentTripId)}renderTripSelector();loadCurrentTripData();},err=>{console.error(err);setStatus('Lỗi đọc danh sách chuyến đi','#c53030')});return tripUnsubscribe;}
+function renderTripSelector(){const sel=document.getElementById('trip-selector');if(!sel)return;sel.innerHTML=trips.length?trips.map(t=>`<option value="${esc(t.id)}" ${t.id===currentTripId?'selected':''}>${esc(t.name)} · ${dateLabel(t.startDate,false)} → ${dateLabel(t.endDate,false)}</option>`).join(''):'<option value="">Chưa có chuyến đi</option>';const t=currentTrip();document.getElementById('trip-meta').innerHTML=t?`<b>${esc(t.description||'Chưa có mô tả')}</b><br><span class="muted">${dateLabel(t.startDate)} → ${dateLabel(t.endDate)} · ${durationDays(t.startDate,t.endDate)} ngày ${nights(t.startDate,t.endDate)} đêm · ID: <span class="code">${esc(t.id)}</span></span>`:'Chưa có chuyến đi.';document.getElementById('app-title').textContent=tripTitle(t);document.getElementById('app-subtitle').textContent=routeSubtitle();document.getElementById('hero-title').textContent='🌄 '+(t?.name||'Hành trình');document.getElementById('hero-desc').textContent=t?`${dateLabel(t.startDate,false)} → ${dateLabel(t.endDate,false)} · ${durationDays(t.startDate,t.endDate)} ngày ${nights(t.startDate,t.endDate)} đêm\n${routeNames().join(' → ')||'Chưa có điểm hành trình'}`:'Đang tải...';if(t?.driveUrl){document.getElementById('drive-upload-link').href=t.driveUrl;document.getElementById('drive-view-link').href=t.driveUrl;}}
+function switchTrip(id){if(!id||id===currentTripId)return;currentTripId=id;localStorage.setItem('appdulich_current_trip',id);loadCurrentTripData();document.querySelector('.v7-nav button')?.click();}
+function loadCurrentTripData(){clearListeners();const t=currentTrip();if(!t)return;renderTripSelector();setStatus('Đang đồng bộ...','#3182ce');const pUn=subRef('points').orderBy('order','asc').onSnapshot(s=>{points=s.docs.map(d=>({id:d.id,...d.data()}));renderPointsTable(points,null);renderRoadRouting();renderTripSelector();},e=>console.error(e));const mUn=subRef('members').orderBy('name','asc').onSnapshot(s=>{members=s.docs.map(d=>({id:d.id,...d.data()}));renderMembers();renderHome();refreshPayerLists();});const sUn=subRef('schedule').orderBy('date','asc').onSnapshot(s=>{schedule=s.docs.map(d=>({id:d.id,...d.data()}));renderSchedule();renderHome();});const cUn=subRef('chat').orderBy('createdAt','asc').limit(500).onSnapshot(s=>{messages=s.docs.map(d=>({id:d.id,...d.data()}));if(!messages.length)messages=[{id:'system',user:'HỆ THỐNG',text:`Chào mừng cả đoàn đến với kênh trao đổi ${t.name||'chuyến đi'}!`,dateTime:''}];renderChatMessages();});const eUn=subRef('expenses').orderBy('date','asc').onSnapshot(s=>{expenses=s.docs.map(d=>({id:d.id,...d.data()}));renderExpenses();renderHome();setStatus('Firebase · Đã đồng bộ','#2f855a');},e=>{console.error(e);setStatus('Firebase · Lỗi đồng bộ','#c53030')});unsubscribers=[pUn,mUn,sUn,cUn,eUn];}
+
+async function addCustomPoint(){if(!v7RequireAdmin())return;const name=document.getElementById('point-name').value.trim(),desc=document.getElementById('point-desc').value.trim(),lat=parseFloat(document.getElementById('point-lat').value),lng=parseFloat(document.getElementById('point-lng').value);if(!name||!Number.isFinite(lat)||!Number.isFinite(lng))return alert('Vui lòng nhập Tên điểm, Vĩ độ và Kinh độ!');if(lat<-90||lat>90||lng<-180||lng>180)return alert('Tọa độ không hợp lệ.');const order=points.length;await subRef('points').add({name,desc,lat,lng,order,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});['point-name','point-desc','point-lat','point-lng'].forEach(id=>document.getElementById(id).value='');}
+async function deletePoint(id){if(!v7RequireAdmin())return;if(points.length<=2)return alert('Lộ trình cần ít nhất 2 điểm!');const p=points.find(x=>x.id===id);if(!p)return;if(!confirm(`Xóa điểm "${p.name}"?`))return;await subRef('points').doc(id).delete();const remain=points.filter(x=>x.id!==id);const batch=db.batch();remain.forEach((x,i)=>batch.update(subRef('points').doc(x.id),{order:i,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit();}
+function openReorderPoints(){if(!v7RequireAdmin())return;reorderBuffer=points.map(x=>({...x}));renderReorder();document.getElementById('reorder-modal').classList.add('show')}
+function renderReorder(){const box=document.getElementById('reorder-list');box.innerHTML=reorderBuffer.map((p,i)=>`<div style="display:flex;align-items:center;gap:7px;border:1px solid #e2e8f0;border-radius:8px;padding:8px;margin-bottom:6px"><b style="width:24px">${i+1}</b><div style="flex:1"><b>${esc(p.name)}</b><div class="muted">${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</div></div><button class="v7-mini v7-edit" onclick="moveReorder(${i},-1)">↑</button><button class="v7-mini v7-edit" onclick="moveReorder(${i},1)">↓</button></div>`).join('')||'<div class="v7-empty">Chưa có điểm.</div>'}
+function moveReorder(i,delta){const j=i+delta;if(j<0||j>=reorderBuffer.length)return;[reorderBuffer[i],reorderBuffer[j]]=[reorderBuffer[j],reorderBuffer[i]];renderReorder()}
+async function saveReorder(){if(!v7RequireAdmin())return;const batch=db.batch();reorderBuffer.forEach((p,i)=>batch.update(subRef('points').doc(p.id),{order:i,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit();closeReorder()}
+function closeReorder(){document.getElementById('reorder-modal').classList.remove('show')}
+
+function renderMembers(){const tbody=document.getElementById('member-list');if(!tbody)return;tbody.innerHTML=members.length?members.map(m=>`<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.phone||'')}</td><td>${esc(m.role||'Thành viên')}</td><td class="admin-col"><button class="btn btn-danger" onclick="deleteMember('${esc(m.id)}')">Xóa</button></td></tr>`).join(''):'<tr><td colspan="4"><div class="v7-empty">Chưa có thành viên.</div></td></tr>';document.getElementById('v7-member-count').textContent=members.length;refreshPayerLists()}
+async function addMember(){if(!v7RequireAdmin())return;const name=document.getElementById('member-name').value.trim(),phone=document.getElementById('member-phone').value.trim(),role=document.getElementById('member-role').value.trim()||'Thành viên';if(!name)return alert('Vui lòng nhập họ tên!');await subRef('members').add({name,phone,role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});['member-name','member-phone','member-role'].forEach(id=>document.getElementById(id).value='')}
+async function deleteMember(id){if(!v7RequireAdmin())return;const m=members.find(x=>x.id===id);if(confirm(`Xóa thành viên "${m?.name||''}"?`))await subRef('members').doc(id).delete()}
+function refreshPayerLists(){const html=members.map(m=>`<option value="${esc(m.name)}"></option>`).join('');document.getElementById('member-payer-list').innerHTML=html;document.getElementById('edit-member-payer-list').innerHTML=html}
+
+function renderChatMessages(){const box=document.getElementById('chat-messages'),my=(localStorage.getItem('chat_my_name')||'').toUpperCase();box.innerHTML=messages.map(m=>{const u=(m.user||'').toUpperCase(),type=u==='HỆ THỐNG'?'system':(my&&u===my?'mine':'other');return `<div class="chat-msg ${type}"><div class="msg-info"><b>${esc(m.user)}</b>${m.dateTime?' • '+esc(m.dateTime):''}</div><div class="bubble">${esc(m.text)}</div></div>`}).join('');box.scrollTop=box.scrollHeight}
+async function sendChatMessage(){if(!currentTripId)return alert('Chưa có chuyến đi.');const user=document.getElementById('chat-user').value.trim().toUpperCase(),text=document.getElementById('chat-text').value.trim();if(!user)return alert('Vui lòng nhập Họ tên!');if(!text)return alert('Vui lòng nhập nội dung!');localStorage.setItem('chat_my_name',user);const now=new Date(),dateTime=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;await subRef('chat').add({user,text,dateTime,createdAt:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('chat-text').value=''}
+
+function defaultScheduleForTrip(t,pts=points){const d=durationDays(t.startDate,t.endDate);const arr=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()).padStart(2,'0')}`;let title='';if(pts[i])title=pts[i].name; if(pts[i]&&pts[i+1])title=`${pts[i].name} → ${pts[i+1].name}`;arr.push({date,title,description:''})}return arr}
+function renderSchedule(){const box=document.getElementById('schedule-list');if(!box)return;const t=currentTrip();if(!t){box.innerHTML='<div class="v7-empty">Chưa có chuyến đi.</div>';return}const d=durationDays(t.startDate,t.endDate),rows=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()).padStart(2,'0')}`,s=schedule.find(x=>x.date===date)||{};rows.push(`<div class="v7-day"><b>NGÀY ${i+1} · ${dateLabel(date)}</b><p><strong>${esc(s.title||'Chưa khai báo tiêu đề')}</strong></p><p>${esc(s.description||'Chưa có nội dung chi tiết.')}</p>${v7IsAdmin()?`<div style="margin-top:6px"><button class="v7-mini v7-edit" onclick="openScheduleEdit('${esc(s.id||'')}', '${date}')">✏️ Sửa</button>${s.id?` <button class="v7-mini v7-del" onclick="deleteSchedule('${esc(s.id)}')">Xóa</button>`:''}</div>`:''}</div>`)}box.innerHTML=rows.join('')}
+function openScheduleEdit(id,date){if(!v7RequireAdmin())return;const s=schedule.find(x=>x.id===id)||{date};document.getElementById('schedule-edit-id').value=id||'';document.getElementById('schedule-date').value=s.date||date;document.getElementById('schedule-title').value=s.title||'';document.getElementById('schedule-desc').value=s.description||'';document.getElementById('schedule-edit-modal').classList.add('show')}
+function closeScheduleModal(){document.getElementById('schedule-edit-modal').classList.remove('show')}
+async function saveSchedule(){if(!v7RequireAdmin())return;const id=document.getElementById('schedule-edit-id').value,date=document.getElementById('schedule-date').value,title=document.getElementById('schedule-title').value.trim(),description=document.getElementById('schedule-desc').value.trim();if(!date)return alert('Vui lòng chọn ngày.');const data={date,title,description,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};if(id)await subRef('schedule').doc(id).update(data);else await subRef('schedule').add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()});closeScheduleModal()}
+async function deleteSchedule(id){if(!v7RequireAdmin()||!confirm('Xóa nội dung lịch trình ngày này?'))return;await subRef('schedule').doc(id).delete()}
+
+function populateCats(){['exp-cat','edit-exp-cat'].forEach(id=>{const s=document.getElementById(id);if(s)s.innerHTML=EXPENSE_CATS.map(x=>`<option>${x}</option>`).join('')})}
+function renderExpenses(){const total=expenses.reduce((s,x)=>s+Number(x.amount||0),0);document.getElementById('v7-cost-total').textContent=money(total);document.getElementById('cost-total2').textContent=money(total);document.getElementById('cost-count').textContent=expenses.length;document.getElementById('cost-avg').textContent=money(expenses.length?total/expenses.length:0);document.getElementById('cost-dayavg').textContent=money(total/(durationDays(currentTrip()?.startDate,currentTrip()?.endDate)||1));const by={};EXPENSE_CATS.forEach(c=>by[c]=0);expenses.forEach(x=>{if(by[x.category]!=null)by[x.category]+=Number(x.amount||0)});const max=Math.max(...Object.values(by),1);document.getElementById('cost-cats').innerHTML=EXPENSE_CATS.map(c=>`<div class="v7-cat-row"><div style="min-width:105px"><b>${esc(c)}</b><div class="v7-bar"><i style="width:${by[c]/max*100}%"></i></div></div><b>${money(by[c])}</b></div>`).join('');const tbody=document.getElementById('expense-list');tbody.innerHTML=expenses.length?expenses.map(x=>`<tr><td>${esc(x.date||'')}</td><td><b>${esc(x.category||'')}</b></td><td>${esc(x.description||'')}</td><td>${esc(x.payer||'')}</td><td><b>${money(x.amount)}</b></td><td class="admin-col"><div class="v7-actions"><button class="v7-mini v7-edit" onclick="openExpenseEdit('${esc(x.id)}')">Sửa</button><button class="v7-mini v7-del" onclick="deleteExpense('${esc(x.id)}')">Xóa</button></div></td></tr>`).join(''):'<tr><td colspan="6"><div class="v7-empty">Chưa có khoản chi.</div></td></tr>'}
+async function saveExpense(){if(!v7RequireAdmin())return;const date=document.getElementById('exp-date').value,category=document.getElementById('exp-cat').value,description=document.getElementById('exp-desc').value.trim(),amount=parseMoney(document.getElementById('exp-amount').value),payer=document.getElementById('exp-payer').value.trim();if(!date||!category||!description||amount<=0||!payer)return alert('Vui lòng nhập đầy đủ ngày, khoản mục, nội dung, số tiền và người trả.');await subRef('expenses').add({date,category,description,amount,payer,isDemo:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});['exp-desc','exp-amount','exp-payer'].forEach(id=>document.getElementById(id).value='');alert('Đã lưu khoản chi vào Firebase.')}
+function openExpenseEdit(id){if(!v7RequireAdmin())return;const x=expenses.find(e=>e.id===id);if(!x)return;document.getElementById('edit-exp-id').value=id;document.getElementById('edit-exp-date').value=x.date||'';document.getElementById('edit-exp-cat').value=x.category||EXPENSE_CATS[0];document.getElementById('edit-exp-desc').value=x.description||'';document.getElementById('edit-exp-amount').value=x.amount||'';document.getElementById('edit-exp-payer').value=x.payer||'';document.getElementById('expense-edit-modal').classList.add('show')}
+function closeExpenseModal(){document.getElementById('expense-edit-modal').classList.remove('show')}
+async function updateExpense(){if(!v7RequireAdmin())return;const id=document.getElementById('edit-exp-id').value,data={date:document.getElementById('edit-exp-date').value,category:document.getElementById('edit-exp-cat').value,description:document.getElementById('edit-exp-desc').value.trim(),amount:parseMoney(document.getElementById('edit-exp-amount').value),payer:document.getElementById('edit-exp-payer').value.trim(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};if(!data.date||!data.description||data.amount<=0||!data.payer)return alert('Vui lòng nhập đầy đủ thông tin.');await subRef('expenses').doc(id).update(data);closeExpenseModal()}
+async function deleteExpense(id){if(!v7RequireAdmin()||!confirm('Xóa khoản chi này khỏi database?'))return;await subRef('expenses').doc(id).delete()}
+
+function renderHome(){const t=currentTrip();if(!t)return;document.getElementById('v7-days').textContent=`${durationDays(t.startDate,t.endDate)} ngày`;document.getElementById('v7-member-count').textContent=members.length;const box=document.getElementById('home-summary');const d=durationDays(t.startDate,t.endDate);const items=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()+1-1).padStart(2,'0')}`;const s=schedule.find(x=>x.date===date)||{};items.push(`<div class="v7-day"><b>NGÀY ${i+1} · ${dateLabel(date,false)}</b><p>${esc(s.title||'Chưa khai báo lịch trình')}</p><p>${esc(s.description||'')}</p></div>`)}box.innerHTML=items.join('')||'<div class="v7-empty">Chưa có dữ liệu.</div>';}
+function renderRouteCopy(){const target=document.getElementById('v7-route-copy');if(!target)return;target.innerHTML=points.length?`<div class="v7-admin-note">${points.length} điểm · ${esc(routeNames().join(' → '))}</div><div class="table-container"><table><thead><tr><th>STT</th><th>Điểm</th><th>Tọa độ</th><th>Mô tả</th></tr></thead><tbody>${points.map((p,i)=>`<tr><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</td><td>${esc(p.desc||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="v7-empty">Chưa có điểm.</div>'}
+function v7Show(name,btn){document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));const sec=document.getElementById('v7-'+name);if(sec)sec.classList.add('active');document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(name==='route')renderRouteCopy();if(name==='schedule')renderSchedule();if(name==='members')renderMembers();if(name==='cost')renderExpenses();}
+
+async function openTripManager(){if(!v7RequireAdmin())return;renderTripManager();document.getElementById('trip-manager-modal').classList.add('show')}
+function closeTripManager(){document.getElementById('trip-manager-modal').classList.remove('show')}
+function renderTripManager(){const box=document.getElementById('trip-manager-list');box.innerHTML=trips.length?trips.map(t=>`<div class="v7-trip-item ${t.id===currentTripId?'active':''}"><div class="v7-trip-info"><b>${esc(t.name)}</b><span>${dateLabel(t.startDate,false)} → ${dateLabel(t.endDate,false)} · ${durationDays(t.startDate,t.endDate)} ngày ${nights(t.startDate,t.endDate)} đêm</span></div><div class="v7-trip-actions"><button class="v7-mini v7-edit" onclick="selectTripFromManager('${esc(t.id)}')">Mở</button><button class="v7-mini v7-edit" onclick="editTrip('${esc(t.id)}')">Sửa</button><button class="v7-mini v7-del" onclick="deleteTrip('${esc(t.id)}')">Xóa</button></div></div>`).join(''):'<div class="v7-empty">Chưa có chuyến đi.</div>'}
+function selectTripFromManager(id){currentTripId=id;localStorage.setItem('appdulich_current_trip',id);loadCurrentTripData();renderTripManager();closeTripManager()}
+function resetTripForm(){['trip-edit-id','trip-name','trip-drive-url','trip-description','trip-start-date','trip-end-date'].forEach(id=>document.getElementById(id).value='');document.getElementById('trip-copy-legacy').checked=false}
+function editTrip(id){const t=trips.find(x=>x.id===id);if(!t)return;document.getElementById('trip-edit-id').value=id;document.getElementById('trip-name').value=t.name||'';document.getElementById('trip-drive-url').value=t.driveUrl||'';document.getElementById('trip-description').value=t.description||'';document.getElementById('trip-start-date').value=t.startDate||'';document.getElementById('trip-end-date').value=t.endDate||'';document.getElementById('trip-copy-legacy').checked=false;}
+async function saveTrip(){if(!v7RequireAdmin())return;const id=document.getElementById('trip-edit-id').value,name=document.getElementById('trip-name').value.trim(),description=document.getElementById('trip-description').value.trim(),startDate=document.getElementById('trip-start-date').value,endDate=document.getElementById('trip-end-date').value,driveUrl=document.getElementById('trip-drive-url').value.trim();if(!name||!startDate||!endDate)return alert('Vui lòng nhập Tên chuyến, Ngày đi và Ngày về.');if(endDate<startDate)return alert('Ngày về không được trước ngày đi.');const data={name,description,startDate,endDate,driveUrl,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};let newId=id;if(id){await db.collection('trips').doc(id).update(data)}else{const copyLegacy=document.getElementById('trip-copy-legacy').checked;const ref=await db.collection('trips').add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});newId=ref.id;currentTripId=newId;localStorage.setItem('appdulich_current_trip',newId);if(copyLegacy)await importLegacyIntoTrip(newId,data);else await seedSchedule(newId,data)}closeTripManager();alert(id?'Đã cập nhật chuyến đi.':'Đã tạo chuyến đi mới.');}
+async function seedSchedule(tripId,t){const pts=[];const snap=await db.collection('trips').doc(tripId).collection('points').orderBy('order','asc').get();snap.forEach(d=>pts.push(d.data()));const arr=defaultScheduleForTrip(t,pts);const batch=db.batch();arr.forEach(x=>batch.set(db.collection('trips').doc(tripId).collection('schedule').doc(),{...x,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit()}
+async function deleteTrip(id){if(!v7RequireAdmin())return;const t=trips.find(x=>x.id===id);if(!t)return;if(trips.length<=1)return alert('Không thể xóa chuyến cuối cùng. Hãy tạo chuyến khác trước.');if(!confirm(`Xóa chuyến "${t.name}" và toàn bộ dữ liệu con?\nThao tác này không thể hoàn tác.`))return;const names=['points','members','schedule','chat','expenses'];for(const name of names){const snap=await db.collection('trips').doc(id).collection(name).get();let batch=db.batch(),count=0;for(const d of snap.docs){batch.delete(d.ref);count++;if(count===450){await batch.commit();batch=db.batch();count=0}}if(count)await batch.commit()}await db.collection('trips').doc(id).delete();if(currentTripId===id){const other=trips.find(x=>x.id!==id);currentTripId=other?.id||null;if(currentTripId)localStorage.setItem('appdulich_current_trip',currentTripId)}}
+
+async function migrateLegacyData(){if(!v7RequireAdmin())return;const exists=trips.some(t=>t.legacyMigrated===true);if(exists&&!confirm('Đã có một chuyến được đánh dấu nhập V6. Bạn vẫn muốn tạo một bản nhập mới?'))return;const name='HÀNH TRÌNH DU LỊCH HÈ 2026';const startDate='2026-08-28',endDate='2026-09-02';const ref=await db.collection('trips').add({name,description:'Hà Nội – Thanh Hóa – Đồng Hới – Hội An – Huế – Hà Tĩnh – Hà Nội',startDate,endDate,legacyMigrated:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});const trip=ref;const oldPoints=await db.collection('trip_data').doc('points').get();let oldPts=oldPoints.exists&&oldPoints.data().list?oldPoints.data().list:LEGACY_DEFAULT_POINTS;const batch=db.batch();oldPts.forEach((p,i)=>batch.set(trip.collection('points').doc(),{name:String(p.name||'').replace(/^\d+\.\s*/,''),lat:Number(p.lat),lng:Number(p.lng),desc:p.desc||'',order:i,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await batch.commit();const oldMembers=await db.collection('trip_data').doc('members').get();const ml=oldMembers.exists&&oldMembers.data().list?oldMembers.data().list:[{name:'Nguyễn Tiến Duẩn',phone:'098x xxx xxx',role:'Trưởng đoàn / Lái chính'}];let b=db.batch();ml.forEach(m=>b.set(trip.collection('members').doc(),{name:m.name||'',phone:m.phone||'',role:m.role||'Thành viên',createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldChat=await db.collection('trip_data').doc('chat').get();const cl=oldChat.exists&&oldChat.data().list?oldChat.data().list:[];b=db.batch();cl.forEach(m=>b.set(trip.collection('chat').doc(),{user:m.user||'HỆ THỐNG',text:m.text||'',dateTime:m.dateTime||'',createdAt:firebase.firestore.Timestamp.now()}));await b.commit();const oldExp=await db.collection('trip_expenses').get();b=db.batch();let n=0;for(const d of oldExp.docs){b.set(trip.collection('expenses').doc(),{...d.data(),migratedFrom:'trip_expenses'});n++;if(n===450){await b.commit();b=db.batch();n=0}}if(n)await b.commit();await seedSchedule(ref.id,{startDate,endDate});currentTripId=ref.id;localStorage.setItem('appdulich_current_trip',ref.id);alert(`Đã nhập dữ liệu V6 sang chuyến mới.\nĐiểm: ${oldPts.length}\nThành viên: ${ml.length}\nChat: ${cl.length}\nChi phí: ${oldExp.size}`);}
+async function importLegacyIntoTrip(tripId,t){const trip=db.collection('trips').doc(tripId);const oldPoints=await db.collection('trip_data').doc('points').get();const pts=oldPoints.exists&&oldPoints.data().list?oldPoints.data().list:[];let b=db.batch();pts.forEach((p,i)=>b.set(trip.collection('points').doc(),{name:String(p.name||'').replace(/^\d+\.\s*/,''),lat:Number(p.lat),lng:Number(p.lng),desc:p.desc||'',order:i,createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldMembers=await db.collection('trip_data').doc('members').get();const ml=oldMembers.exists&&oldMembers.data().list?oldMembers.data().list:[];b=db.batch();ml.forEach(m=>b.set(trip.collection('members').doc(),{name:m.name||'',phone:m.phone||'',role:m.role||'Thành viên',createdAt:firebase.firestore.FieldValue.serverTimestamp()}));await b.commit();const oldChat=await db.collection('trip_data').doc('chat').get();const cl=oldChat.exists&&oldChat.data().list?oldChat.data().list:[];b=db.batch();cl.forEach(m=>b.set(trip.collection('chat').doc(),{user:m.user||'HỆ THỐNG',text:m.text||'',dateTime:m.dateTime||'',createdAt:firebase.firestore.Timestamp.now()}));await b.commit();const oldExp=await db.collection('trip_expenses').get();b=db.batch();let n=0;for(const d of oldExp.docs){b.set(trip.collection('expenses').doc(),{...d.data(),migratedFrom:'trip_expenses'});n++;if(n===450){await b.commit();b=db.batch();n=0}}if(n)await b.commit();await seedSchedule(tripId,t)}
+
+async function loadAdminRole(user){currentUser=user||null;isAdminUser=false;if(user&&!user.isAnonymous){try{const s=await db.collection('admin_users').doc(user.uid).get();isAdminUser=s.exists&&s.data().role==='admin'}catch(e){console.error(e)}}checkAdminStatus()}
+function v7IsAdmin(){return!!(currentUser&&!currentUser.isAnonymous&&isAdminUser)}
+function v7RequireAdmin(){if(!v7IsAdmin()){alert('Bạn đang ở chế độ Thành viên. Vui lòng đăng nhập Quản trị để thực hiện thao tác này.');return false}return true}
+function checkAdminStatus(){const a=v7IsAdmin();document.body.classList.toggle('is-admin',a);const role=document.getElementById('role-display'),login=document.getElementById('btn-login-admin'),email=document.getElementById('admin-email-display'),logout=document.getElementById('btn-logout-admin'),badge=document.getElementById('v7-role-badge');if(a){role.className='badge-role role-admin';role.textContent='Quản Trị Viên';login.style.display='none';email.style.display='inline-flex';email.textContent=currentUser.email||'';logout.style.display='inline-flex';if(badge){badge.className='badge-role role-admin';badge.textContent='QUẢN TRỊ VIÊN'}}else{role.className='badge-role role-user';role.textContent=currentUser&&!currentUser.isAnonymous?'Đã đăng nhập · Chỉ xem':'Thành Viên (Chỉ Xem)';login.style.display='inline-block';email.style.display='none';logout.style.display='none';if(badge){badge.className='badge-role role-user';badge.textContent='THÀNH VIÊN'}}}
+function openAdminLogin(){document.getElementById('admin-login-modal').classList.add('show');document.getElementById('admin-login-error').style.display='none';document.getElementById('admin-login-email').focus()}
+function closeAdminLogin(){document.getElementById('admin-login-modal').classList.remove('show')}
+async function loginAdmin(){const email=document.getElementById('admin-login-email').value.trim(),password=document.getElementById('admin-login-password').value,error=document.getElementById('admin-login-error');if(!email||!password){error.textContent='Vui lòng nhập đầy đủ email và mật khẩu.';error.style.display='block';return}try{const cred=await auth.signInWithEmailAndPassword(email,password);await loadAdminRole(cred.user);if(!isAdminUser){const uid=cred.user.uid;await auth.signOut();await auth.signInAnonymously().catch(()=>{});error.innerHTML=`Firebase đăng nhập thành công nhưng tài khoản này chưa có quyền Admin.<br>UID: <code>${esc(uid)}</code><br>Firestore: <code>admin_users/${esc(uid)}</code> phải có <code>role: "admin"</code>.`;error.style.display='block';return}document.getElementById('admin-login-password').value='';closeAdminLogin();alert('Đăng nhập quản trị thành công!')}catch(e){console.error(e);const friendly={'auth/invalid-credential':'Thông tin đăng nhập không hợp lệ.','auth/wrong-password':'Mật khẩu không đúng.','auth/user-not-found':'Không tìm thấy tài khoản.','auth/invalid-email':'Email không đúng định dạng.','auth/user-disabled':'Tài khoản đang bị vô hiệu hóa.','auth/operation-not-allowed':'Email/Password chưa được bật trong Firebase Authentication.','auth/too-many-requests':'Có quá nhiều lần thử. Hãy chờ rồi thử lại.','auth/network-request-failed':'Không kết nối được Firebase.','auth/unauthorized-domain':'Domain website chưa được thêm vào Authorized domains.'};error.innerHTML=`<b>❌ Đăng nhập thất bại</b><br>Mã lỗi: <code>${esc(e.code||'unknown')}</code><br>${esc(friendly[e.code]||e.message||'Lỗi không xác định')}`;error.style.display='block'}}
+async function logoutAdmin(){try{await auth.signOut();await auth.signInAnonymously()}catch(e){alert('Không thể đăng xuất: '+e.message)}}
+async function changeAdminPassword(){if(!v7IsAdmin()||!currentUser.email)return;try{await auth.sendPasswordResetEmail(currentUser.email);alert('Đã gửi email đặt lại mật khẩu tới '+currentUser.email+'.')}catch(e){alert('Không thể gửi email: '+e.message)}}
+
+function systemCheck(){const box=document.getElementById('system-status');const t=currentTrip();box.innerHTML=`<span class="status-dot"></span>Firebase project: <b>${esc(firebaseConfig.projectId)}</b><br>Trip đang mở: <b>${esc(t?.name||'Chưa có')}</b><br>Trip ID: <span class="code">${esc(currentTripId||'')}</span><br>Điểm: ${points.length} · Thành viên: ${members.length} · Lịch trình: ${schedule.length} · Chat: ${messages.length} · Chi phí: ${expenses.length}`}
+
+document.addEventListener('DOMContentLoaded',()=>{initMap();populateCats();const saved=localStorage.getItem('chat_my_name');if(saved)document.getElementById('chat-user').value=saved;document.getElementById('chat-user').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();localStorage.setItem('chat_my_name',e.target.value.trim())});document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);auth.onAuthStateChanged(async user=>{await loadAdminRole(user)});if(!auth.currentUser)auth.signInAnonymously().catch(e=>console.error('Anonymous Auth:',e));loadTrips();setTimeout(systemCheck,1500)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
+</script>
 </body>
 </html>
