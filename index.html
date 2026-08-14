@@ -14,7 +14,8 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 body{background:#f4f6f8;padding:8px;color:#333;-webkit-tap-highlight-color:transparent}
-
+.app-logo-bar{position:fixed;top:0;left:0;right:0;width:100%;height:126px;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.98);border-bottom:1px solid #e2e8f0;box-shadow:0 3px 14px rgba(15,23,42,.10);padding:7px 16px;overflow:hidden;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.app-logo-bar img{display:block;width:auto;height:108px;max-width:min(92vw,260px);object-fit:contain;object-position:center;flex:0 0 auto}
 body{padding-top:141px}
 .container{max-width:1050px;margin:0 auto;background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
 .header{text-align:center;margin-bottom:16px;border-bottom:2px solid #007bff;padding-bottom:12px}.header h1{color:#1a365d;font-size:20px;margin-bottom:6px;line-height:1.3}.header p{color:#4a5568;font-size:13px;font-weight:500;line-height:1.5}
@@ -31,7 +32,7 @@ body{padding-top:141px}
 .chat-box{background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.chat-messages{height:260px;overflow-y:auto;background:#fff;border:1px solid #cbd5e0;border-radius:6px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}.chat-msg{display:flex;flex-direction:column;max-width:75%}.chat-msg.mine{align-self:flex-end;align-items:flex-end}.chat-msg.other{align-self:flex-start;align-items:flex-start}.chat-msg.system{align-self:center;align-items:center;max-width:90%;width:100%}.chat-msg .msg-info{font-size:10px;color:#a0aec0;margin-bottom:2px}.chat-msg.mine .msg-info{text-align:right}.chat-msg .bubble{padding:8px 12px;border-radius:12px;font-size:13px;word-break:break-word;line-height:1.4}.chat-msg.mine .bubble{background:#007bff;color:#fff;border-top-right-radius:2px}.chat-msg.other .bubble{background:#edf2f7;color:#2d3748;border-top-left-radius:2px}.chat-msg.system .bubble{background:#e2e8f0;color:#4a5568;font-style:italic;text-align:center;border-radius:6px;font-size:12px}
 .v7-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 15px;position:sticky;top:133px;z-index:20}.v7-nav button{border:1px solid #dbe5ef;background:#fff;color:#334e68;border-radius:10px;padding:10px 6px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.04)}.v7-nav button.active{background:#1f6feb;color:#fff;border-color:#1f6feb}.v7-section{display:none}.v7-section.active{display:block}.v7-hero{background:linear-gradient(135deg,#eaf4ff,#f7fbff);border:1px solid #cfe3f7;border-radius:14px;padding:15px;margin-bottom:15px}.v7-hero-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.v7-hero h2{font-size:20px;color:#163a5f;margin:0 0 5px}.v7-hero p{font-size:12px;color:#52677d;line-height:1.5}.v7-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.v7-pill{background:#fff;border:1px solid #d8e6f2;border-radius:10px;padding:9px;text-align:center}.v7-pill b{display:block;font-size:16px;color:#1f4e79}.v7-pill span{font-size:10px;color:#718096}.v7-admin-note{font-size:11px;color:#718096;background:#f8fafc;padding:8px;border-radius:8px;margin-bottom:10px;line-height:1.5}.v7-day{border-left:3px solid #3182ce;padding:9px 10px;margin-bottom:9px;background:#f8fbff;border-radius:0 8px 8px 0}.v7-day b{color:#24557b;font-size:13px}.v7-day p{font-size:11px;color:#52677d;line-height:1.5;margin-top:3px;white-space:pre-line}.v7-cost-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}.v7-cost-box{background:#f8fbff;border:1px solid #d9e8f5;border-radius:9px;padding:9px;text-align:center}.v7-cost-box b{display:block;color:#1f4e79;font-size:15px}.v7-cost-box span{font-size:10px;color:#718096}.v7-cat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf2f7;font-size:12px}.v7-cat-row:last-child{border-bottom:0}.v7-bar{height:7px;background:#edf2f7;border-radius:10px;overflow:hidden;margin:4px 0}.v7-bar i{display:block;height:100%;background:#3182ce;border-radius:10px}.v7-actions{display:flex;gap:5px;flex-wrap:wrap}.v7-mini{padding:5px 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}.v7-edit{background:#fff3cd;color:#8a5a00}.v7-del{background:#ffe3e3;color:#b42318}.v7-empty{padding:18px;text-align:center;color:#718096;font-size:12px;background:#f8fafc;border-radius:9px}.v7-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}.v7-modal.show{display:flex}.v7-modal-box{width:100%;max-width:650px;background:#fff;border-radius:14px;padding:16px;max-height:92vh;overflow:auto}.v7-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.v7-close{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;cursor:pointer}.v7-trip-list{display:grid;gap:9px}.v7-trip-item{border:1px solid #dbe5ef;border-radius:10px;padding:10px;background:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.v7-trip-item.active{border-color:#3182ce;background:#f3f9ff}.v7-trip-info{min-width:0}.v7-trip-info b{display:block;color:#1f4e79;font-size:13px}.v7-trip-info span{display:block;color:#718096;font-size:10px;margin-top:3px;line-height:1.4}.v7-trip-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#38a169;margin-right:5px}.danger-note{background:#fff5f5;border:1px solid #fed7d7;color:#c53030;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.success-note{background:#f0fff4;border:1px solid #c6f6d5;color:#276749;padding:9px;border-radius:8px;font-size:11px;line-height:1.5}.muted{color:#718096;font-size:11px}.two-col{display:grid;grid-template-columns:1fr;gap:10px}.field{margin-bottom:9px}.switch-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#52606d}.switch-row input{width:auto}.sticky-select{display:flex;gap:8px;align-items:center;margin-bottom:12px}.sticky-select select{flex:1}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px}
 @media(min-width:600px){body{padding:15px;padding-top:141px}.container{padding:25px;border-radius:16px}.header h1{font-size:26px}.admin-bar{flex-direction:row;justify-content:space-between;text-align:left}.admin-bar-btns{width:auto}.summary-box{flex-direction:row;justify-content:space-around}.btn-group{flex-direction:row}.btn{width:auto}.form-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}#map{height:500px}table{min-width:100%}th,td{padding:10px;font-size:13px}.chat-form-grid{grid-template-columns:1fr 2fr auto!important}.v7-nav{grid-template-columns:repeat(7,1fr)}.v7-pills{grid-template-columns:repeat(4,1fr)}.v7-cost-summary{grid-template-columns:repeat(4,1fr)}.two-col{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.v7-nav{top:109px}body{padding-top:116px}.col-coord{display:none}.v7-trip-item{align-items:flex-start;flex-direction:column}.v7-trip-actions{width:100%;justify-content:flex-start}}
+@media(max-width:480px){.app-logo-bar{height:102px;padding:5px 8px}.app-logo-bar img{height:88px;max-width:92vw}.v7-nav{top:109px}body{padding-top:116px}.col-coord{display:none}.v7-trip-item{align-items:flex-start;flex-direction:column}.v7-trip-actions{width:100%;justify-content:flex-start}}
 
 /* ===== GOOD JOURNEY DASHBOARD ===== */
 :root{--gj-blue:#1976ed;--gj-blue-dark:#123d72;--gj-green:#0c9b6d;--gj-text:#17365f;--gj-muted:#64748b;--gj-line:#dce7f2}
@@ -40,7 +41,6 @@ body{background:radial-gradient(circle at 10% 12%,rgba(53,177,231,.20),transpare
 body:before{content:"";position:fixed;z-index:-2;top:72px;left:0;right:0;height:300px;background:linear-gradient(170deg,transparent 48%,rgba(23,111,154,.18) 49%,rgba(23,111,154,.04) 65%,transparent 66%),linear-gradient(12deg,transparent 48%,rgba(18,100,144,.16) 49%,rgba(18,100,144,.03) 64%,transparent 65%),linear-gradient(180deg,#9ed7f4,#d9f2fb 65%,transparent);opacity:.9}
 .container{max-width:none!important;width:100%!important;margin:0!important;padding:0 24px 40px!important;background:transparent!important;border-radius:0!important;box-shadow:none!important}
 .header{display:none!important}
-.app-logo-bar{display:none!important}
 
 /* top bar */
 .v7-nav{position:fixed!important;top:0!important;left:0!important;right:0!important;width:100%!important;height:92px!important;margin:0!important;padding:10px 24px!important;display:grid!important;grid-template-columns:330px minmax(0,1fr) auto!important;align-items:center!important;gap:18px!important;background:rgba(255,255,255,.96)!important;border-bottom:1px solid #dce7f2!important;border-radius:0 0 16px 16px!important;box-shadow:0 7px 24px rgba(26,68,108,.13)!important;z-index:5000!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important}
@@ -75,77 +75,22 @@ body:before{content:"";position:fixed;z-index:-2;top:72px;left:0;right:0;height:
 @media(max-width:720px){body{padding-top:78px!important}.container{padding:0 10px 25px!important}.v7-nav{height:68px!important;grid-template-columns:145px minmax(0,1fr) auto!important;border-radius:0 0 12px 12px!important}.top-brand{height:54px}.top-brand img{width:140px;height:54px}.top-nav-links{overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.top-nav-links::-webkit-scrollbar{display:none}.v7-nav button{min-height:40px;padding:9px 10px!important;font-size:18px!important}.v7-nav button span{display:none}.top-online,.top-login,.top-chevron{display:none}.top-avatar{width:38px;height:38px;font-size:12px}.dashboard-hero{grid-template-columns:52px minmax(0,1fr);padding:17px 15px;min-height:130px;border-radius:18px;gap:12px}.dashboard-hero-icon{width:52px;height:52px;font-size:24px}.dashboard-hero-main h2{font-size:22px}.dashboard-hero-main p{font-size:12px}.dashboard-date{grid-column:1/-1;text-align:center;padding:10px 14px;font-size:12px}.dashboard-card{padding:14px}.dashboard-card-title h3{font-size:18px!important}.trip-open-box{flex-direction:column;align-items:flex-start}.dashboard-outline-btn{width:100%}.quick-stat{min-height:75px}.schedule-card,.map-card{min-height:auto}.home-map-preview{height:230px}.admin-bar{min-height:56px}}
 
 
-/* ===== FINAL MOBILE / TOUCH OPTIMIZATION ===== */
-.mobile-menu-toggle,.mobile-drawer,.mobile-bottom-nav{display:none}
-@media(max-width:720px){
-  html,body{width:100%;max-width:100%;overflow-x:hidden}
-  body{padding-top:76px!important;padding-bottom:78px!important;background:linear-gradient(180deg,#e5f7ff 0,#f5fbff 240px,#f4f7fa 650px)!important}
-  body:before{top:62px;height:230px;opacity:.45}
-  .container{width:100%!important;box-sizing:border-box;padding:10px 10px 90px!important;margin:0!important}
-  .v7-nav{height:64px!important;min-height:64px!important;grid-template-columns:150px 1fr auto!important;padding:6px 10px!important;gap:6px!important;border-radius:0 0 14px 14px!important}
-  .top-brand{height:52px!important;overflow:visible!important}
-  .top-brand img{width:142px!important;height:52px!important;object-fit:contain!important;object-position:left center!important}
-  .top-nav-links{display:none!important}
-  .top-user-area{gap:5px!important}
-  .top-online,.top-login,.top-chevron{display:none!important}
-  .top-avatar{width:40px!important;height:40px!important;font-size:12px!important}
-  .mobile-menu-toggle{display:flex!important;width:40px!important;height:40px!important;border:0!important;border-radius:12px!important;background:#eef6ff!important;color:#126bd1!important;align-items:center!important;justify-content:center!important;font-size:21px!important;cursor:pointer!important}
-  .mobile-drawer{position:fixed;display:flex;flex-direction:column;right:10px;top:70px;width:min(290px,calc(100vw - 20px));padding:10px;background:rgba(255,255,255,.98);border:1px solid #dbe7f1;border-radius:16px;box-shadow:0 18px 40px rgba(23,57,91,.20);z-index:6000;opacity:0;pointer-events:none;transform:translateY(-8px);transition:.18s ease;backdrop-filter:blur(14px)}
-  .mobile-drawer.open{opacity:1;pointer-events:auto;transform:translateY(0)}
-  .mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:5px 7px 9px;border-bottom:1px solid #edf2f7;margin-bottom:5px;color:#174b88}
-  .mobile-drawer-head button{border:0;background:#edf2f7;border-radius:50%;width:30px;height:30px;font-size:20px;color:#475569}
-  .mobile-drawer>button{border:0;background:transparent;text-align:left;padding:14px 10px;border-radius:10px;font-size:15px;font-weight:750;color:#40566f}
-  .mobile-drawer>button:active,.mobile-drawer>button:hover{background:#eef7ff;color:#126bd1}
-  .mobile-bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;height:62px;background:rgba(255,255,255,.97);border:1px solid #dce7f2;border-radius:18px;box-shadow:0 8px 28px rgba(23,57,91,.17);z-index:5500;backdrop-filter:blur(14px)}
-  .mobile-bottom-nav button{border:0;background:transparent;color:#718096;font-size:20px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:14px;cursor:pointer}
-  .mobile-bottom-nav button span{font-size:9px;font-weight:750}
-  .mobile-bottom-nav button.active{color:#1478e5;background:#edf6ff}
-  .dashboard-hero{margin:0 0 12px!important;padding:14px!important;min-height:0!important;grid-template-columns:48px minmax(0,1fr)!important;border-radius:17px!important;gap:10px!important}
-  .dashboard-hero-icon{width:48px!important;height:48px!important;font-size:22px!important}
-  .dashboard-hero-main h2{font-size:21px!important;margin-bottom:4px!important}
-  .dashboard-hero-main p{font-size:11px!important;line-height:1.4!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .dashboard-date{grid-column:1/-1!important;width:100%;box-sizing:border-box;padding:9px 11px!important;font-size:11px!important;border-radius:20px!important;text-align:center}
-  .dashboard-grid{display:flex!important;flex-direction:column!important;gap:12px!important}
-  .dashboard-card{width:100%;box-sizing:border-box;padding:12px!important;border-radius:15px!important;box-shadow:0 5px 17px rgba(31,73,111,.065)!important}
-  .dashboard-card-title{gap:9px;margin-bottom:11px}
-  .dashboard-card-title h3{font-size:17px!important}
-  .title-icon{width:34px!important;height:34px!important;border-radius:10px!important;font-size:19px!important}
-  .dashboard-small-btn{font-size:10px!important;padding:7px 9px!important}
-  .trip-open-box{padding:13px!important;min-height:0!important;border-radius:12px!important;gap:12px!important}
-  .trip-open-info b{font-size:16px!important;margin-bottom:7px!important;line-height:1.3}
-  .trip-open-info span{font-size:11px!important;line-height:1.55!important;white-space:normal!important}
-  .dashboard-outline-btn{font-size:12px!important;width:100%!important;padding:10px 12px!important}
-  .quick-stats{gap:8px!important}
-  .quick-stat{min-height:68px!important;padding:9px!important;grid-template-columns:32px 1fr!important;column-gap:7px!important}
-  .quick-stat .stat-icon{width:32px!important;height:32px!important;font-size:14px!important}
-  .quick-stat small{font-size:9px!important}.quick-stat b{font-size:17px!important}
-  .dashboard-schedule-list{max-height:260px!important}
-  .dashboard-schedule-list .v7-day{padding:9px 10px!important;margin-bottom:7px!important}
-  .dashboard-schedule-list .v7-day b{font-size:11px!important}.dashboard-schedule-list .v7-day p{font-size:10px!important}
-  .home-map-preview{height:205px!important}.map-preview-footer{font-size:10px!important}.map-preview-footer b{font-size:12px!important}
-  /* All legacy tabs: prevent desktop tables/forms from overflowing the phone. */
-  .v7-section{width:100%!important;max-width:100%!important;box-sizing:border-box}
-  .v7-card{max-width:100%!important;box-sizing:border-box;overflow:hidden}
-  .form-grid,.two-col,.chat-form-grid{grid-template-columns:1fr!important}
-  input,select,textarea,.btn,.dashboard-small-btn,button{max-width:100%;box-sizing:border-box}
-  table{display:block;width:100%!important;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
-  #map{height:62vh!important;min-height:320px!important;max-height:600px!important}
-  .admin-bar{margin:0 0 12px!important;border-radius:12px!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;padding:10px!important}
-  .admin-bar-btns{width:100%!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
-  .admin-bar-btns .btn{width:100%!important;margin:0!important}
-  .v7-modal{padding:8px!important;align-items:flex-end!important}
-  .v7-modal-box{max-height:88vh!important;border-radius:18px 18px 0 0!important;padding:14px!important}
-  .mobile-drawer .admin-flex{display:flex!important}
-}
-@media(max-width:380px){
-  .v7-nav{grid-template-columns:125px 1fr auto!important}.top-brand img{width:120px!important}
-  .mobile-bottom-nav button{font-size:18px}.mobile-bottom-nav button span{font-size:8px}
-  .dashboard-hero-main h2{font-size:19px!important}.dashboard-card-title h3{font-size:16px!important}
-}
+/* ===== FINAL LOGO SIZE TUNING ===== */
+.v7-nav{height:104px!important;grid-template-columns:390px minmax(0,1fr) auto!important;padding:8px 26px!important}
+.top-brand{height:92px!important;overflow:visible!important;align-items:center!important}
+.top-brand img{width:auto!important;height:92px!important;max-width:360px!important;display:block!important;object-fit:contain!important;object-position:left center!important;transform:scale(1.10);transform-origin:left center}
+body{padding-top:120px!important}
+@media(max-width:1100px){.v7-nav{grid-template-columns:300px minmax(0,1fr) auto!important;height:96px!important}.top-brand{height:84px!important}.top-brand img{height:84px!important;max-width:290px!important;transform:scale(1.06)}body{padding-top:108px!important}}
+@media(max-width:720px){.v7-nav{height:70px!important;grid-template-columns:165px minmax(0,1fr) auto!important;padding:7px 10px!important}.top-brand{height:58px!important}.top-brand img{height:58px!important;max-width:160px!important;transform:none!important}body{padding-top:82px!important}}
+
+
+/* The old standalone logo bar is intentionally disabled; the only logo is in .top-brand. */
+.app-logo-bar{display:none!important}
 
 </style>
 </head>
 <body class="dashboard-home-active">
+<!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
 <div class="container">
   <div class="header">
     <h1 id="app-title">HÀNH TRÌNH DU LỊCH</h1>
@@ -213,21 +158,7 @@ body:before{content:"";position:fixed;z-index:-2;top:72px;left:0;right:0;height:
       <button id="top-login-admin" class="top-login" onclick="openAdminLogin()">🔒</button>
       <div class="top-avatar">TV</div>
       <button class="top-chevron" type="button" aria-label="Tài khoản">⌄</button>
-      <button class="mobile-menu-toggle" type="button" onclick="toggleMobileMenu()" aria-label="Mở menu">☰</button>
     </div>
-  </div>
-  <div id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
-    <div class="mobile-drawer-head"><strong>Good Journey</strong><button type="button" onclick="toggleMobileMenu()">×</button></div>
-    <button onclick="mobileNavigate('chat',5)">💬 Chat</button>
-    <button onclick="mobileNavigate('cost',6)">▤ Chi phí</button>
-    <button class="admin-only admin-flex" onclick="mobileNavigate('tools',7)">⚙ Quản trị</button>
-  </div>
-  <div class="mobile-bottom-nav">
-    <button class="active" onclick="mobileNavigate('home',0)">⌂<span>Tổng quan</span></button>
-    <button onclick="mobileNavigate('route',1)">⌁<span>Lộ trình</span></button>
-    <button onclick="mobileNavigate('schedule',2)">▣<span>Lịch trình</span></button>
-    <button onclick="mobileNavigate('members',3)">♟<span>Thành viên</span></button>
-    <button onclick="toggleMobileMenu()">☰<span>Thêm</span></button>
   </div>
 
   <section id="v7-home" class="v7-section active">
@@ -343,16 +274,7 @@ function routeSubtitle(){const t=currentTrip();if(!t)return 'Đang tải dữ li
 function clearListeners(){unsubscribers.forEach(fn=>{try{fn&&fn()}catch(e){}});unsubscribers=[];}
 function setStatus(text,color='#3182ce'){const el=document.getElementById('db-status');if(el){el.textContent='● '+text;el.style.color=color;}}
 
-let baseTileLayer=null;let baseTileFallbackIndex=0;
-const BASE_TILE_SOURCES=[
-  {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',options:{maxZoom:19,attribution:'© OpenStreetMap contributors'}},
-  {url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',options:{subdomains:'abcd',maxZoom:20,attribution:'© OpenStreetMap © CARTO'}},
-  {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',options:{maxZoom:19,attribution:'Tiles © Esri'}}
-];
-function attachBaseTiles(index){if(!map)return;const src=BASE_TILE_SOURCES[index];if(!src)return;try{if(baseTileLayer){map.removeLayer(baseTileLayer)}baseTileLayer=L.tileLayer(src.url,src.options);let tileErrors=0;baseTileLayer.on('tileerror',()=>{tileErrors++;if(tileErrors>=3&&baseTileFallbackIndex===index){baseTileFallbackIndex=index+1;attachBaseTiles(baseTileFallbackIndex)}});baseTileLayer.addTo(map);}catch(e){console.warn('Base map provider error',e);baseTileFallbackIndex=index+1;attachBaseTiles(baseTileFallbackIndex)}}
-function initMap(){try{const el=document.getElementById('map');if(!el)return;if(!map){map=L.map(el,{zoomControl:true,preferCanvas:true,attributionControl:true}).setView([18.5,106],6);attachBaseTiles(0);}else{map.invalidateSize(true)}setTimeout(()=>{try{map.invalidateSize(true)}catch(e){}},150);setTimeout(()=>{try{map.invalidateSize(true)}catch(e){}},700);}catch(e){console.error('Leaflet init error',e)}}
-window.addEventListener('load',()=>setTimeout(()=>initMap(),250));
-window.addEventListener('resize',()=>{if(map)map.invalidateSize(true)});
+function initMap(){try{if(!map){map=L.map('map').setView([18.5,106],6);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);}}catch(e){console.error(e)}}
 function clearMapExtras(){legBadgeMarkers.forEach(x=>{try{map.removeLayer(x)}catch(e){}});legBadgeMarkers=[];if(fallbackPolyline){try{map.removeLayer(fallbackPolyline)}catch(e){}fallbackPolyline=null;}}
 function haversineKm(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lng-a.lng)*Math.PI/180;const q=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))*1.25;}
 function renderRoadRouting(){if(!map)return;const token=++routeRenderToken;clearMapExtras();if(routingControl){try{map.removeControl(routingControl)}catch(e){}routingControl=null}if(points.length<2){renderPointsTable(points,null);if(points.length)map.setView([points[0].lat,points[0].lng],12);return}const waypoints=points.map(p=>L.latLng(Number(p.lat),Number(p.lng)));const same=points.length>1&&points[0].lat===points.at(-1).lat&&points[0].lng===points.at(-1).lng;routingControl=L.Routing.control({waypoints,router:L.Routing.osrmv1({serviceUrl:'https://router.project-osrm.org/route/v1',profile:'car'}),lineOptions:{styles:[{color:'#007bff',weight:4,opacity:.8}]},createMarker:function(i,wp){const p=points[i]||{};let shift='';if(same&&i===0)shift='transform:translateX(-16px);';if(same&&i===points.length-1)shift='transform:translateX(16px);';const bg=i===0?'#28a745':i===points.length-1?'#6f42c1':'#007bff';const icon=L.divIcon({className:'custom-div-icon',html:`<div style="background:${bg};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);${shift}" title="${i===0?'Xuất phát':i===points.length-1?'Về đích':'Điểm '+(i+1)}">${i+1}</div>`,iconSize:[32,32],iconAnchor:[16,16]});return L.marker(wp.latLng,{icon}).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.desc||'')}<br><small>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</small>`);},addWaypoints:false,routeWhileDragging:false}).addTo(map);routingControl.on('routesfound',e=>{if(token!==routeRenderToken)return;renderPointsTable(points,e.routes[0]);}).on('routingerror',e=>{console.warn('OSRM routing error',e);if(token!==routeRenderToken)return;fallbackPolyline=L.polyline(points.map(p=>[p.lat,p.lng]),{color:'#007bff',weight:3,dashArray:'5,8'}).addTo(map);renderPointsTable(points,null);});}
@@ -397,7 +319,7 @@ async function deleteExpense(id){if(!v7RequireAdmin()||!confirm('Xóa khoản ch
 function renderHomeMapPreview(){const el=document.getElementById('home-map-preview');if(!el)return;if(!points||points.length<2){el.innerHTML='<div class="home-map-empty">Chưa đủ dữ liệu điểm dừng để hiển thị tuyến.</div>';return}const W=900,H=285,pad=55;const lngs=points.map(p=>Number(p.lng)),lats=points.map(p=>Number(p.lat));const minX=Math.min(...lngs),maxX=Math.max(...lngs),minY=Math.min(...lats),maxY=Math.max(...lats);const sx=v=>pad+(v-minX)/Math.max(maxX-minX,.0001)*(W-pad*2);const sy=v=>H-pad-(v-minY)/Math.max(maxY-minY,.0001)*(H-pad*2);const pts=points.map((p,i)=>({x:sx(Number(p.lng)),y:sy(Number(p.lat)),n:i+1,name:esc(p.name||'')}));const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');const circles=pts.map(p=>`<g><circle cx="${p.x}" cy="${p.y}" r="12" fill="#fff"/><circle cx="${p.x}" cy="${p.y}" r="8" fill="#147eea"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">${p.n}</text></g>`).join('');const labels=pts.filter((p,i)=>i===0||i===pts.length-1||i%2===0).map(p=>`<text x="${Math.min(p.x+16,W-170)}" y="${Math.max(p.y-13,18)}" font-size="11" font-weight="700" fill="#24557b">${p.name}</text>`).join('');el.innerHTML=`<svg class="home-map-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Bản đồ hành trình"><path d="${path}" fill="none" stroke="rgba(255,255,255,.96)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#1684e8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5"/>${circles}${labels}</svg>`;}
 function renderHome(){const t=currentTrip();if(!t)return;document.getElementById('v7-days').textContent=`${durationDays(t.startDate,t.endDate)}`;document.getElementById('v7-member-count').textContent=members.length;const pc=document.getElementById('dashboard-point-count');if(pc)pc.textContent=points.length;const rp=document.getElementById('dashboard-route-points');if(rp)rp.textContent=`${points.length} điểm dừng`;const box=document.getElementById('home-summary');const d=durationDays(t.startDate,t.endDate);const items=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()+1-1).padStart(2,'0')}`;const s=schedule.find(x=>x.date===date)||{};items.push(`<div class="v7-day"><b>NGÀY ${i+1} · ${dateLabel(date,false)}</b><p>${esc(s.title||'Chưa khai báo lịch trình')}</p><p>${esc(s.description||'')}</p></div>`)}box.innerHTML=items.join('')||'<div class="v7-empty">Chưa có dữ liệu.</div>';renderHomeMapPreview();}
 function renderRouteCopy(){const target=document.getElementById('v7-route-copy');if(!target)return;target.innerHTML=points.length?`<div class="v7-admin-note">${points.length} điểm · ${esc(routeNames().join(' → '))}</div><div class="table-container"><table><thead><tr><th>STT</th><th>Điểm</th><th>Tọa độ</th><th>Mô tả</th></tr></thead><tbody>${points.map((p,i)=>`<tr><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${Number(p.lat).toFixed(6)}, ${Number(p.lng).toFixed(6)}</td><td>${esc(p.desc||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="v7-empty">Chưa có điểm.</div>'}
-function v7Show(name,btn){document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));const sec=document.getElementById('v7-'+name);if(sec)sec.classList.add('active');document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.body.classList.toggle('dashboard-nonhome',name!=='home');if(name==='route')renderRouteCopy();if(name==='schedule')renderSchedule();if(name==='members')renderMembers();if(name==='cost')renderExpenses();setTimeout(()=>{if(map)map.invalidateSize(true)},80);}
+function v7Show(name,btn){document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));const sec=document.getElementById('v7-'+name);if(sec)sec.classList.add('active');document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.body.classList.toggle('dashboard-nonhome',name!=='home');if(name==='route')renderRouteCopy();if(name==='schedule')renderSchedule();if(name==='members')renderMembers();if(name==='cost')renderExpenses();}
 
 async function openTripManager(){if(!v7RequireAdmin())return;renderTripManager();document.getElementById('trip-manager-modal').classList.add('show')}
 function closeTripManager(){document.getElementById('trip-manager-modal').classList.remove('show')}
@@ -478,16 +400,28 @@ function checkAdminStatus(){const a=v7IsAdmin();document.body.classList.toggle('
 function openAdminLogin(){document.getElementById('admin-login-modal').classList.add('show');document.getElementById('admin-login-error').style.display='none';document.getElementById('admin-login-email').focus()}
 function closeAdminLogin(){document.getElementById('admin-login-modal').classList.remove('show')}
 async function loginAdmin(){const email=document.getElementById('admin-login-email').value.trim(),password=document.getElementById('admin-login-password').value,error=document.getElementById('admin-login-error');if(!email||!password){error.textContent='Vui lòng nhập đầy đủ email và mật khẩu.';error.style.display='block';return}try{const cred=await auth.signInWithEmailAndPassword(email,password);await loadAdminRole(cred.user);if(!isAdminUser){const uid=cred.user.uid;await auth.signOut();await auth.signInAnonymously().catch(()=>{});error.innerHTML=`Firebase đăng nhập thành công nhưng tài khoản này chưa có quyền Admin.<br>UID: <code>${esc(uid)}</code><br>Firestore: <code>admin_users/${esc(uid)}</code> phải có <code>role: "admin"</code>.`;error.style.display='block';return}document.getElementById('admin-login-password').value='';closeAdminLogin();alert('Đăng nhập quản trị thành công!')}catch(e){console.error(e);const friendly={'auth/invalid-credential':'Thông tin đăng nhập không hợp lệ.','auth/wrong-password':'Mật khẩu không đúng.','auth/user-not-found':'Không tìm thấy tài khoản.','auth/invalid-email':'Email không đúng định dạng.','auth/user-disabled':'Tài khoản đang bị vô hiệu hóa.','auth/operation-not-allowed':'Email/Password chưa được bật trong Firebase Authentication.','auth/too-many-requests':'Có quá nhiều lần thử. Hãy chờ rồi thử lại.','auth/network-request-failed':'Không kết nối được Firebase.','auth/unauthorized-domain':'Domain website chưa được thêm vào Authorized domains.'};error.innerHTML=`<b>❌ Đăng nhập thất bại</b><br>Mã lỗi: <code>${esc(e.code||'unknown')}</code><br>${esc(friendly[e.code]||e.message||'Lỗi không xác định')}`;error.style.display='block'}}
-async function logoutAdmin(){try{await auth.signOut();await auth.signInAnonymously()}catch(e){alert('Không thể đăng xuất: '+e.message)}}
+async function logoutAdmin(){try{await auth.signOut();}catch(e){alert('Không thể đăng xuất: '+e.message)}}
 async function changeAdminPassword(){if(!v7IsAdmin()||!currentUser.email)return;try{await auth.sendPasswordResetEmail(currentUser.email);alert('Đã gửi email đặt lại mật khẩu tới '+currentUser.email+'.')}catch(e){alert('Không thể gửi email: '+e.message)}}
 
 function systemCheck(){const box=document.getElementById('system-status');const t=currentTrip();box.innerHTML=`<span class="status-dot"></span>Firebase project: <b>${esc(firebaseConfig.projectId)}</b><br>Trip đang mở: <b>${esc(t?.name||'Chưa có')}</b><br>Trip ID: <span class="code">${esc(currentTripId||'')}</span><br>Điểm: ${points.length} · Thành viên: ${members.length} · Lịch trình: ${schedule.length} · Chat: ${messages.length} · Chi phí: ${expenses.length}`}
 
-document.addEventListener('DOMContentLoaded',()=>{populateCats();const saved=localStorage.getItem('chat_my_name');if(saved)document.getElementById('chat-user').value=saved;document.getElementById('chat-user').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();localStorage.setItem('chat_my_name',e.target.value.trim())});document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);auth.onAuthStateChanged(async user=>{await loadAdminRole(user)});if(!auth.currentUser)auth.signInAnonymously().catch(e=>console.error('Anonymous Auth:',e));loadTrips();setTimeout(systemCheck,1500)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
+let anonymousLoginInProgress=false;
+function startAnonymousSession(){if(anonymousLoginInProgress||auth.currentUser)return;anonymousLoginInProgress=true;auth.signInAnonymously().catch(e=>console.error('Anonymous Auth:',e)).finally(()=>{anonymousLoginInProgress=false})}
 
-function toggleMobileMenu(){const d=document.getElementById('mobile-drawer');if(!d)return;const open=d.classList.toggle('open');d.setAttribute('aria-hidden',open?'false':'true')}
-function mobileNavigate(name,index){const buttons=document.querySelectorAll('.v7-nav button');v7Show(name,buttons[index]||buttons[0]);document.querySelectorAll('.mobile-bottom-nav button').forEach(b=>b.classList.remove('active'));const map={home:0,route:1,schedule:2,members:3};const bi=map[name];if(bi!==undefined){const mb=document.querySelectorAll('.mobile-bottom-nav button')[bi];if(mb)mb.classList.add('active')}const d=document.getElementById('mobile-drawer');if(d){d.classList.remove('open');d.setAttribute('aria-hidden','true')}window.scrollTo({top:0,behavior:'smooth'})}
+document.addEventListener('DOMContentLoaded',async()=>{initMap();populateCats();const saved=localStorage.getItem('chat_my_name');if(saved)document.getElementById('chat-user').value=saved;document.getElementById('chat-user').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();localStorage.setItem('chat_my_name',e.target.value.trim())});document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
+  try{
+    // Giữ phiên đăng nhập Admin qua refresh/trình duyệt đóng-mở.
+    // Quan trọng: không đăng nhập Anonymous trước khi Firebase khôi phục phiên hiện tại.
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+  }catch(e){console.warn('Auth persistence:',e)}
+  auth.onAuthStateChanged(async user=>{
+    await loadAdminRole(user);
+    // Chỉ dùng Anonymous khi Firebase xác nhận thật sự không có phiên đăng nhập.
+    if(!user) startAnonymousSession();
+  });
+  loadTrips();setTimeout(systemCheck,1500)
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
 </script>
 </body>
 </html>
