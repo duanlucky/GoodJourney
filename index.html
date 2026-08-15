@@ -104,6 +104,154 @@ body{padding-top:120px!important}
   .trip-open-box{width:100%;}
 }
 </style>
+<style>
+
+/* =========================================================
+   FINAL FIX — HEADER / LOGO / MAIN MENU
+   Giữ nguyên toàn bộ giao diện và chức năng khác.
+   Chỉ sửa lỗi logo tràn và menu chính chèn lấn.
+   ========================================================= */
+
+/* Desktop/tablet: thanh menu cố định gọn, logo không vượt khung */
+.v7-nav{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:78px!important;
+  min-height:78px!important;
+  padding:7px 18px!important;
+  grid-template-columns:minmax(185px,235px) minmax(0,1fr) auto!important;
+  gap:12px!important;
+  overflow:hidden!important;
+}
+
+.top-brand{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:235px!important;
+  height:64px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+}
+
+.top-brand img{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:220px!important;
+  max-height:58px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  transform:none!important;
+  flex:0 1 auto!important;
+}
+
+.top-nav-links{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  scrollbar-width:none!important;
+}
+.top-nav-links::-webkit-scrollbar{display:none!important}
+
+.v7-nav button{
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  min-width:42px!important;
+  min-height:42px!important;
+  max-width:150px!important;
+  padding:9px 10px!important;
+  white-space:nowrap!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+}
+
+/* Phần tài khoản bên phải không được đè lên menu */
+.top-online,
+.top-login,
+.top-avatar,
+.top-chevron{
+  flex:0 0 auto!important;
+}
+
+/* Nội dung không bị thanh menu cố định che */
+body{
+  padding-top:94px!important;
+}
+
+/* Tablet */
+@media (max-width:1100px){
+  .v7-nav{
+    height:72px!important;
+    min-height:72px!important;
+    padding:6px 12px!important;
+    grid-template-columns:minmax(155px,190px) minmax(0,1fr) auto!important;
+    gap:8px!important;
+  }
+  .top-brand{
+    height:58px!important;
+    max-width:190px!important;
+  }
+  .top-brand img{
+    max-width:175px!important;
+    max-height:50px!important;
+  }
+  .v7-nav button{
+    min-width:40px!important;
+    min-height:40px!important;
+    padding:8px 9px!important;
+    font-size:12px!important;
+  }
+  body{padding-top:86px!important}
+}
+
+/* Điện thoại: chỉ giảm kích thước, không để logo/menu chồng nhau */
+@media (max-width:720px){
+  .v7-nav{
+    height:64px!important;
+    min-height:64px!important;
+    padding:5px 8px!important;
+    grid-template-columns:125px minmax(0,1fr) auto!important;
+    gap:5px!important;
+    border-radius:0 0 12px 12px!important;
+  }
+  .top-brand{
+    height:52px!important;
+    max-width:125px!important;
+  }
+  .top-brand img{
+    max-width:118px!important;
+    max-height:44px!important;
+  }
+  .top-nav-links{
+    justify-content:flex-start!important;
+    gap:2px!important;
+  }
+  .v7-nav button{
+    min-width:38px!important;
+    min-height:38px!important;
+    padding:8px!important;
+    font-size:11px!important;
+  }
+  body{padding-top:76px!important}
+}
+
+/* Không cho bất kỳ phần tử con nào của header tạo overflow ngang */
+.v7-nav,
+.v7-nav *{
+  min-width:0;
+}
+
+</style>
 </head>
 <body class="dashboard-home-active">
 <!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
