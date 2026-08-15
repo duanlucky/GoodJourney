@@ -304,6 +304,221 @@ body{
 }
 
 </style>
+<style>
+
+/* =========================================================
+   HEADER REDESIGN — aligned with dashboard content
+   Không thay đổi chức năng bên dưới.
+   ========================================================= */
+
+/* Header nằm cùng trục với dashboard, không còn full-bleed */
+.v7-nav{
+  box-sizing:border-box!important;
+  position:fixed!important;
+  top:8px!important;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+  width:min(1600px,calc(100% - 48px))!important;
+  max-width:1600px!important;
+  height:82px!important;
+  min-height:82px!important;
+  padding:7px 18px!important;
+  display:grid!important;
+  grid-template-columns:300px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:18px!important;
+  background:rgba(255,255,255,.98)!important;
+  border:1px solid #dce7f2!important;
+  border-radius:16px!important;
+  box-shadow:0 7px 24px rgba(26,68,108,.13)!important;
+  overflow:hidden!important;
+  z-index:5000!important;
+}
+
+/* Logo lớn, sắc nét, nằm đúng trong cột của nó */
+.top-brand{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:300px!important;
+  height:68px!important;
+  min-width:0!important;
+  padding:0!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  overflow:hidden!important;
+}
+
+.top-brand img{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:auto!important;
+  height:62px!important;
+  max-width:292px!important;
+  max-height:62px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  transform:none!important;
+  image-rendering:auto!important;
+  flex:0 0 auto!important;
+}
+
+/* Khu menu: các nút có kích thước đủ lớn, icon rõ */
+.top-nav-links{
+  min-width:0!important;
+  width:100%!important;
+  height:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scrollbar-width:none!important;
+}
+.top-nav-links::-webkit-scrollbar{display:none!important}
+
+.v7-nav button{
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  min-width:72px!important;
+  min-height:56px!important;
+  padding:8px 12px!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:transparent!important;
+  color:#51677c!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  box-shadow:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  -webkit-font-smoothing:antialiased!important;
+  transition:background .16s ease,color .16s ease,transform .16s ease!important;
+}
+
+.v7-nav button:hover{
+  background:#eef6ff!important;
+  color:#1769d2!important;
+  transform:translateY(-1px)!important;
+}
+
+.v7-nav button.active{
+  background:linear-gradient(135deg,#1981f5,#1472df)!important;
+  color:#fff!important;
+  box-shadow:0 7px 18px rgba(25,118,237,.25)!important;
+}
+
+/* Nếu icon là emoji / ký tự đầu của button */
+.v7-nav button::first-letter{
+  font-size:20px!important;
+}
+
+/* Khu tài khoản không được chèn vào menu */
+.top-online,.top-login,.top-avatar,.top-chevron{
+  flex:0 0 auto!important;
+}
+
+/* Nội dung bắt đầu dưới header */
+body{
+  padding-top:105px!important;
+}
+
+/* Tablet */
+@media(max-width:1100px){
+  .v7-nav{
+    width:calc(100% - 28px)!important;
+    height:76px!important;
+    min-height:76px!important;
+    grid-template-columns:245px minmax(0,1fr) auto!important;
+    gap:10px!important;
+    padding:6px 12px!important;
+  }
+  .top-brand{
+    max-width:245px!important;
+    height:62px!important;
+  }
+  .top-brand img{
+    height:56px!important;
+    max-width:238px!important;
+    max-height:56px!important;
+  }
+  .v7-nav button{
+    min-width:62px!important;
+    min-height:52px!important;
+    padding:7px 9px!important;
+    font-size:12px!important;
+  }
+  body{padding-top:94px!important}
+}
+
+/* Mobile */
+@media(max-width:720px){
+  .v7-nav{
+    top:5px!important;
+    width:calc(100% - 12px)!important;
+    height:64px!important;
+    min-height:64px!important;
+    grid-template-columns:150px minmax(0,1fr) auto!important;
+    gap:5px!important;
+    padding:5px 8px!important;
+    border-radius:13px!important;
+  }
+  .top-brand{
+    max-width:150px!important;
+    height:52px!important;
+  }
+  .top-brand img{
+    height:46px!important;
+    max-width:145px!important;
+    max-height:46px!important;
+  }
+  .top-nav-links{
+    justify-content:flex-start!important;
+    gap:2px!important;
+  }
+  .v7-nav button{
+    min-width:42px!important;
+    min-height:48px!important;
+    padding:6px 7px!important;
+    font-size:18px!important;
+  }
+  .v7-nav button span{
+    display:none!important;
+  }
+  .top-online,.top-login,.top-chevron{
+    display:none!important;
+  }
+  .top-avatar{
+    width:38px!important;
+    height:38px!important;
+    font-size:12px!important;
+  }
+  body{padding-top:76px!important}
+}
+
+/* Rất nhỏ: logo vẫn rõ nhưng không ép menu */
+@media(max-width:430px){
+  .v7-nav{
+    grid-template-columns:128px minmax(0,1fr) auto!important;
+  }
+  .top-brand{
+    max-width:128px!important;
+  }
+  .top-brand img{
+    max-width:124px!important;
+    height:42px!important;
+    max-height:42px!important;
+  }
+}
+
+</style>
 </head>
 <body class="dashboard-home-active">
 <!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
