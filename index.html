@@ -252,6 +252,58 @@ body{
 }
 
 </style>
+<style>
+
+/* ===== LOGO SIZE ADJUSTMENT — larger, still safely inside header ===== */
+.v7-nav{
+  grid-template-columns:minmax(245px,300px) minmax(0,1fr) auto!important;
+}
+
+.top-brand{
+  max-width:300px!important;
+  height:64px!important;
+  padding:0!important;
+}
+
+.top-brand img{
+  max-width:285px!important;
+  max-height:60px!important;
+  width:auto!important;
+  height:auto!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  transform:none!important;
+}
+
+@media (max-width:1100px){
+  .v7-nav{
+    grid-template-columns:minmax(205px,235px) minmax(0,1fr) auto!important;
+  }
+  .top-brand{
+    max-width:235px!important;
+    height:58px!important;
+  }
+  .top-brand img{
+    max-width:225px!important;
+    max-height:54px!important;
+  }
+}
+
+@media (max-width:720px){
+  .v7-nav{
+    grid-template-columns:155px minmax(0,1fr) auto!important;
+  }
+  .top-brand{
+    max-width:155px!important;
+    height:52px!important;
+  }
+  .top-brand img{
+    max-width:148px!important;
+    max-height:46px!important;
+  }
+}
+
+</style>
 </head>
 <body class="dashboard-home-active">
 <!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
