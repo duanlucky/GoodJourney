@@ -932,6 +932,64 @@ body{
 }
 </style>
 
+<style id="final-layout-and-chat-fix">
+html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+:root{--app-shell-width:1600px;--app-shell-gutter:24px;--app-header-height:104px}
+.container{width:calc(100% - (var(--app-shell-gutter)*2))!important;max-width:var(--app-shell-width)!important;margin-left:auto!important;margin-right:auto!important;padding-left:0!important;padding-right:0!important;background:transparent!important;box-shadow:none!important}
+.v7-nav{position:fixed!important;top:10px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:calc(100% - (var(--app-shell-gutter)*2))!important;max-width:var(--app-shell-width)!important;height:var(--app-header-height)!important;min-height:var(--app-header-height)!important;margin:0!important;padding:8px 16px!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:300px minmax(0,1fr) 100px!important;gap:10px!important;align-items:center!important;overflow:hidden!important;border-radius:16px!important}
+.admin-bar,.dashboard-hero,.dashboard-grid,.v7-section{width:100%!important;max-width:var(--app-shell-width)!important;margin-left:auto!important;margin-right:auto!important}
+body.dashboard-nonhome .v7-section{width:100%!important;max-width:var(--app-shell-width)!important;margin-left:auto!important;margin-right:auto!important}
+.dashboard-card,.v7-card,.dashboard-grid,.v7-section{min-width:0!important}
+.v7-nav .top-brand{width:300px!important;max-width:300px!important;min-width:0!important;height:88px!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:flex-start!important}
+.v7-nav .top-brand img{width:auto!important;height:82px!important;max-width:292px!important;max-height:82px!important;object-fit:contain!important;object-position:left center!important;transform:none!important}
+.v7-nav .top-nav-links{min-width:0!important;width:100%!important;height:86px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:4px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x!important}
+.v7-nav .top-nav-links::-webkit-scrollbar{display:none!important}
+.v7-nav .top-nav-links>button{flex:0 0 auto!important;min-width:94px!important;width:auto!important;height:68px!important;min-height:68px!important;display:inline-flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:6px 11px!important;margin:0!important;white-space:nowrap!important;word-break:keep-all!important;overflow:visible!important;font-size:12px!important}
+.v7-nav .top-nav-links>button .nav-svg{width:30px!important;height:30px!important;flex:0 0 30px!important}
+.v7-nav .top-nav-links>button span{display:block!important;width:max-content!important;max-width:none!important;white-space:nowrap!important;overflow:visible!important}
+.v7-nav .top-user-area{width:100px!important;min-width:0!important;height:72px!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:6px!important}
+#v7-chat .v7-card,#v7-chat .chat-box,#v7-chat .chat-messages{width:100%!important;max-width:100%!important}
+#v7-chat .chat-messages{overflow-x:hidden!important}
+#v7-chat .chat-form-grid{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:minmax(105px,.75fr) minmax(0,1.5fr) auto!important;align-items:center!important}
+#v7-chat .chat-form-grid input{min-width:0!important;max-width:100%!important}
+#v7-chat .chat-form-grid button{width:auto!important;min-width:72px!important;white-space:nowrap!important}
+@media(max-width:1100px){
+ :root{--app-shell-gutter:14px;--app-header-height:80px}
+ body{padding-top:98px!important}
+ .v7-nav{grid-template-columns:235px minmax(0,1fr) 52px!important;padding:6px 10px!important}
+ .v7-nav .top-brand{width:235px!important;max-width:235px!important;height:68px!important}
+ .v7-nav .top-brand img{height:62px!important;max-height:62px!important;max-width:228px!important}
+ .v7-nav .top-nav-links{height:68px!important}
+ .v7-nav .top-nav-links>button{min-width:86px!important;height:60px!important;min-height:60px!important;font-size:11px!important}
+ .v7-nav .top-nav-links>button .nav-svg{width:27px!important;height:27px!important;flex-basis:27px!important}
+ .v7-nav .top-user-area{width:52px!important}
+ .top-online,.top-login,.top-chevron{display:none!important}
+}
+@media(max-width:720px){
+ :root{--app-shell-gutter:10px;--app-header-height:70px}
+ body{padding-top:82px!important}
+ .container{width:calc(100% - 20px)!important;max-width:100%!important}
+ .v7-nav{top:5px!important;width:calc(100% - 20px)!important;max-width:100%!important;height:70px!important;min-height:70px!important;grid-template-columns:150px minmax(0,1fr) 40px!important;padding:5px 7px!important;border-radius:14px!important}
+ .v7-nav .top-brand{width:150px!important;max-width:150px!important;height:58px!important}
+ .v7-nav .top-brand img{height:53px!important;max-height:53px!important;max-width:146px!important}
+ .v7-nav .top-nav-links{height:58px!important;justify-content:flex-start!important;gap:2px!important}
+ .v7-nav .top-nav-links>button{min-width:80px!important;height:54px!important;min-height:54px!important;padding:4px 8px!important;font-size:10.5px!important}
+ .v7-nav .top-nav-links>button .nav-svg{width:25px!important;height:25px!important;flex-basis:25px!important}
+ .v7-nav .top-user-area{width:40px!important;height:54px!important}
+ .v7-nav .top-avatar{width:36px!important;height:36px!important}
+ .dashboard-hero,.dashboard-grid,.v7-section,.admin-bar{width:100%!important;max-width:100%!important}
+ #v7-chat .chat-form-grid{grid-template-columns:minmax(0,1fr) minmax(0,2fr)!important}
+ #v7-chat .chat-form-grid button{grid-column:1/-1!important;width:100%!important;min-height:42px!important}
+ #v7-chat .chat-messages{height:320px!important}
+}
+@media(max-width:430px){
+ .v7-nav{grid-template-columns:130px minmax(0,1fr) 38px!important}
+ .v7-nav .top-brand{width:130px!important;max-width:130px!important}
+ .v7-nav .top-brand img{height:48px!important;max-height:48px!important;max-width:126px!important}
+ .v7-nav .top-nav-links>button{min-width:78px!important;font-size:10px!important}
+}
+</style>
+
 </head>
 <body class="dashboard-home-active">
 <!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
@@ -1072,7 +1130,7 @@ body{
 
   <section id="v7-members" class="v7-section"><div class="v7-card"><h3>👥 Thành viên trong đoàn</h3><div class="form-grid admin-only"><div class="field"><label>Họ và tên</label><input id="member-name" placeholder="Họ và tên"></div><div class="field"><label>Số điện thoại</label><input id="member-phone" placeholder="Số điện thoại"></div><div class="field"><label>Vai trò</label><input id="member-role" placeholder="VD: Lái chính"></div></div><button class="btn btn-success admin-only admin-flex" onclick="addMember()" style="margin-bottom:12px">➕ Thêm Thành Viên</button><div class="table-container"><table><thead><tr><th>Họ Tên</th><th>SĐT</th><th>Vai Trò</th><th class="admin-col">Thao Tác</th></tr></thead><tbody id="member-list"></tbody></table></div></div></section>
 
-  <section id="v7-chat" class="v7-section"><div class="v7-card"><h3>💬 Trò Chuyện Online</h3><div class="chat-box"><div class="chat-messages" id="chat-messages"></div><div class="form-grid chat-form-grid" style="gap:6px"><input type="text" id="chat-user" placeholder="HỌ VÀ TÊN (IN HOA)" style="text-transform:uppercase"><input type="text" id="chat-text" placeholder="Nhập tin nhắn..." onkeypress="if(event.key==='Enter')sendChatMessage()"><button class="btn btn-success" onclick="sendChatMessage()">Gửi 📤</button></div></div></div></section>
+  <section id="v7-chat" class="v7-section"><div class="v7-card"><h3>💬 Trò Chuyện Online</h3><div class="chat-box"><div class="chat-messages" id="chat-messages"></div><div class="form-grid chat-form-grid" style="gap:6px"><input type="text" id="chat-user" placeholder="HỌ VÀ TÊN (IN HOA)" style="text-transform:uppercase"><input type="text" id="chat-text" placeholder="Nhập tin nhắn..." autocomplete="off"><button type="button" class="btn btn-success" onclick="sendChatMessage()">Gửi 📤</button></div></div></div></section>
 
   <section id="v7-cost" class="v7-section">
     <div class="v7-card"><h3>💰 Quản lý chi phí thực tế <span id="db-status" style="font-size:10px;color:#3182ce;font-weight:600">● Đang kết nối...</span></h3><div class="v7-admin-note">☁️ Dữ liệu chi phí được lưu riêng cho từng chuyến đi trong Firebase Firestore. Chỉ Quản trị viên mới được thêm, sửa hoặc xóa.</div><div class="v7-cost-summary"><div class="v7-cost-box"><b id="cost-total2">0 đ</b><span>Tổng cộng</span></div><div class="v7-cost-box"><b id="cost-count">0</b><span>Khoản chi</span></div><div class="v7-cost-box"><b id="cost-avg">0 đ</b><span>Bình quân/khoản</span></div><div class="v7-cost-box"><b id="cost-dayavg">0 đ</b><span>Bình quân/ngày</span></div></div><div id="cost-cats"></div></div>
@@ -1290,7 +1348,47 @@ function openTripCoverPreview(){const t=currentTrip();if(!t?.coverImageUrl)retur
 
 function renderTripSelector(){const sel=document.getElementById('trip-selector');if(!sel)return;sel.innerHTML=trips.length?trips.map(t=>`<option value="${esc(t.id)}" ${t.id===currentTripId?'selected':''}>${esc(t.name)} · ${dateLabel(t.startDate,false)} → ${dateLabel(t.endDate,false)}</option>`).join(''):'<option value="">Chưa có chuyến đi</option>';const t=currentTrip();document.getElementById('trip-meta').innerHTML=t?`<b>${esc(t.description||'Chưa có mô tả')}</b><br><span class="muted">${dateLabel(t.startDate)} → ${dateLabel(t.endDate)} · ${durationDays(t.startDate,t.endDate)} ngày ${nights(t.startDate,t.endDate)} đêm · ID: <span class="code">${esc(t.id)}</span></span>`:'Chưa có chuyến đi.';document.getElementById('app-title').textContent=tripTitle(t);document.getElementById('app-subtitle').textContent=routeSubtitle();document.getElementById('hero-title').textContent=t?`${durationDays(t.startDate,t.endDate)} Ngày ${nights(t.startDate,t.endDate)} Đêm`:'Hành trình';document.getElementById('hero-desc').textContent=t?`${routeNames().join(' → ')||'Chưa có điểm hành trình'}`:'Đang tải...';const dateEl=document.getElementById('hero-date-range');if(dateEl)dateEl.textContent=t?`${dateLabel(t.startDate,false)} – ${dateLabel(t.endDate,false)}`:'Đang tải...';const tripName=document.getElementById('dashboard-trip-name');if(tripName)tripName.textContent=t?.name||'Đang tải...';const tripDate=document.getElementById('dashboard-trip-date');if(tripDate)tripDate.textContent=t?`${dateLabel(t.startDate,false)} – ${dateLabel(t.endDate,false)}`:'Đang tải...';const tripRoute=document.getElementById('dashboard-trip-route');if(tripRoute)tripRoute.textContent=routeNames().join(' → ')||'Chưa có điểm hành trình';renderTripCover(t);if(t?.driveUrl){document.getElementById('drive-upload-link').href=t.driveUrl;document.getElementById('drive-view-link').href=t.driveUrl;}}
 function switchTrip(id){if(!id||id===currentTripId)return;currentTripId=id;localStorage.setItem('appdulich_current_trip',id);loadCurrentTripData();document.querySelector('.v7-nav button')?.click();}
-function loadCurrentTripData(){clearListeners();const t=currentTrip();if(!t)return;const dashKm=document.getElementById('dashboard-total-km');if(dashKm)dashKm.textContent='0 km';const dashTime=document.getElementById('dashboard-total-time');if(dashTime)dashTime.textContent='0 giờ 0 phút';renderTripSelector();setStatus('Đang đồng bộ...','#3182ce');const pUn=subRef('points').orderBy('order','asc').onSnapshot(s=>{points=s.docs.map(d=>({id:d.id,...d.data()}));renderPointsTable(points,null,false);syncDashboardRouteStats();if(document.getElementById('v7-route')?.classList.contains('active'))renderRoadRouting();renderTripSelector();},e=>console.error(e));const mUn=subRef('members').orderBy('name','asc').onSnapshot(s=>{members=s.docs.map(d=>({id:d.id,...d.data()}));renderMembers();renderHome();refreshPayerLists();});const sUn=subRef('schedule').orderBy('date','asc').onSnapshot(s=>{schedule=s.docs.map(d=>({id:d.id,...d.data()}));renderSchedule();renderHome();});const cUn=subRef('chat').orderBy('createdAt','asc').limit(500).onSnapshot(s=>{messages=s.docs.map(d=>({id:d.id,...d.data()}));if(!messages.length)messages=[{id:'system',user:'HỆ THỐNG',text:`Chào mừng cả đoàn đến với kênh trao đổi ${t.name||'chuyến đi'}!`,dateTime:''}];renderChatMessages();});const eUn=subRef('expenses').orderBy('date','asc').onSnapshot(s=>{expenses=s.docs.map(d=>({id:d.id,...d.data()}));renderExpenses();renderHome();setStatus('Firebase · Đã đồng bộ','#2f855a');},e=>{console.error(e);setStatus('Firebase · Lỗi đồng bộ','#c53030')});unsubscribers=[pUn,mUn,sUn,cUn,eUn];}
+function loadCurrentTripData(){
+  clearListeners();
+  const t=currentTrip();
+  if(!t)return;
+  const dashKm=document.getElementById('dashboard-total-km'),dashTime=document.getElementById('dashboard-total-time');
+  if(dashKm)dashKm.textContent='0 km';
+  if(dashTime)dashTime.textContent='0 giờ 0 phút';
+  renderTripSelector();
+  setStatus('Đang đồng bộ...','#3182ce');
+
+  const pUn=subRef('points').orderBy('order','asc').onSnapshot(s=>{
+    points=s.docs.map(d=>({id:d.id,...d.data()}));
+    renderPointsTable(points,null,false);syncDashboardRouteStats();
+    if(document.getElementById('v7-route')?.classList.contains('active'))renderRoadRouting();
+    renderTripSelector();
+  },e=>console.error('POINTS LISTENER:',e));
+
+  const mUn=subRef('members').orderBy('name','asc').onSnapshot(s=>{
+    members=s.docs.map(d=>({id:d.id,...d.data()}));renderMembers();renderHome();refreshPayerLists();
+  },e=>console.error('MEMBERS LISTENER:',e));
+
+  const sUn=subRef('schedule').orderBy('date','asc').onSnapshot(s=>{
+    schedule=s.docs.map(d=>({id:d.id,...d.data()}));renderSchedule();renderHome();
+  },e=>console.error('SCHEDULE LISTENER:',e));
+
+  const cUn=subRef('chat').orderBy('createdAt','asc').limit(500).onSnapshot(s=>{
+    messages=s.docs.map(d=>({id:d.id,...d.data()}));
+    if(!messages.length)messages=[{id:'system',user:'HỆ THỐNG',text:`Chào mừng cả đoàn đến với kênh trao đổi ${t.name||'chuyến đi'}!`,dateTime:''}];
+    renderChatMessages();
+  },e=>{
+    console.error('CHAT LISTENER:',e);
+    messages=[{id:'system',user:'HỆ THỐNG',text:'Không thể tải tin nhắn từ Firebase. Vui lòng kiểm tra kết nối/quyền truy cập.',dateTime:''}];
+    renderChatMessages();
+    setStatus(`Chat · Lỗi Firebase (${e?.code||'unknown'})`,'#c53030');
+  });
+
+  const eUn=subRef('expenses').orderBy('date','asc').onSnapshot(s=>{
+    expenses=s.docs.map(d=>({id:d.id,...d.data()}));renderExpenses();renderHome();setStatus('Firebase · Đã đồng bộ','#2f855a');
+  },e=>{console.error('EXPENSE LISTENER:',e);setStatus('Firebase · Lỗi đồng bộ','#c53030')});
+  unsubscribers=[pUn,mUn,sUn,cUn,eUn];
+}
 
 function resetPointForm(){document.getElementById('point-edit-id').value='';['point-name','point-desc','point-lat','point-lng'].forEach(id=>document.getElementById(id).value='');const b=document.getElementById('point-save-btn');if(b){b.textContent='➕ Thêm Điểm Vào Lộ Trình';b.classList.remove('btn-success');}const c=document.getElementById('point-cancel-btn');if(c)c.style.display='none';}
 function cancelPointEdit(){resetPointForm();}
@@ -1310,9 +1408,37 @@ async function deleteMember(id){if(!v7RequireAdmin())return;const m=members.find
 function refreshPayerLists(){const html=members.map(m=>`<option value="${esc(m.name)}"></option>`).join('');document.getElementById('member-payer-list').innerHTML=html;document.getElementById('edit-member-payer-list').innerHTML=html}
 
 function renderChatMessages(){const box=document.getElementById('chat-messages'),my=(localStorage.getItem('chat_my_name')||'').toUpperCase();box.innerHTML=messages.map(m=>{const u=(m.user||'').toUpperCase(),type=u==='HỆ THỐNG'?'system':(my&&u===my?'mine':'other');return `<div class="chat-msg ${type}"><div class="msg-info"><b>${esc(m.user)}</b>${m.dateTime?' • '+esc(m.dateTime):''}</div><div class="bubble">${esc(m.text)}</div></div>`}).join('');box.scrollTop=box.scrollHeight}
-async function sendChatMessage(){if(!currentTripId)return alert('Chưa có chuyến đi.');const user=document.getElementById('chat-user').value.trim().toUpperCase(),text=document.getElementById('chat-text').value.trim();if(!user)return alert('Vui lòng nhập Họ tên!');if(!text)return alert('Vui lòng nhập nội dung!');localStorage.setItem('chat_my_name',user);const now=new Date(),dateTime=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;await subRef('chat').add({user,text,dateTime,createdAt:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('chat-text').value=''}
+async function sendChatMessage(){
+  const userEl=document.getElementById('chat-user'),textEl=document.getElementById('chat-text');
+  const sendBtn=textEl?.parentElement?.querySelector('button');
+  if(!currentTripId)return alert('Chưa có chuyến đi đang mở.');
+  const user=(userEl?.value||'').trim().toUpperCase(),text=(textEl?.value||'').trim();
+  if(!user)return alert('Vui lòng nhập Họ tên!');
+  if(!text)return alert('Vui lòng nhập nội dung!');
+  const matched=members.some(m=>String(m.name||'').trim().toUpperCase()===user);
+  if(!matched)return alert('Tên bạn nhập chưa trùng với tên thành viên trong chuyến đi.\n\nVui lòng nhập đúng Họ và Tên đã đăng ký.');
+  try{
+    if(!auth.currentUser)await auth.signInAnonymously();
+    localStorage.setItem('chat_my_name',user);
+    if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Đang gửi…';}
+    const now=new Date();
+    const dateTime=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    await subRef('chat').add({user,text,dateTime,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    textEl.value='';
+    setStatus('Firebase · Đã gửi tin nhắn','#2f855a');
+  }catch(e){
+    console.error('SEND CHAT ERROR:',e);
+    let msg='Không thể gửi tin nhắn.';
+    if(e?.code==='permission-denied')msg='Firebase từ chối quyền gửi chat. Hãy kiểm tra Firestore Rules: trips/{tripId}/chat/{messageId} phải cho phép create khi đã đăng nhập.';
+    else if(e?.code==='failed-precondition')msg='Firestore yêu cầu cấu hình/index cho truy vấn chat.';
+    else if(e?.code==='unavailable')msg='Mạng/Firebase đang tạm thời không sẵn sàng. Tin nhắn chưa được lưu.';
+    alert(`❌ ${msg}\n\nMã lỗi: ${e?.code||'unknown'}`);
+  }finally{
+    if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Gửi 📤';}
+  }
+}
 
-function defaultScheduleForTrip(t,pts=points){const d=durationDays(t.startDate,t.endDate);const arr=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()).padStart(2,'0')}`;let title='';if(pts[i])title=pts[i].name; if(pts[i]&&pts[i+1])title=`${pts[i].name} → ${pts[i+1].name}`;arr.push({date,title,description:''})}return arr}
+
 function renderSchedule(){const box=document.getElementById('schedule-list');if(!box)return;const t=currentTrip();if(!t){box.innerHTML='<div class="v7-empty">Chưa có chuyến đi.</div>';return}const d=durationDays(t.startDate,t.endDate),rows=[];for(let i=0;i<d;i++){const ds=new Date(dateObj(t.startDate).getTime()+i*86400000),date=`${ds.getFullYear()}-${String(ds.getMonth()+1).padStart(2,'0')}-${String(ds.getDate()).padStart(2,'0')}`,s=schedule.find(x=>x.date===date)||{};rows.push(`<div class="v7-day"><b>NGÀY ${i+1} · ${dateLabel(date)}</b><p><strong>${esc(s.title||'Chưa khai báo tiêu đề')}</strong></p><p>${esc(s.description||'Chưa có nội dung chi tiết.')}</p>${v7IsAdmin()?`<div style="margin-top:6px"><button class="v7-mini v7-edit" onclick="openScheduleEdit('${esc(s.id||'')}', '${date}')">✏️ Sửa</button>${s.id?` <button class="v7-mini v7-del" onclick="deleteSchedule('${esc(s.id)}')">Xóa</button>`:''}</div>`:''}</div>`)}box.innerHTML=rows.join('')}
 function openScheduleEdit(id,date){if(!v7RequireAdmin())return;const s=schedule.find(x=>x.id===id)||{date};document.getElementById('schedule-edit-id').value=id||'';document.getElementById('schedule-date').value=s.date||date;document.getElementById('schedule-title').value=s.title||'';document.getElementById('schedule-desc').value=s.description||'';document.getElementById('schedule-edit-modal').classList.add('show')}
 function closeScheduleModal(){document.getElementById('schedule-edit-modal').classList.remove('show')}
@@ -1333,30 +1459,32 @@ function renderRouteCopy(){const target=document.getElementById('v7-route-copy')
 function v7Show(name,btn){
   document.querySelectorAll('.v7-section').forEach(x=>x.classList.remove('active'));
   const sec=document.getElementById('v7-'+name);
-  if(sec)sec.classList.add('active');
-  document.querySelectorAll('.v7-nav button').forEach(x=>x.classList.remove('active'));
+  if(!sec)return;
+  sec.classList.add('active');
+  document.querySelectorAll('.v7-nav .top-nav-links > button').forEach(x=>x.classList.remove('active'));
   if(btn)btn.classList.add('active');
   document.body.classList.toggle('dashboard-nonhome',name!=='home');
-
-  // Khi bấm tab, tự động cuộn tới đúng khu vực tương ứng.
-  // scroll-margin-top đã chừa khoảng cho thanh menu cố định phía trên.
-  if(sec){
-    requestAnimationFrame(()=>sec.scrollIntoView({behavior:'smooth',block:'start'}));
-  }
-
   if(name==='home'){
-    requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'smooth'}));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }else{
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const nav=document.querySelector('.v7-nav');
+      const navH=nav ? nav.getBoundingClientRect().height : 0;
+      const top=Math.max(0,sec.getBoundingClientRect().top+window.pageYOffset-navH-14);
+      window.scrollTo({top,behavior:'smooth'});
+    }));
   }
   if(name==='route'){
     initMap();
-    setTimeout(()=>{
-      if(map)map.invalidateSize({animate:false});
-      renderRoadRouting();
-      renderRouteCopy();
-    },40);
+    setTimeout(()=>{if(map)map.invalidateSize({animate:false});renderRoadRouting();renderRouteCopy();},100);
   }
   if(name==='schedule')renderSchedule();
   if(name==='members')renderMembers();
+  if(name==='chat'){
+    const input=document.getElementById('chat-user'),text=document.getElementById('chat-text');
+    if(input&&!input.value.trim())input.value=(localStorage.getItem('chat_my_name')||'').toUpperCase();
+    setTimeout(()=>{const box=document.getElementById('chat-messages');if(box)box.scrollTop=box.scrollHeight;if(text&&window.innerWidth>720)text.focus();},150);
+  }
   if(name==='cost')renderExpenses();
 }
 
@@ -1454,79 +1582,50 @@ document.addEventListener('DOMContentLoaded',async()=>{populateCats();const save
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
   }catch(e){console.warn('Auth persistence:',e)}
   auth.onAuthStateChanged(async user=>{
-    await loadAdminRole(user);
-    // Chỉ dùng Anonymous khi Firebase xác nhận thật sự không có phiên đăng nhập.
-    if(!user) startAnonymousSession();
+    if(user){
+      await loadAdminRole(user);
+      if(!tripUnsubscribe) loadTrips();
+    }else{
+      try{await auth.signInAnonymously();}
+      catch(e){console.error('Anonymous Auth:',e);setStatus('Firebase · Chưa đăng nhập','#c53030');}
+    }
   });
-  loadTrips();setTimeout(systemCheck,1500)
+  setTimeout(systemCheck,1500)
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.activeElement?.id==='chat-text'){
+    e.preventDefault();
+    sendChatMessage();
+  }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();closeTripManager();closeScheduleModal();closeExpenseModal();closeReorder()}if(e.key==='Enter'&&document.getElementById('admin-login-modal').classList.contains('show')&&document.activeElement?.tagName==='INPUT')loginAdmin()});
 </script>
 
 <script>
-/* Good Journey — horizontal menu interaction */
 (function(){
   function initHorizontalMenu(){
-    const el = document.querySelector('.v7-nav .top-nav-links');
-    if(!el || el.dataset.gjScrollReady === '1') return;
-    el.dataset.gjScrollReady = '1';
-
-    /* Mouse wheel -> horizontal scroll when menu itself can scroll */
-    el.addEventListener('wheel', function(e){
-      if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      const canScroll = el.scrollWidth > el.clientWidth + 2;
-      if(!canScroll) return;
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    }, {passive:false});
-
-    let down = false, startX = 0, startScroll = 0, moved = false;
-
-    el.addEventListener('pointerdown', function(e){
-      if(e.pointerType === 'mouse' && e.button !== 0) return;
-      down = true;
-      moved = false;
-      startX = e.clientX;
-      startScroll = el.scrollLeft;
-      el.classList.add('dragging');
-      try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    const el=document.querySelector('.v7-nav .top-nav-links');
+    if(!el||el.dataset.gjScrollReady==='1')return;
+    el.dataset.gjScrollReady='1';
+    el.addEventListener('wheel',e=>{
+      if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)||el.scrollWidth<=el.clientWidth+2)return;
+      e.preventDefault();el.scrollLeft+=e.deltaY;
+    },{passive:false});
+    let down=false,startX=0,startScroll=0;
+    el.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      down=true;startX=e.clientX;startScroll=el.scrollLeft;el.classList.add('dragging');
     });
-
-    el.addEventListener('pointermove', function(e){
-      if(!down) return;
-      const dx = e.clientX - startX;
-      if(Math.abs(dx) > 4) moved = true;
-      el.scrollLeft = startScroll - dx;
+    el.addEventListener('pointermove',e=>{
+      if(!down)return;
+      const dx=e.clientX-startX;
+      if(Math.abs(dx)>7)el.scrollLeft=startScroll-dx;
     });
-
-    function endDrag(){
-      if(!down) return;
-      down = false;
-      el.classList.remove('dragging');
-      if(moved){
-        el.dataset.gjBlockClick = '1';
-        setTimeout(()=>{ el.dataset.gjBlockClick = '0'; }, 80);
-      }
-    }
-    el.addEventListener('pointerup', endDrag);
-    el.addEventListener('pointercancel', endDrag);
-    el.addEventListener('pointerleave', function(e){
-      if(e.pointerType === 'mouse') endDrag();
-    });
-
-    el.addEventListener('click', function(e){
-      if(el.dataset.gjBlockClick === '1'){
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, true);
+    const end=()=>{down=false;el.classList.remove('dragging')};
+    el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+    el.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')end()});
   }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', initHorizontalMenu);
-  }else{
-    initHorizontalMenu();
-  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHorizontalMenu);else initHorizontalMenu();
 })();
 </script>
 
