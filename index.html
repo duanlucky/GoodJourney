@@ -991,6 +991,12 @@ body.dashboard-nonhome .v7-section{width:100%!important;max-width:var(--app-shel
 }
 </style>
 
+
+<style id="bacnam-module-css">
+/* ===== CAO TỐC BẮC NAM MODULE ===== */
+.bn-wrap{max-width:1600px;margin:0 auto}.bn-card{background:#fff;border:1px solid #dbe7f1;border-radius:17px;padding:18px;box-shadow:0 8px 24px rgba(31,73,111,.07);margin-bottom:18px}.bn-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.bn-title{display:flex;align-items:center;gap:10px}.bn-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#e8f4ff;font-size:22px}.bn-title h2{margin:0;color:#14518f;font-size:22px;font-weight:850}.bn-title p{margin:3px 0 0;color:#718096;font-size:12px}.bn-role{padding:8px 10px;border-radius:8px;background:#f3f7fb;color:#52677d;font-size:11px}.bn-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 190px auto auto;gap:8px;margin-bottom:12px}.bn-toolbar input,.bn-toolbar select{width:100%;padding:10px 12px;border:1px solid #cbd5e0;border-radius:8px;background:#fff;font-size:13px}.bn-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}.bn-stat{background:#f8fbff;border:1px solid #d9e8f5;border-radius:10px;padding:10px;text-align:center}.bn-stat b{display:block;font-size:17px;color:#1f4e79}.bn-stat span{font-size:10px;color:#718096}.bn-table-wrap{width:100%;overflow:auto;border:1px solid #dbe5ef;border-radius:10px}.bn-table{width:100%;min-width:1180px;border-collapse:collapse}.bn-table th,.bn-table td{border:1px solid #e2e8f0;padding:8px;font-size:12px;line-height:1.45;vertical-align:top}.bn-table th{background:#f3f8fc;color:#2d4f70;font-weight:800;position:sticky;top:0;z-index:2}.bn-table tbody tr:hover td{background:#f8fbff}.bn-stt{text-align:center;width:52px;font-weight:800}.bn-num{text-align:right;white-space:nowrap}.bn-money{text-align:right;white-space:nowrap;font-weight:700}.bn-note{min-width:320px;white-space:pre-line}.bn-status{display:inline-block;padding:4px 7px;border-radius:6px;background:#edf2f7;color:#52606d;font-weight:700;font-size:11px}.bn-actions{white-space:nowrap;text-align:center}.bn-mini{border:0;border-radius:6px;padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer;margin:2px}.bn-edit{background:#fff3cd;color:#8a5a00}.bn-del{background:#ffe3e3;color:#b42318}.bn-empty,.bn-loading{padding:30px;text-align:center;color:#718096;background:#f8fafc}.bn-modal{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:15px;background:rgba(15,23,42,.55)}.bn-modal.show{display:flex}.bn-modal-box{width:100%;max-width:780px;max-height:94vh;overflow:auto;background:#fff;border-radius:15px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.bn-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.bn-modal-head b{color:#14518f;font-size:17px}.bn-close{width:32px;height:32px;border:0;border-radius:50%;background:#edf2f7;cursor:pointer;font-size:18px}.bn-form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.bn-field{margin-bottom:7px}.bn-field.full{grid-column:1/-1}.bn-field label{display:block;margin-bottom:4px;color:#52606d;font-size:11px;font-weight:800}.bn-field input,.bn-field textarea{width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:7px;font-size:13px;background:#fff;box-sizing:border-box}.bn-field textarea{min-height:120px;resize:vertical}.bn-actions-row{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}.bn-import-note{padding:9px 11px;border-radius:8px;background:#f0fff7;border:1px solid #ccefe0;color:#26735b;font-size:11px;margin-bottom:12px}.bn-hidden{display:none!important}@media(max-width:1000px){.bn-toolbar{grid-template-columns:1fr 1fr}.bn-toolbar button{min-width:0}.bn-summary{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.bn-card{padding:12px}.bn-toolbar{grid-template-columns:1fr}.bn-summary{grid-template-columns:1fr 1fr}.bn-form-grid{grid-template-columns:1fr}.bn-field.full{grid-column:auto}.bn-title h2{font-size:18px}}
+</style>
+
 </head>
 <body class="dashboard-home-active">
 <!-- Good Journey - Logo cố định, nền ảnh trong suốt -->
@@ -1059,6 +1065,7 @@ body.dashboard-nonhome .v7-section{width:100%!important;max-width:var(--app-shel
       <button onclick="v7Show('members',this)" title="Thành viên"><svg class="nav-svg" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-3.3 2.4-5 5.5-5s5 1.7 5.5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 14.5c2.6.1 4.2 1.5 4.8 4"/></svg><span>Thành viên</span></button>
       <button onclick="v7Show('chat',this)" title="Chat"><svg class="nav-svg" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-4.5 3V17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 12h7"/></svg><span>Chat</span></button>
       <button onclick="v7Show('cost',this)" title="Chi phí"><svg class="nav-svg" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M7 6V4h10v2M3 10h18"/><circle cx="16.5" cy="14" r="2.2"/><path d="M15.7 14h1.6"/></svg><span>Chi phí</span></button>
+      <button onclick="v7Show('bacnam',this)" title="Cao tốc Bắc Nam"><svg class="nav-svg" viewBox="0 0 24 24"><path d="M5 18h14M7 18l1.5-8h7L17 18M9 10l1-4h4l1 4"/><circle cx="8.5" cy="19" r="1.2"/><circle cx="15.5" cy="19" r="1.2"/></svg><span>Cao tốc Bắc Nam</span></button>
       <button class="admin-only admin-flex" onclick="v7Show('tools',this)" title="Quản trị"><svg class="nav-svg" viewBox="0 0 24 24"><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M5.9 5.9l1.4 1.4M16.7 16.7l1.4 1.4M18.1 5.9l-1.4 1.4M7.3 16.7l-1.4 1.4"/><circle cx="12" cy="12" r="4.2"/></svg><span>Quản trị</span></button>
     </div>
     <div class="top-user-area">
@@ -1068,6 +1075,32 @@ body.dashboard-nonhome .v7-section{width:100%!important;max-width:var(--app-shel
       <button class="top-chevron" type="button" aria-label="Tài khoản">⌄</button>
     </div>
   </div>
+
+
+  <section id="v7-bacnam" class="v7-section">
+    <div class="bn-wrap">
+      <div class="bn-card">
+        <div class="bn-head">
+          <div class="bn-title"><div class="bn-icon">🚗</div><div><h2>Cao tốc Bắc Nam</h2><p>Thông tin các đoạn tuyến · cập nhật từ dữ liệu Excel ngày 08/08/2026</p></div></div>
+          <div id="bn-role" class="bn-role">Đang kiểm tra quyền...</div>
+        </div>
+        <div id="bn-import-note" class="bn-import-note">Dữ liệu được lưu trực tuyến trên Firebase. Thành viên chỉ được xem; Quản trị viên được thêm, sửa, xóa.</div>
+        <div class="bn-summary">
+          <div class="bn-stat"><b id="bn-total">0</b><span>Đoạn tuyến</span></div>
+          <div class="bn-stat"><b id="bn-length">0 km</b><span>Tổng chiều dài</span></div>
+          <div class="bn-stat"><b id="bn-fee">0 đ</b><span>Tổng phí</span></div>
+          <div class="bn-stat"><b id="bn-rest">0</b><span>Có thông tin dừng nghỉ</span></div>
+        </div>
+        <div class="bn-toolbar">
+          <input id="bn-search" type="search" placeholder="🔎 Tìm đoạn tuyến, trạm dừng nghỉ, hiện trạng...">
+          <select id="bn-filter"><option value="">Tất cả hiện trạng</option></select>
+          <button id="bn-add" class="btn btn-success admin-only admin-flex" type="button">➕ Thêm đoạn tuyến</button>
+          <button id="bn-seed" class="btn btn-warning admin-only admin-flex" type="button">📥 Nạp dữ liệu Excel</button>
+        </div>
+        <div id="bn-table" class="bn-table-wrap"><div class="bn-loading">Đang tải dữ liệu...</div></div>
+      </div>
+    </div>
+  </section>
 
   <section id="v7-home" class="v7-section active">
     <div class="dashboard-hero">
@@ -1487,6 +1520,7 @@ function v7Show(name,btn){
     setTimeout(()=>{const box=document.getElementById('chat-messages');if(box)box.scrollTop=box.scrollHeight;if(text&&window.innerWidth>720)text.focus();},150);
   }
   if(name==='cost')renderExpenses();
+  if(name==='bacnam'){ initBacNamModule(); }
 }
 
 async function openTripManager(){if(!v7RequireAdmin())return;renderTripManager();document.getElementById('trip-manager-modal').classList.add('show')}
@@ -1627,6 +1661,130 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();c
     el.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')end()});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHorizontalMenu);else initHorizontalMenu();
+})();
+</script>
+
+
+<script id="bacnam-module-js">
+/* =========================================================
+   CAO TỐC BẮC NAM - MODULE TÍCH HỢP FIREBASE
+   Collection: bac_nam_expressways
+   Quyền đọc: người dùng đã xác thực
+   Quyền ghi/xóa: Admin (v7IsAdmin/v7RequireAdmin)
+   ========================================================= */
+(function(){
+  const COL='bac_nam_expressways';
+  let data=[];
+  let unsub=null;
+  let editId='';
+  let initialized=false;
+
+  const SEED=[
+    [1,'Pháp Vân - Cầu Giẽ',182,29.7,'10+2','6+2',100,40549,'-'],
+    [2,'Cầu Giẽ - Cao Bồ',211.7,48.5,'6+2','4+2',120,82880,'Trạm dừng nghỉ Phú Thứ tại km227.7: đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [3,'Cao Bồ - Mai Sơn',260.2,15.1,'6+2',4,80,0,'Trạm dừng nghỉ Tây Ninh Bình tại km270.1: đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [4,'Mai Sơn - QL45',275.3,63.3,'6+2',4,80,54909,'Trạm dừng nghỉ Đông Sơn tại km329.7: đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [5,'QL45 - Nghi Sơn',338.6,40.9,'6+2',4,90,40516,'Trạm dừng nghỉ Trúc Lâm tại km367: đang xây dựng, chưa có dịch vụ'],
+    [6,'Nghi Sơn - Diễn Châu',379.5,50.5,'6+2',4,90,45405,'Trạm dừng nghỉ Diễn Châu tại km427: đang xây dựng, chỉ có nhà vệ sinh'],
+    [7,'Diễn Châu - Bãi Vọt',430,49.3,'6+2',4,90,82286,'Trạm dừng nghỉ Đức Thọ tại km478.2: đang xây dựng, chưa có dịch vụ'],
+    [8,'Bãi Vọt - Hàm Nghi',479.3,35.1,'6+2',4,90,27443,'-'],
+    [9,'Hàm Nghi - Vũng Áng',514.4,53.7,'6+2',4,90,52573,'Trạm dừng nghỉ Xuân Khiêm tại km534.3: đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [10,'Vũng Áng - Bùng',568.1,58.6,'6+2',4,90,51605,'Trạm dừng nghỉ Xuân Khiêm tại km594.4: có dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng'],
+    [11,'Bùng - Vạn Ninh',626.7,47.1,'6+2',4,90,41786,'Trạm dừng nghỉ Đồng Sơn tại km651: đang xây dựng, chưa có dịch vụ'],
+    [12,'Vạn Ninh - Cam Lộ',673.8,65,'6+2',4,90,59136,'Trạm dừng nghỉ Cồn Tiên tại km725.5: đang xây dựng, chưa có dịch vụ'],
+    [13,'Cam Lộ - La Sơn',739.5,98.4,'6+2','2+2',50,0,'Trạm dừng nghỉ Kim Trà (hướng NB) tại km803.7: đang xây dựng, chưa có dịch vụ.\nTrạm dừng nghỉ Kim Long (hướng BN) tại km817.3: đang xây dựng, chưa có dịch vụ'],
+    [14,'La Sơn - Hòa Liên',837.9,66,'6+2','2+2',60,0,'Trạm dừng nghỉ La Sơn (hướng NB) tại km839.2: đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [15,'Hòa Liên - Túy Loan',903.9,12,'6+2','4+2',80,0,'-'],
+    [16,'Đà Nẵng - Quảng Ngãi',924.5,128,'6+2','4+2',120,216160,'Trạm dừng nghỉ Núi Thành tại km1020 (96.1): đang hoàn thiện, chỉ có nhà vệ sinh'],
+    [17,'Quảng Ngãi - Hoài Nhơn',1064,88,'6+2',4,90,0,'Trạm dừng nghỉ Đình Cường tại km1066: đang xây dựng, chưa có dịch vụ.\nTrạm dừng nghỉ Hoài Nhơn tại km1128: đang xây dựng, chưa có dịch vụ'],
+    [18,'Hoài Nhơn - Quy Nhơn',1152,69,'6+2',4,90,0,'Trạm dừng nghỉ Phú Mỹ Nam tại km1187.5: đang xây dựng, chưa có dịch vụ'],
+    [19,'Quy Nhơn - Chí Thạnh',1221,66,'6+2',4,90,0,'Trạm dừng nghỉ Phương Huy tại km1243: khai thác tạm, có dịch vụ ăn uống, vệ sinh, tạp hóa.\nTrạm dừng nghỉ Xuân Lộc tại km1251: đang xây dựng, có dịch vụ ăn uống, vệ sinh, tạp hóa.\n(Phí Hầm Cù Mông: 69,000đ)'],
+    [20,'Chí Thạnh - Vân Phong',1287,48,'6+2',4,90,0,'Trạm dừng nghỉ Tuy Hòa tại km1320.1: chưa xây dựng'],
+    [21,'Hầm Đèo Cả - Hầm Cổ Mã',1335,13,4,4,80,108000,'-'],
+    [22,'Vân Phong - Nha Trang',1348,87.9,'6+2',4,90,0,'Trạm dừng nghỉ Ninh Hòa tại km1397.9 (334): đang xây dựng, chưa có dịch vụ'],
+    [23,'Nha Trang - Cam Lâm',1435.9,49.1,'6+2',4,90,81904,'Trạm dừng nghỉ Cam Lâm tại km1468.9 (33): có dịch vụ ăn uống, vệ sinh, tạp hóa'],
+    [24,'Cam Lâm - Vĩnh Hảo',1485,85.9,'6+2',4,90,130000,'Trạm dừng nghỉ Thuận Bắc tại km1503.4 (67.5): chưa xây dựng.\nTrạm dừng nghỉ Phương Huy tại km1548.9 (113): có dịch vụ ăn uống, vệ sinh, tạp hóa'],
+    [25,'Vĩnh Hảo - Phan Thiết',1570.9,95.1,'6+2',4,90,90555,'Trạm dừng nghỉ Tuy Phong tại km1575 (139.1): chưa xây dựng.\nTrạm dừng nghỉ TTC tại km1641 (205.1): đầy đủ dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng, trạm sạc'],
+    [26,'Phan Thiết - Dầu Giây',1659.4,99,'6+2','4+2',120,128700,'Trạm dừng nghỉ FUTA tại km1706.9 (47.5): có dịch vụ ăn uống, vệ sinh, tạp hóa'],
+    [27,'Dầu Giây - TPHCM',1758.4,43.5,'10+2','4+2',120,86047,'Trạm dừng nghỉ Châu Thành tại km1760.7 (42.1): có dịch vụ ăn uống, vệ sinh, tạp hóa, cây xăng tạm dừng']
+  ];
+
+  function E(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+  function N(v){return Number.isFinite(Number(v))?Number(v).toLocaleString('vi-VN',{maximumFractionDigits:2}):''}
+  function M(v){return Number(v||0).toLocaleString('vi-VN',{maximumFractionDigits:0})+' đ'}
+  function admin(){return typeof v7IsAdmin==='function'&&v7IsAdmin()}
+  function requireAdmin(){return typeof v7RequireAdmin==='function'?v7RequireAdmin():false}
+  function els(id){return document.getElementById(id)}
+
+  function createModal(){
+    if(els('bn-modal'))return;
+    const d=document.createElement('div');d.id='bn-modal';d.className='bn-modal';
+    d.innerHTML=`<div class="bn-modal-box"><div class="bn-modal-head"><b id="bn-modal-title">➕ Thêm đoạn tuyến</b><button class="bn-close" type="button" onclick="bnClose()">×</button></div><div class="bn-form-grid"><div class="bn-field"><label>STT *</label><input id="bn-stt" type="number" min="1"></div><div class="bn-field"><label>Đoạn tuyến *</label><input id="bn-segment" type="text"></div><div class="bn-field"><label>Điểm đầu (km)</label><input id="bn-start" type="number" step="any"></div><div class="bn-field"><label>Chiều dài (km) *</label><input id="bn-len" type="number" step="any"></div><div class="bn-field"><label>Quy mô</label><input id="bn-scale" type="text"></div><div class="bn-field"><label>Hiện trạng</label><input id="bn-status" type="text"></div><div class="bn-field"><label>Tốc độ tối đa (km/h)</label><input id="bn-speed" type="number" min="0"></div><div class="bn-field"><label>Phí (VNĐ)</label><input id="bn-fee-input" type="number" min="0"></div><div class="bn-field full"><label>Ghi chú / Trạm dừng nghỉ</label><textarea id="bn-note"></textarea></div></div><div class="bn-actions-row"><button class="btn btn-light" type="button" onclick="bnClose()">Hủy</button><button class="btn btn-success" type="button" onclick="bnSave()">💾 Lưu</button></div></div>`;
+    d.addEventListener('click',e=>{if(e.target===d)window.bnClose()});document.body.appendChild(d);
+  }
+
+  function getDisplayData(){
+    // Luôn hiển thị danh sách chuẩn từ Excel ngay cả khi Firestore chưa có dữ liệu.
+    // Khi Firestore có dữ liệu, dữ liệu online sẽ được ưu tiên.
+    if(data.length) return data;
+    return SEED.map(r=>({stt:r[0],segment:r[1],startKm:r[2],lengthKm:r[3],scale:String(r[4]??''),status:String(r[5]??''),speed:r[6],fee:r[7],note:r[8]||'',localOnly:true}));
+  }
+
+  function render(){
+    const box=els('bn-table');if(!box)return;
+    const display=getDisplayData();
+    const q=(els('bn-search')?.value||'').trim().toLowerCase(), f=els('bn-filter')?.value||'';
+    let list=display.filter(x=>{const text=[x.segment,x.scale,x.status,x.note,x.startKm,x.speed].join(' ').toLowerCase();return(!q||text.includes(q))&&(!f||String(x.status||'')===f)}).sort((a,b)=>Number(a.stt)-Number(b.stt));
+    els('bn-total').textContent=display.length;els('bn-length').textContent=N(display.reduce((s,x)=>s+Number(x.lengthKm||0),0))+' km';els('bn-fee').textContent=M(display.reduce((s,x)=>s+Number(x.fee||0),0));els('bn-rest').textContent=display.filter(x=>x.note&&x.note!=='-').length;
+    const role=els('bn-role');if(role)role.textContent=admin()?'🔐 Quản trị viên · Có quyền sửa':'👁 Thành viên · Chỉ xem';
+    const seed=els('bn-seed');if(seed)seed.style.display=admin()?'inline-flex':'none';
+    const add=els('bn-add');if(add)add.style.display=admin()?'inline-flex':'none';
+    if(!list.length){box.innerHTML='<div class="bn-empty">Không có dữ liệu phù hợp.</div>';return}
+    box.innerHTML=`<table class="bn-table"><thead><tr><th>STT</th><th>Đoạn tuyến</th><th>Điểm đầu<br>(km)</th><th>Chiều dài<br>(km)</th><th>Quy mô</th><th>Hiện trạng</th><th>Tốc độ tối đa<br>(km/h)</th><th>Phí<br>(VNĐ)</th><th>Ghi chú / Trạm dừng nghỉ</th>${admin()?'<th>Thao tác</th>':''}</tr></thead><tbody>${list.map(x=>`<tr><td class="bn-stt">${E(x.stt)}</td><td><b>${E(x.segment)}</b></td><td class="bn-num">${N(x.startKm)}</td><td class="bn-num">${N(x.lengthKm)}</td><td>${E(x.scale)}</td><td><span class="bn-status">${E(x.status)}</span></td><td class="bn-num">${E(x.speed)}</td><td class="bn-money">${M(x.fee)}</td><td class="bn-note">${E(x.note||'-')}</td>${admin()?`<td class="bn-actions"><button class="bn-mini bn-edit" onclick="bnEdit('${E(x.id)}')">✏️ Sửa</button><button class="bn-mini bn-del" onclick="bnDelete('${E(x.id)}')">🗑️ Xóa</button></td>`:''}</tr>`).join('')}</tbody></table>`;
+  }
+
+  function filters(){
+    const sel=els('bn-filter');if(!sel)return;const old=sel.value;const source=data.length?data:SEED.map(r=>({status:r[5]}));const vals=[...new Set(source.map(x=>String(x.status??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi'));
+    sel.innerHTML='<option value="">Tất cả hiện trạng</option>'+vals.map(v=>`<option value="${E(v)}">${E(v)}</option>`).join('');if(vals.includes(old))sel.value=old;
+  }
+
+  async function listen(){
+    if(unsub||typeof db==='undefined')return;
+    unsub=db.collection(COL).orderBy('stt','asc').onSnapshot(async snap=>{
+      data=snap.docs.map(d=>({id:d.id,...d.data()}));filters();render();
+      if(!data.length&&admin()) await seedIfEmpty();
+    },err=>{console.error('Cao toc Firebase',err);filters();render();});
+  }
+
+  async function seedIfEmpty(){
+    if(!admin()||typeof db==='undefined')return;
+    const check=await db.collection(COL).limit(1).get();if(!check.empty)return;
+    const batch=db.batch();SEED.forEach(r=>{const ref=db.collection(COL).doc();batch.set(ref,{stt:r[0],segment:r[1],startKm:r[2],lengthKm:r[3],scale:String(r[4]??''),status:String(r[5]??''),speed:r[6],fee:r[7],note:r[8]||'',source:'Book1.xlsx - Sheet2',sourceUpdated:'08/08/2026',createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||null})});
+    try{await batch.commit();alert('✅ Đã nạp 27 đoạn tuyến từ Book1.xlsx vào Firebase.')}catch(e){console.error(e);alert('❌ Không thể nạp dữ liệu: '+e.message)}
+  }
+
+  async function save(){
+    if(!requireAdmin())return;
+    const obj={stt:Number(els('bn-stt').value),segment:els('bn-segment').value.trim(),startKm:Number(els('bn-start').value),lengthKm:Number(els('bn-len').value),scale:els('bn-scale').value.trim(),status:els('bn-status').value.trim(),speed:Number(els('bn-speed').value),fee:Number(els('bn-fee-input').value),note:els('bn-note').value.trim(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||null};
+    if(!Number.isInteger(obj.stt)||obj.stt<1)return alert('STT không hợp lệ.');if(!obj.segment)return alert('Vui lòng nhập Đoạn tuyến.');if(!Number.isFinite(obj.lengthKm)||obj.lengthKm<=0)return alert('Chiều dài không hợp lệ.');if(!Number.isFinite(obj.startKm))obj.startKm=0;if(!Number.isFinite(obj.speed)||obj.speed<0)return alert('Tốc độ không hợp lệ.');if(!Number.isFinite(obj.fee)||obj.fee<0)return alert('Phí không hợp lệ.');
+    try{if(editId){await db.collection(COL).doc(editId).update(obj);alert('✅ Đã cập nhật đoạn tuyến.')}else{await db.collection(COL).add({...obj,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null});alert('✅ Đã thêm đoạn tuyến.')}window.bnClose()}catch(e){console.error(e);alert('❌ Không thể lưu: '+e.message)}
+  }
+
+  window.bnOpen=function(){if(!requireAdmin())return;editId='';els('bn-modal-title').textContent='➕ Thêm đoạn tuyến';els('bn-stt').value=data.length?Math.max(...data.map(x=>Number(x.stt)||0))+1:1;['bn-segment','bn-start','bn-len','bn-scale','bn-status','bn-speed','bn-fee-input','bn-note'].forEach(id=>els(id).value='');els('bn-modal').classList.add('show');els('bn-segment').focus()};
+  window.bnEdit=function(id){if(!requireAdmin())return;const x=data.find(y=>y.id===id);if(!x)return;editId=id;els('bn-modal-title').textContent='✏️ Sửa đoạn tuyến';els('bn-stt').value=x.stt??'';els('bn-segment').value=x.segment??'';els('bn-start').value=x.startKm??'';els('bn-len').value=x.lengthKm??'';els('bn-scale').value=x.scale??'';els('bn-status').value=x.status??'';els('bn-speed').value=x.speed??'';els('bn-fee-input').value=x.fee??'';els('bn-note').value=x.note??'';els('bn-modal').classList.add('show');};
+  window.bnSave=save;
+  window.bnClose=function(){els('bn-modal')?.classList.remove('show')};
+  window.bnDelete=async function(id){if(!requireAdmin())return;const x=data.find(y=>y.id===id);if(!x)return;if(!confirm(`Xóa đoạn tuyến ${x.stt}. ${x.segment}?\n\nDữ liệu sẽ bị xóa khỏi Firebase và không thể hoàn tác.`))return;try{await db.collection(COL).doc(id).delete();alert('✅ Đã xóa đoạn tuyến.')}catch(e){console.error(e);alert('❌ Không thể xóa: '+e.message)}};
+  window.bnSeed=seedIfEmpty;
+
+  window.initBacNamModule=function(){
+    createModal();
+    if(!initialized){initialized=true;els('bn-search')?.addEventListener('input',render);els('bn-filter')?.addEventListener('change',render);els('bn-add')?.addEventListener('click',window.bnOpen);els('bn-seed')?.addEventListener('click',async()=>{if(!requireAdmin())return;const ok=confirm('Nạp dữ liệu 27 đoạn tuyến từ Book1.xlsx vào Firebase? Nếu collection đã có dữ liệu, hệ thống sẽ không ghi đè.');if(ok)await seedIfEmpty();});listen();}
+    filters();render();
+  };
+
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')window.bnClose()});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{createModal()});else createModal();
 })();
 </script>
 
