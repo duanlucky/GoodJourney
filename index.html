@@ -1740,7 +1740,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();c
     const seed=els('bn-seed');if(seed)seed.style.display=admin()?'inline-flex':'none';
     const add=els('bn-add');if(add)add.style.display=admin()?'inline-flex':'none';
     if(!list.length){box.innerHTML='<div class="bn-empty">Không có dữ liệu phù hợp.</div>';return}
-    box.innerHTML=`<table class="bn-table"><thead><tr><th>STT</th><th>Đoạn tuyến</th><th>Điểm đầu<br>(km)</th><th>Chiều dài<br>(km)</th><th>Quy mô</th><th>Hiện trạng</th><th>Tốc độ tối đa<br>(km/h)</th><th>Phí<br>(VNĐ)</th><th>Ghi chú / Trạm dừng nghỉ</th>${admin()?'<th>Thao tác</th>':''}</tr></thead><tbody>${list.map(x=>`<tr><td class="bn-stt">${E(x.stt)}</td><td><b>${E(x.segment)}</b></td><td class="bn-num">${N(x.startKm)}</td><td class="bn-num">${N(x.lengthKm)}</td><td>${E(x.scale)}</td><td><span class="bn-status">${E(x.status)}</span></td><td class="bn-num">${E(x.speed)}</td><td class="bn-money">${M(x.fee)}</td><td class="bn-note">${E(x.note||'-')}</td>${admin()?`<td class="bn-actions"><button class="bn-mini bn-edit" onclick="bnEdit('${E(x.id)}')">✏️ Sửa</button><button class="bn-mini bn-del" onclick="bnDelete('${E(x.id)}')">🗑️ Xóa</button></td>`:''}</tr>`).join('')}</tbody></table>`;
+    box.innerHTML=`<table class="bn-table"><thead><tr><th>STT</th><th>Đoạn tuyến</th><th>Điểm đầu<br>(km)</th><th>Chiều dài<br>(km)</th><th>Quy mô</th><th>Hiện trạng</th><th>Tốc độ tối đa<br>(km/h)</th><th>Phí<br>(VNĐ)</th><th>Ghi chú / Trạm dừng nghỉ</th>${admin()?'<th>Thao tác</th>':''}</tr></thead><tbody>${list.map(x=>`<tr><td class="bn-stt">${E(x.stt)}</td><td><b>${E(x.segment)}</b></td><td class="bn-num">${N(x.startKm)}</td><td class="bn-num">${N(x.lengthKm)}</td><td>${E(x.scale)}</td><td><span class="bn-status">${E(x.status)}</span></td><td class="bn-num">${E(x.speed)}</td><td class="bn-money">${M(x.fee)}</td><td class="bn-note">${E(x.note||'-')}</td>${admin()?`<td class="bn-actions">${x.localOnly?`<button class="bn-mini bn-edit" onclick="bnSeedAndEdit(${Number(x.stt)})">✏️ Sửa</button><button class="bn-mini bn-del" onclick="bnSeedAndDelete(${Number(x.stt)})">🗑️ Xóa</button>`:`<button class="bn-mini bn-edit" onclick="bnEdit('${E(x.id)}')">✏️ Sửa</button><button class="bn-mini bn-del" onclick="bnDelete('${E(x.id)}')">🗑️ Xóa</button>`}</td>`:''}</tr>`).join('')}</tbody></table>`;
   }
 
   function filters(){
@@ -1757,10 +1757,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();c
   }
 
   async function seedIfEmpty(){
-    if(!admin()||typeof db==='undefined')return;
-    const check=await db.collection(COL).limit(1).get();if(!check.empty)return;
+    if(!admin()||typeof db==='undefined')return false;
+    const check=await db.collection(COL).limit(1).get();if(!check.empty)return true;
     const batch=db.batch();SEED.forEach(r=>{const ref=db.collection(COL).doc();batch.set(ref,{stt:r[0],segment:r[1],startKm:r[2],lengthKm:r[3],scale:String(r[4]??''),status:String(r[5]??''),speed:r[6],fee:r[7],note:r[8]||'',source:'Book1.xlsx - Sheet2',sourceUpdated:'08/08/2026',createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||null})});
-    try{await batch.commit();alert('✅ Đã nạp 27 đoạn tuyến từ Book1.xlsx vào Firebase.')}catch(e){console.error(e);alert('❌ Không thể nạp dữ liệu: '+e.message)}
+    try{await batch.commit();alert('✅ Đã nạp 27 đoạn tuyến từ Book1.xlsx vào Firebase.');return true}catch(e){console.error(e);alert('❌ Không thể nạp dữ liệu: '+e.message);return false}
   }
 
   async function save(){
@@ -1776,6 +1776,37 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdminLogin();c
   window.bnClose=function(){els('bn-modal')?.classList.remove('show')};
   window.bnDelete=async function(id){if(!requireAdmin())return;const x=data.find(y=>y.id===id);if(!x)return;if(!confirm(`Xóa đoạn tuyến ${x.stt}. ${x.segment}?\n\nDữ liệu sẽ bị xóa khỏi Firebase và không thể hoàn tác.`))return;try{await db.collection(COL).doc(id).delete();alert('✅ Đã xóa đoạn tuyến.')}catch(e){console.error(e);alert('❌ Không thể xóa: '+e.message)}};
   window.bnSeed=seedIfEmpty;
+
+  // Quando o Firebase ainda não possui os dados, a tabela usa os 27 registros
+  // locais como fallback. Nessa situação os botões não têm document ID;
+  // primeiro sincronizamos o registro com o Firebase e só então editamos/excluímos.
+  window.bnSeedAndEdit=async function(stt){
+    if(!requireAdmin())return;
+    try{
+      const ok=await seedIfEmpty();
+      if(!ok)return;
+      const snap=await db.collection(COL).where('stt','==',Number(stt)).limit(1).get();
+      const x=snap.empty?null:{id:snap.docs[0].id,...snap.docs[0].data()};
+      if(!x){alert('❌ Chưa tìm thấy đoạn tuyến trên Firebase sau khi nạp dữ liệu.');return;}
+      window.bnEdit(x.id);
+    }catch(e){console.error(e);alert('❌ Không thể đồng bộ đoạn tuyến với Firebase: '+(e.message||e));}
+  };
+
+  window.bnSeedAndDelete=async function(stt){
+    if(!requireAdmin())return;
+    const x0=SEED.find(r=>Number(r[0])===Number(stt));
+    if(!x0)return;
+    if(!confirm(`Xóa đoạn tuyến ${x0[0]}. ${x0[1]}?\n\nHệ thống sẽ đồng bộ dữ liệu này lên Firebase trước khi xóa.`))return;
+    try{
+      const ok=await seedIfEmpty();
+      if(!ok)return;
+      const snap=await db.collection(COL).where('stt','==',Number(stt)).limit(1).get();
+      const x=snap.empty?null:{id:snap.docs[0].id,...snap.docs[0].data()};
+      if(!x){alert('❌ Chưa tìm thấy đoạn tuyến trên Firebase sau khi nạp dữ liệu.');return;}
+      await db.collection(COL).doc(x.id).delete();
+      alert('✅ Đã xóa đoạn tuyến.');
+    }catch(e){console.error(e);alert('❌ Không thể xóa: '+(e.message||e));}
+  };
 
   window.initBacNamModule=function(){
     createModal();
